@@ -58,30 +58,43 @@ export function AppointmentDetail({
   appointment,
   canUpdate,
   canCancel,
+  canOpenClinical,
   onClose,
   onChanged,
 }: {
   appointment: AppointmentWithPatient;
   canUpdate: boolean;
   canCancel: boolean;
+  canOpenClinical?: boolean;
   onClose: () => void;
   onChanged: () => void;
 }) {
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [startLocal, setStartLocal] = useState("");
 
   async function runStatus(status: AppointmentStatus) {
-    if (status === "in_progress") {
-      setInfo(
-        "O prontuário clínico será implementado na próxima fase.",
-      );
-    }
     if (status === "no_show") {
       const ok = window.confirm("Marcar paciente como faltou?");
       if (!ok) return;
+    }
+    if (status === "completed") {
+      const drafts = await fetch(
+        `/api/demo/clinical?resource=drafts-for-appointment&appointmentId=${appointment.id}`,
+      );
+      if (drafts.ok) {
+        const data = (await drafts.json()) as { items?: unknown[] };
+        if ((data.items?.length ?? 0) > 0) {
+          const proceed = window.confirm(
+            "Existe uma evolução clínica em rascunho para este atendimento.\n\nOK = Concluir consulta mesmo assim\nCancelar = Voltar ao prontuário",
+          );
+          if (!proceed) {
+            window.location.href = `/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`;
+            return;
+          }
+        }
+      }
     }
     setLoading(true);
     setError(null);
@@ -94,6 +107,10 @@ export function AppointmentDetail({
     setLoading(false);
     if (!response.ok) {
       setError(data.error ?? "Não foi possível concluir esta ação. Tente novamente.");
+      return;
+    }
+    if (status === "in_progress" && canOpenClinical) {
+      window.location.href = `/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`;
       return;
     }
     onChanged();
@@ -207,11 +224,6 @@ export function AppointmentDetail({
           />
         </dl>
 
-        {info ? (
-          <p className="mt-3 rounded-xl bg-[var(--info-soft)] px-3 py-2 text-sm text-[var(--info)]">
-            {info}
-          </p>
-        ) : null}
         {error ? (
           <p className="mt-3 rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
             {error}
@@ -246,6 +258,17 @@ export function AppointmentDetail({
           </form>
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
+            {canOpenClinical &&
+            (appointment.status === "arrived" ||
+              appointment.status === "in_progress" ||
+              appointment.status === "confirmed") ? (
+              <Link
+                href={`/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`}
+                className="inline-flex h-9 items-center rounded-xl bg-[var(--brand-primary)] px-3 text-sm font-medium text-white"
+              >
+                Abrir prontuário
+              </Link>
+            ) : null}
             {actions.map((action) => (
               <Button
                 key={action.label}

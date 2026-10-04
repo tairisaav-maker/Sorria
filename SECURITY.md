@@ -4,33 +4,31 @@
 
 **Deny by default · Least privilege · Defense in depth · Tenant isolation**
 
-## Regra estrutural
+## Regras estruturais
 
-**Administrative Patient Data ≠ Clinical Record Access**
+```text
+Administrativo ≠ Clínico
+Agenda ≠ Prontuário
+Rascunho ≠ Registro finalizado
+Correção ≠ Sobrescrita silenciosa
+Owner administrativo ≠ acesso clínico universal
+Arquivo privado ≠ URL pública
+```
 
-Secretária: dados cadastrais + agenda administrativa ✅  
-Prontuário/anamnese/evolução/odontograma/arquivos clínicos ❌
+## Prontuário (Fase 4)
 
-## Agenda (Fase 3)
+Permissões: `clinical_record.*`, `anamnesis.*`, `clinical_evolution.*`, `odontogram.*`, `clinical_files.*`
 
-- `appointments.view|create|update|cancel`
-- `appointment_requests.view|manage`
-- Checks via `can()` / `requirePermission` — não espalhar role checks na UI
-- `patient_id` e `professional_id` validados no tenant (membership ativo + papel adequado)
-- Cross-clinic: UUID conhecido de outra clínica → not found / denied (sem revelar existência)
-- Usuário suspenso: membership inativo → negado
-- Conflitos de horário validados no servidor (não só na UI)
-- Aprovação de solicitação revalida disponibilidade (race condition)
-- Audit (sem dados excessivamente sensíveis):
-  - `appointment.created|rescheduled|status_changed|cancelled`
-  - `appointment_request.created|reviewed|proposed|approved|rejected|cancelled`
+- Secretária: clínico **NEGADO** (sem badges/contadores clínicos)
+- Dentista: clínico conforme matriz
+- Owner: administrativo; clínico somente com `clinical_access`
+- Cross-clinic: UUID/path conhecidos → not found
+- Storage: bucket privado; signed URL temporária; path tenant-bound
+- Evolução finalizada: sem update silencioso; correção versionada
+- Audit: ações de anamnese/evolução/odontograma/arquivo **sem** dump completo do conteúdo clínico
 
 ## Cadeia
 
 ```text
-Auth → Membership → Clinic → Permission → Tenant Check → RLS → Data
+Auth → Membership → Clinic → Permission (+ clinical_access) → Tenant Check → RLS → Data/Storage
 ```
-
-## Service role
-
-Nunca no browser. Nunca `NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY`.

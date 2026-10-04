@@ -1,6 +1,6 @@
 import {
   getMembership,
-  permissionsForRole,
+  permissionsForMembership,
 } from "@/lib/demo/authz-store";
 import type { PermissionKey } from "@/lib/permissions/keys";
 
@@ -53,7 +53,7 @@ export function can(
     return { allowed: false, reason: "revoked" };
   }
 
-  const granted = permissionsForRole(membership.role_key);
+  const granted = permissionsForMembership(membership);
   if (!granted.includes(permission)) {
     return { allowed: false, reason: "missing_permission" };
   }

@@ -24,6 +24,7 @@ import {
   countPendingRequests,
   listAppointmentRequests,
 } from "@/services/appointment-requests";
+import { countPendingFollowUps } from "@/services/clinical";
 import { listPatients } from "@/services/patients";
 
 function mapHomeStatus(
@@ -38,6 +39,7 @@ export function buildHomeDashboard(ctx: AuthzContext) {
   const canAgenda = can(ctx, "appointments.view").allowed;
   const canRequests = can(ctx, "appointment_requests.view").allowed;
   const canPatients = can(ctx, "patients.demographics.view").allowed;
+  const canClinical = can(ctx, "clinical_evolution.view").allowed;
 
   const todayStats = canAgenda
     ? countTodayAppointments(ctx)
@@ -46,6 +48,19 @@ export function buildHomeDashboard(ctx: AuthzContext) {
   const activePatients = canPatients
     ? listPatients(ctx, { status: "active", page: 1, pageSize: 1 }).total
     : 0;
+
+  const pendingFollowUps = canClinical ? countPendingFollowUps(ctx) : 0;
+
+  const pendenciasHint = canClinical
+    ? [
+        pendingRequests > 0 ? `${pendingRequests} solicitações` : null,
+        pendingFollowUps > 0 ? `${pendingFollowUps} retornos` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ") || "nada pendente"
+    : pendingRequests > 0
+      ? "solicitações aguardando"
+      : "agenda";
 
   const kpis: HomeKpi[] = [
     {
@@ -66,8 +81,11 @@ export function buildHomeDashboard(ctx: AuthzContext) {
     {
       id: "requests",
       label: "Pendências",
-      value: String(pendingRequests),
-      hint: "solicitações aguardando",
+      // Secretária: só solicitações (sem vazamento de retorno clínico)
+      value: String(
+        canClinical ? pendingRequests + pendingFollowUps : pendingRequests,
+      ),
+      hint: pendenciasHint,
     },
     {
       id: "patients",

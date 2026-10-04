@@ -92,11 +92,24 @@ export const PATIENT_ADMIN_PERMISSIONS: PermissionKey[] = [
   "patients.administrative.update",
 ];
 
+/**
+ * Owner = poder administrativo da clínica.
+ * NÃO implica acesso clínico universal (gestor ≠ profissional clínico).
+ * Acesso clínico exige papel dentist ou membership.clinical_access.
+ */
+export const OWNER_ADMIN_PERMISSIONS: PermissionKey[] = PERMISSIONS.filter(
+  (key) =>
+    !CLINICAL_PERMISSIONS.includes(key) &&
+    key !== "treatments.view" &&
+    key !== "treatments.create" &&
+    key !== "treatments.update",
+);
+
 export const ROLE_PERMISSION_MATRIX: Record<
   Exclude<RoleKey, "patient">,
   PermissionKey[]
 > = {
-  owner: [...PERMISSIONS],
+  owner: [...OWNER_ADMIN_PERMISSIONS],
   dentist: [
     "dashboard.view",
     "appointments.view",

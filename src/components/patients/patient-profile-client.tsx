@@ -40,15 +40,19 @@ export function PatientProfileClient({
   canEdit,
   canArchive,
   canCreateAppointment,
+  canViewClinical,
   nextAppointment,
   lastAppointment,
+  followUp,
 }: {
   patient: Patient;
   canEdit: boolean;
   canArchive: boolean;
   canCreateAppointment: boolean;
+  canViewClinical: boolean;
   nextAppointment: AppointmentWithPatient | null;
   lastAppointment: AppointmentWithPatient | null;
+  followUp: { intervalDays: number | null; pending: boolean } | null;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Resumo");
@@ -187,6 +191,33 @@ export function PatientProfileClient({
       {tab === "Resumo" ? (
         <div className="grid gap-4 md:grid-cols-2">
           <PatientCompletion patient={patient} />
+
+          {canViewClinical && followUp ? (
+            <SummaryCard title="Retorno indicado">
+              <Row
+                label="Prazo"
+                value={
+                  followUp.intervalDays
+                    ? `Em ${followUp.intervalDays} dias`
+                    : "Indicado"
+                }
+              />
+              <Row
+                label="Situação"
+                value={
+                  followUp.pending ? "Retorno pendente" : "Consulta futura existe"
+                }
+              />
+              {followUp.pending && canCreateAppointment ? (
+                <Link
+                  href={`/app/agenda?patientId=${patient.id}`}
+                  className="mt-2 inline-flex text-sm font-medium text-[var(--brand-primary)]"
+                >
+                  Agendar retorno
+                </Link>
+              ) : null}
+            </SummaryCard>
+          ) : null}
 
           <SummaryCard title="Próxima consulta">
             {nextAppointment ? (
@@ -377,7 +408,21 @@ export function PatientProfileClient({
       ) : null}
 
       {tab === "Prontuário" ? (
-        <Placeholder text="O prontuário clínico será disponibilizado em uma próxima etapa." />
+        canViewClinical ? (
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-5 py-8 text-center">
+            <p className="text-sm text-[var(--text-muted)]">
+              Abrir o prontuário clínico completo deste paciente.
+            </p>
+            <Link
+              href={`/app/pacientes/${patient.id}/prontuario`}
+              className="mt-4 inline-flex h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
+            >
+              Abrir prontuário
+            </Link>
+          </div>
+        ) : (
+          <Placeholder text="Você não tem permissão para acessar o prontuário deste paciente." />
+        )
       ) : null}
       {tab === "Tratamento" ? (
         <Placeholder text="Os planos de tratamento serão disponibilizados em uma próxima etapa." />

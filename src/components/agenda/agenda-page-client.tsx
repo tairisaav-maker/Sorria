@@ -44,6 +44,7 @@ export function AgendaPageClient({
   canCreate,
   canUpdate,
   canCancel,
+  canOpenClinical,
   pendingRequests,
   professionals,
   defaultProfessionalId,
@@ -52,6 +53,7 @@ export function AgendaPageClient({
   canCreate: boolean;
   canUpdate: boolean;
   canCancel: boolean;
+  canOpenClinical?: boolean;
   pendingRequests: number;
   professionals: Professional[];
   defaultProfessionalId: string;
@@ -259,6 +261,7 @@ export function AgendaPageClient({
           appointment={selected}
           canUpdate={canUpdate}
           canCancel={canCancel}
+          canOpenClinical={canOpenClinical}
           onClose={() => setSelected(null)}
           onChanged={async () => {
             setSelected(null);

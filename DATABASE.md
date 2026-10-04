@@ -6,73 +6,51 @@
 2. `20251005000000_fase1_authz_equipe.sql`
 3. `20251006000000_fase2_patients.sql`
 4. `20251007000000_fase3_agenda.sql`
+5. `20251008000000_fase4_prontuario.sql`
 
-## Fase 3 — Agenda
+## Fase 4 — Prontuário
 
-### `appointment_requests`
+### `clinic_members.clinical_access`
 
-Solicitação de horário. Nunca vira consulta automaticamente.
+Opt-in de acesso clínico. Owner sem flag não acessa prontuário.  
+Migration revoga permissões clínicas do papel `owner` no catálogo.
 
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| id | uuid | PK |
-| clinic_id | uuid | tenant |
-| patient_id | uuid | FK patients |
-| requested_date | date | opcional |
-| preferred_period | enum | morning / afternoon / evening |
-| reason / custom_reason / notes | text | motivo ≠ diagnóstico |
-| status | enum | new…cancelled |
-| proposed_start_at / proposed_end_at | timestamptz | preenchidos na proposta |
-| proposed_professional_id | uuid | |
-| reviewed_by / reviewed_at | | |
-| rejection_reason | text | |
-| created_at / updated_at / cancelled_at | | |
+### `anamneses`
 
-### `appointments`
-
-Consulta definitiva da agenda.
-
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| id | uuid | PK |
-| clinic_id / patient_id / professional_id | uuid | tenant + FKs |
-| appointment_request_id | uuid | nullable — vínculo opcional |
-| start_at / end_at | timestamptz | `end_at > start_at` |
-| reason / status / notes | | |
-| estimated_value | numeric | opcional |
-| created_by | uuid | |
-| cancelled_at / cancellation_reason / cancelled_by | | |
-
-**Canceladas não bloqueiam horário** (exclusão de overlap ignora `cancelled`).
-
-### `appointment_status_history`
-
-| Coluna | Tipo |
+| Coluna | Notas |
 | --- | --- |
-| id | uuid |
-| appointment_id / clinic_id | uuid |
-| from_status / to_status | enum |
-| changed_by / reason | |
-| created_at | timestamptz |
+| template_version | default 1 |
+| status | draft / submitted / reviewed |
+| answered_by / answered_at | |
+| reviewed_by / reviewed_at | |
 
-Alterações de horário/profissional também vão para `audit_logs` (`appointment.rescheduled`).
+### `anamnesis_answers`
 
-### Constraints / índices
+`question_key` + `value_bool` / `value_text` · unique (anamnesis_id, question_key)
 
-- Check `end_at > start_at`
-- Exclusion gist (quando disponível) para overlap por `(clinic_id, professional_id)` em status ≠ cancelled
-- Índices: `(clinic_id, start_at)`, `(clinic_id, professional_id, start_at)`, `(clinic_id, patient_id)`, `(clinic_id, status)`
-- Requests: `(clinic_id, status, created_at desc)`, `(patient_id)`
+### `clinical_entries`
 
-### RLS
+Queixa, exame, procedimento, conduta, orientações, próximo passo, `related_teeth[]`,  
+`follow_up_required`, `follow_up_interval_days`, `status` draft|finalized, `signed_at`, `version_number`
 
-Todas as três tabelas:
+### `clinical_entry_versions`
 
-- auth obrigatório
-- membership ativo na clínica
-- permission apropriada (`appointments.*` / `appointment_requests.*`)
-- isolamento por `clinic_id`
+Snapshots imutáveis: `version_number`, `snapshot_json`, `changed_by`, `change_reason`
 
-## Tabelas anteriores
+### `odontogram_entries`
 
-Ver migrations Fase 0–2: `clinics`, `profiles`, `clinic_members`, `roles`, `permissions`, `patients`, `audit_logs`.
+FDI `tooth_number`, `condition`, `planned_procedure`, `notes` · unique (clinic, patient, tooth)
+
+### `attachments`
+
+Storage path privado, MIME, `patient_visible` default false, vínculo opcional a evolução
+
+### Storage
+
+Bucket privado `clinical-files`  
+Path: `clinic/{clinicId}/patient/{patientId}/clinical/...`  
+Policies RLS no storage + signed URL temporária
+
+### Índices
+
+`(clinic_id, patient_id, created_at)` em entries/attachments; follow-up parcial; odontogram por paciente

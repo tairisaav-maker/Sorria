@@ -4,9 +4,10 @@
 
 ## Fase atual
 
-**FASE 3 — Solicitações de horário + Agenda**
+**FASE 4 — Prontuário clínico**
 
-> Solicitação ≠ Consulta · Agenda administrativa ≠ Prontuário clínico
+> Administrativo ≠ Clínico · Rascunho ≠ Finalizado · Correção ≠ Sobrescrita  
+> Owner administrativo ≠ acesso clínico universal
 
 ## Como rodar
 
@@ -16,9 +17,10 @@ npm install
 npm run dev
 ```
 
-Demo: `demo@sorria.app` / `sorria-demo`
+Demo: `demo@sorria.app` / `sorria-demo`  
+(Dra. Ana = proprietária **com** `clinical_access` — também atende.)
 
-Navegação: **Agenda** · **Pacientes** · **Solicitações** (Mais / indicador na Agenda) · **Equipe**
+Navegação: **Agenda** · **Pacientes → Prontuário** · **Solicitações** · **Equipe**
 
 ## Scripts
 

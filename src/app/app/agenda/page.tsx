@@ -28,6 +28,7 @@ export default async function AgendaPage({
       canCreate={can(actor.ctx, "appointments.create").allowed}
       canUpdate={can(actor.ctx, "appointments.update").allowed}
       canCancel={can(actor.ctx, "appointments.cancel").allowed}
+      canOpenClinical={can(actor.ctx, "clinical_record.view").allowed}
       pendingRequests={
         can(actor.ctx, "appointment_requests.view").allowed
           ? countPendingRequests(actor.ctx)

@@ -7,6 +7,7 @@ import {
   getPatientLastAppointment,
   getPatientNextAppointment,
 } from "@/services/appointments";
+import { getPatientFollowUp } from "@/services/clinical";
 import { getPatient } from "@/services/patients";
 
 export const metadata: Metadata = {
@@ -24,12 +25,25 @@ export default async function PacientePerfilPage({
   try {
     const patient = getPatient(actor.ctx, patientId);
     const canViewAgenda = can(actor.ctx, "appointments.view").allowed;
+    const canViewClinical = can(actor.ctx, "clinical_record.view").allowed;
     const nextAppointment = canViewAgenda
       ? getPatientNextAppointment(actor.ctx, patientId)
       : null;
     const lastAppointment = canViewAgenda
       ? getPatientLastAppointment(actor.ctx, patientId)
       : null;
+
+    let followUp: { intervalDays: number | null; pending: boolean } | null =
+      null;
+    if (canViewClinical) {
+      const fu = getPatientFollowUp(actor.ctx, patientId);
+      if (fu) {
+        followUp = {
+          intervalDays: fu.intervalDays,
+          pending: fu.pending,
+        };
+      }
+    }
 
     return (
       <PatientProfileClient
@@ -41,8 +55,10 @@ export default async function PacientePerfilPage({
         }
         canArchive={can(actor.ctx, "patients.administrative.update").allowed}
         canCreateAppointment={can(actor.ctx, "appointments.create").allowed}
+        canViewClinical={canViewClinical}
         nextAppointment={nextAppointment}
         lastAppointment={lastAppointment}
+        followUp={followUp}
       />
     );
   } catch {

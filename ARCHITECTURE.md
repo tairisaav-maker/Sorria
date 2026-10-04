@@ -4,86 +4,62 @@
 
 Sorria é SaaS multi-clínica. A marca é independente; cada clínica é tenant (`clinic_id`).
 
-## Identidade (Fase 1)
+## Identidade
 
 ```text
-Auth → Profile → Clinic Membership → Role → Permissions
+Auth → Profile → Clinic Membership → Role → Permissions (+ clinical_access)
   → Resource/Tenant Check → RLS → Data
 ```
 
-## Pacientes (Fase 2)
+**Owner administrativo ≠ acesso clínico universal.**  
+Acesso clínico: papel `dentist` **ou** `owner` com `membership.clinical_access = true`.
 
-Cadastro administrativo do paciente ≠ prontuário clínico.
+## Domínios
 
-Services em `src/services/patients/`. UI não consulta Supabase diretamente.
-
-## Agenda + Solicitações (Fase 3)
-
-### Regra fundamental
-
-```text
-SOLICITAÇÃO DE HORÁRIO  ≠  CONSULTA
-```
-
-O paciente **nunca** agenda um slot disponível. Ele envia uma solicitação.
-Profissionais autorizados podem criar consulta diretamente na agenda (sem `appointment_request`).
-
-### Fluxos
-
-```text
-AGENDA → Dia/Semana/Mês → Horário livre → Nova consulta
-  → Paciente → Data+duração → Validar disponibilidade → Consulta
-
-PACIENTE → Solicita horário → Clínica analisa → Propõe horário
-  → Paciente confirma → Revalidar disponibilidade → Criar CONSULTA
-```
-
-### Domínios
-
-| Domínio | Nesta fase |
+| Domínio | Status |
 | --- | --- |
-| Agenda administrativa | ✅ |
-| Solicitações de horário | ✅ |
-| Prontuário / anamnese / odontograma | ❌ placeholders |
-| Financeiro real / WhatsApp / Portal / IA | ❌ |
+| Equipe / permissões | ✅ |
+| Pacientes administrativos | ✅ |
+| Agenda / solicitações | ✅ |
+| Prontuário (anamnese, evoluções, odontograma, arquivos) | ✅ |
+| Plano de tratamento / Financeiro / Portal / IA | ❌ |
+
+## Prontuário (Fase 4)
+
+Rota: `/app/pacientes/[patientId]/prontuario`
+
+Subtabs: Resumo clínico · Anamnese · Evoluções · Odontograma · Arquivos
 
 ### Services
 
 ```text
-src/services/appointments/
-  availability.ts   # overlap half-open; cancelled não bloqueia
-  queries.ts        # list/get/next/last/today
-  mutations.ts      # create/reschedule/status/cancel
-
-src/services/appointment-requests/
-  index.ts          # list/review/propose/reject/approve/cancel
+src/services/clinical/     # summary, entries, follow-up
+src/services/anamnesis/
+src/services/odontogram/
+src/services/attachments/
 ```
 
-### State machines
+### Integridade da evolução
 
-**Consulta:** `scheduled → confirmed → arrived → in_progress → completed`  
-Alternativas: `cancelled`, `no_show` nos estados iniciais. Terminais: `completed`, `no_show`, `cancelled`.
+```text
+draft → editar livremente
+     → finalizar (signed_at + versão 1)
+     → correção = nova versão + motivo (versão anterior intacta)
+```
 
-**Solicitação:** `new → under_review → proposed → approved`  
-Alternativas: `rejected`, `cancelled`. Proposta **não** cria appointment.
+Concorrência otimista via `expected_updated_at`.
 
-### Conflitos
+### Retorno estruturado
 
-Intervalos half-open `[start, end)`. Validação no servidor via `checkAvailability`.
-Ao aprovar solicitação, disponibilidade é **revalidada** (race condition).
+`follow_up_required` + `follow_up_interval_days` na evolução.  
+**Retorno pendente** = derivado (retorno indicado ∧ sem consulta futura).  
+Não é `patient.status`.
 
-### Timezone
+### Anamnese
 
-Timestamps em UTC no banco. UI apresenta no timezone da clínica (`clinics.timezone`, default `America/Sao_Paulo`).
-Horário de funcionamento default 08–18 em `src/lib/agenda/hours.ts` — preparado para configuração futura.
-
-### Rotas
-
-- `/app/agenda` — Dia / Semana / Mês
-- `/app/solicitacoes`
-- `/app/pacientes/[patientId]` — Nova consulta, próxima/última consulta
-- `/app/home` — KPIs reais de agenda/solicitações
+`template_version` permite evoluir perguntas sem invalidar respostas antigas.  
+Alertas clínicos derivados das respostas (não diagnóstico).
 
 ## Fora do escopo atual
 
-Prontuário, anamnese, evoluções, odontograma, tratamentos, financeiro, portal completo, Secretária Virtual, IA, WhatsApp automático.
+Plano de tratamento completo, financeiro, portal, Secretária Virtual, IA clínica, prescrição, interpretação de exames.

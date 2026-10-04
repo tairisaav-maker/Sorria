@@ -1,4 +1,5 @@
 import {
+  CLINICAL_PERMISSIONS,
   ROLE_PERMISSION_MATRIX,
   type MembershipStatus,
   type PermissionKey,
@@ -22,6 +23,11 @@ export type DemoMembership = {
   user_id: string;
   role_key: Exclude<RoleKey, "patient">;
   status: MembershipStatus;
+  /**
+   * Opt-in explícito de acesso clínico (ex.: proprietária que também atende).
+   * Owner sem este flag NÃO acessa prontuário.
+   */
+  clinical_access: boolean;
   invited_at: string | null;
   joined_at: string | null;
   suspended_at: string | null;
@@ -60,6 +66,7 @@ export const CLINIC_B_ID = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
 export const OWNER_A_ID = "a1000000-0000-0000-0000-000000000001";
 export const DENTIST_A_ID = "a1000000-0000-0000-0000-000000000002";
 export const SECRETARY_A_ID = "a1000000-0000-0000-0000-000000000003";
+export const OWNER_ADMIN_A_ID = "a1000000-0000-0000-0000-000000000099";
 export const OWNER_B_ID = "b1000000-0000-0000-0000-000000000001";
 export const DENTIST_B_ID = "b1000000-0000-0000-0000-000000000002";
 export const SECRETARY_B_ID = "b1000000-0000-0000-0000-000000000003";
@@ -111,6 +118,8 @@ function seed(): Store {
       user_id: OWNER_A_ID,
       role_key: "owner",
       status: "active",
+      // Dra. Ana é proprietária E dentista — clínico via opt-in, não via papel owner
+      clinical_access: true,
       invited_at: null,
       joined_at: stamp,
       suspended_at: null,
@@ -123,6 +132,7 @@ function seed(): Store {
       user_id: DENTIST_A_ID,
       role_key: "dentist",
       status: "active",
+      clinical_access: true,
       invited_at: stamp,
       joined_at: stamp,
       suspended_at: null,
@@ -135,6 +145,7 @@ function seed(): Store {
       user_id: SECRETARY_A_ID,
       role_key: "secretary",
       status: "active",
+      clinical_access: false,
       invited_at: stamp,
       joined_at: stamp,
       suspended_at: null,
@@ -147,6 +158,7 @@ function seed(): Store {
       user_id: OWNER_B_ID,
       role_key: "owner",
       status: "active",
+      clinical_access: true,
       invited_at: null,
       joined_at: stamp,
       suspended_at: null,
@@ -159,6 +171,7 @@ function seed(): Store {
       user_id: DENTIST_B_ID,
       role_key: "dentist",
       status: "active",
+      clinical_access: true,
       invited_at: stamp,
       joined_at: stamp,
       suspended_at: null,
@@ -171,6 +184,7 @@ function seed(): Store {
       user_id: SECRETARY_B_ID,
       role_key: "secretary",
       status: "active",
+      clinical_access: false,
       invited_at: stamp,
       joined_at: stamp,
       suspended_at: null,
@@ -200,10 +214,61 @@ export function resetAuthzStore() {
   globalThis.__sorriaAuthzStore = seed();
 }
 
+/** Cria owner administrativo sem acesso clínico (teste de arquitetura). */
+export function ensureAdminOwnerWithoutClinical() {
+  const store = getAuthzStore();
+  if (!store.profiles.some((p) => p.id === OWNER_ADMIN_A_ID)) {
+    store.profiles.push({
+      id: OWNER_ADMIN_A_ID,
+      full_name: "Gestor Admin Demo",
+      email: "gestor.admin@clinicademo.sorria.app",
+    });
+  }
+  if (!store.memberships.some((m) => m.id === "m-a-owner-admin")) {
+    const stamp = now();
+    store.memberships.push({
+      id: "m-a-owner-admin",
+      clinic_id: CLINIC_A_ID,
+      user_id: OWNER_ADMIN_A_ID,
+      role_key: "owner",
+      status: "active",
+      clinical_access: false,
+      invited_at: null,
+      joined_at: stamp,
+      suspended_at: null,
+      created_at: stamp,
+      updated_at: stamp,
+    });
+  }
+  return { userId: OWNER_ADMIN_A_ID, clinicId: CLINIC_A_ID };
+}
+
 export function permissionsForRole(
   role: Exclude<RoleKey, "patient">,
 ): PermissionKey[] {
   return ROLE_PERMISSION_MATRIX[role];
+}
+
+/** Permissões efetivas do membership (owner + clinical_access). */
+export function permissionsForMembership(
+  membership: DemoMembership,
+): PermissionKey[] {
+  const base = permissionsForRole(membership.role_key);
+  if (membership.role_key === "owner" && membership.clinical_access) {
+    return [
+      ...new Set([
+        ...base,
+        ...CLINICAL_PERMISSIONS,
+        "treatments.view" as PermissionKey,
+        "treatments.create" as PermissionKey,
+        "treatments.update" as PermissionKey,
+      ]),
+    ];
+  }
+  if (membership.role_key === "dentist") {
+    return base;
+  }
+  return base;
 }
 
 export function getProfile(userId: string) {
@@ -291,6 +356,7 @@ export function inviteMember(input: {
     user_id: profile.id,
     role_key: input.roleKey,
     status: "invited",
+    clinical_access: input.roleKey === "dentist",
     invited_at: stamp,
     joined_at: null,
     suspended_at: null,
@@ -335,6 +401,7 @@ export function changeRole(input: {
   }
 
   membership.role_key = input.newRole;
+  membership.clinical_access = input.newRole === "dentist";
   membership.updated_at = now();
 
   appendAudit({
