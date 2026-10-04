@@ -18,8 +18,7 @@ export function HomeGreeting({
         Bom te ver, {firstName}
       </h1>
       <p className="mt-2 max-w-xl text-sm text-[var(--text-muted)] sm:text-base">
-        Resumo do dia na {clinicName}. Dados mockados da Fase 0 — apenas para
-        validar o visual e a navegação.
+        Resumo do dia na {clinicName} com dados reais da agenda e solicitações.
       </p>
     </section>
   );
