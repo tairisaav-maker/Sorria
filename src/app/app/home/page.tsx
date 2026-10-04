@@ -14,6 +14,7 @@ import { getClinic, getProfile } from "@/lib/demo/authz-store";
 import { buildHomeDashboard } from "@/lib/home/dashboard";
 import { getInventoryDashboard } from "@/services/inventory";
 import { forecastMaterialNeeds } from "@/services/inventory/forecast";
+import { getUpcomingReplenishmentBrief } from "@/services/inventory/replenishment";
 import { getTodayOperationalKpis } from "@/services/patient-summary";
 import { getOperationalOverview } from "@/services/reports/operational";
 import { getOnboarding } from "@/services/settings";
@@ -29,6 +30,10 @@ export default async function HomePage() {
   const dashboard = buildHomeDashboard(actor.ctx);
   const onboarding = getOnboarding(actor.ctx);
   const inventory = getInventoryDashboard(actor.ctx);
+  const replenishmentBrief = can(actor.ctx, "inventory.replenishment_view")
+    .allowed
+    ? getUpcomingReplenishmentBrief(actor.ctx, 7)
+    : null;
   const canForecast = can(actor.ctx, "inventory.forecast_view").allowed;
   const operationalToday =
     can(actor.ctx, "performed_procedures.view").allowed
@@ -112,7 +117,9 @@ export default async function HomePage() {
       ) : operationalToday ? (
         <OperationalKpisCard title="Operacional de hoje" kpis={operationalToday} />
       ) : null}
-      {inventory ? <InventoryHomeCard data={inventory} /> : null}
+      {inventory ? (
+        <InventoryHomeCard data={inventory} replenishment={replenishmentBrief} />
+      ) : null}
       {weekForecast && tomorrowForecast ? (
         <ForecastHomeCard week={weekForecast} tomorrow={tomorrowForecast} />
       ) : null}

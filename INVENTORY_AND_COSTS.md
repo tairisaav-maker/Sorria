@@ -204,6 +204,20 @@ Material → Procedimento realizado → Consulta → Paciente → Período
 - Evolução: `clinical_entries.performed_procedure_id`
 - Ver [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
 
+## Reposição inteligente (Subfase 7)
+
+Rota: `/app/estoque/reposicao`
+
+```text
+estoque atual + previsto (Agenda×ficha) + mínimo + embalagem
+→ quantidade a repor → ceil ÷ units_per_purchase_unit
+```
+
+- Histórico real (≥5 ocorrências) só alerta; não redefine compra oficial
+- `purchase_lists` / `purchase_list_items` = planejamento com snapshot
+- Converter lista → compra real (Subfase 2); parcial permitido
+- Ver [REPLENISHMENT.md](./REPLENISHMENT.md)
+
 ## Relatórios operacionais (Subfase 6)
 
 Agrega consumo real → custo real → cobrado → recebido.

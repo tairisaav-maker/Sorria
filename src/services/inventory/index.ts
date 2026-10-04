@@ -51,6 +51,23 @@ export {
 } from "@/services/inventory/forecast";
 
 export {
+  calculateReplenishmentNeeds,
+  getReplenishmentWarnings,
+  getUpcomingReplenishmentBrief,
+} from "@/services/inventory/replenishment";
+
+export {
+  createPurchaseList,
+  updatePurchaseListItem,
+  refreshPurchaseList,
+  cancelPurchaseList,
+  createPurchaseFromPurchaseList,
+  getOpenPurchaseLists,
+  getPurchaseList,
+  listPurchaseLists,
+} from "@/services/inventory/purchase-lists";
+
+export {
   getInventoryMovements,
   applyInventoryMovement,
 } from "@/services/inventory/movements";

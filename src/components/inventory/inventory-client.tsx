@@ -131,10 +131,15 @@ export function InventoryClient({
               Estoque
             </h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Itens · previsão · compras · movimentações · custo médio
+              Itens · reposição · previsão · compras · movimentações
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link href="/app/estoque/reposicao">
+              <Button type="button" size="sm" variant="secondary">
+                Reposição
+              </Button>
+            </Link>
             <Link href="/app/estoque/previsao">
               <Button variant="secondary" size="sm">
                 Previsão

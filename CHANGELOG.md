@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.0 — 2026-10-04
+
+### Added
+- **Subfase 7:** reposição inteligente e lista de compras em `/app/estoque/reposicao`
+- `calculateReplenishmentNeeds`, embalagens com `ceil`, custo estimado, histórico como alerta
+- `purchase_lists` / `purchase_list_items` (snapshot), compra parcial, conversão → compra real
+- Permissions `inventory.replenishment_view`, `purchase_list_create`, `purchase_list_update`
+- Home: card Estoque com resumo de reposição 7 dias
+- [REPLENISHMENT.md](./REPLENISHMENT.md)
+
 ## 1.6.0 — 2026-10-04
 
 ### Added

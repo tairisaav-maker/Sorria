@@ -91,6 +91,9 @@ export const PERMISSIONS = [
   "inventory.cost_view",
   "inventory.forecast_view",
   "inventory.forecast_cost_view",
+  "inventory.replenishment_view",
+  "inventory.purchase_list_create",
+  "inventory.purchase_list_update",
 
   "cost_reports.view",
 
@@ -212,6 +215,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.movements_view",
     "inventory.forecast_view",
     "inventory.forecast_cost_view",
+    "inventory.replenishment_view",
     "cost_reports.view",
   ],
   secretary: [
@@ -254,6 +258,9 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.movements_view",
     "inventory.cost_view",
     "inventory.forecast_view",
+    "inventory.replenishment_view",
+    "inventory.purchase_list_create",
+    "inventory.purchase_list_update",
   ],
 };
 

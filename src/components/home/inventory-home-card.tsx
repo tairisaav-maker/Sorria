@@ -4,6 +4,7 @@ import { formatBRL } from "@/lib/money";
 
 export function InventoryHomeCard({
   data,
+  replenishment,
 }: {
   data: {
     low_count: number;
@@ -11,6 +12,11 @@ export function InventoryHomeCard({
     expiring_count: number;
     estimated_value_cents: number | null;
   };
+  replenishment?: {
+    materials_needing_attention: number;
+    materials_critical: number;
+    top_critical_name: string | null;
+  } | null;
 }) {
   return (
     <section
@@ -46,6 +52,27 @@ export function InventoryHomeCard({
           </li>
         ) : null}
       </ul>
+      {replenishment && replenishment.materials_needing_attention > 0 ? (
+        <div className="mt-3 rounded-xl border border-[var(--border)] px-3 py-2 text-sm">
+          <p className="font-medium text-[var(--brand-ink)]">Reposição</p>
+          <p className="text-[var(--text-muted)]">
+            {replenishment.materials_needing_attention} material(is) precisam
+            de atenção para os próximos 7 dias.
+          </p>
+          {replenishment.top_critical_name ? (
+            <p className="mt-1 text-xs text-[var(--warning)]">
+              {replenishment.top_critical_name} pode acabar antes dos
+              procedimentos agendados.
+            </p>
+          ) : null}
+          <Link
+            href="/app/estoque/reposicao"
+            className="mt-1 inline-block text-sm font-medium text-[var(--brand-primary)]"
+          >
+            Ver lista
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

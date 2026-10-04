@@ -83,13 +83,18 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 | `reports.materials_view` | Consumo de materiais nos relatórios |
 | `reports.patient_financial_view` | Financeiro por paciente nos relatórios |
 | `reports.financial_view` | Aba financeiro operacional |
+| `inventory.replenishment_view` | Necessidade de reposição |
+| `inventory.purchase_list_create` | Criar lista de compras |
+| `inventory.purchase_list_update` | Editar/cancelar/converter lista |
 
-- Clinic A ≠ Clinic B (planned, performed, consumo, compra, lote, movimento, forecast, links financeiros, **agregados de relatório**)
+- Clinic A ≠ Clinic B (planned, performed, consumo, compra, lote, movimento, forecast, links financeiros, **agregados de relatório**, **listas/reposição**)
 - Cross-patient: procedimento ≠ transação/evolução de outro paciente
 - Custos monetários exigem `procedure_costs.view` / `inventory.cost_view` / `inventory.forecast_cost_view` / `reports.procedure_costs_view`
 - Recebido/saldo exigem `finance.view_*` / `reports.patient_financial_view`
 - Payload de relatório **omite** custos/margem sem permissão (não só esconde no UI)
-- Drill-down de materiais: nome de paciente só com `patients.demographics.view`
+- Reposição: sem `inventory.cost_view` → quantidades sem preço estimado no payload
+- Drill-down de materiais/reposição: nome de paciente só com `patients.demographics.view`
+- Lista de compras não é compra; conversão exige `inventory.purchase_create`
 - Previsão não baixa estoque; baixa só após confirmação de consumo (Subfase 3)
 - Cobrança ≠ pagamento; antiduplicidade com plano já faturado
 - Conversão planned→performed idempotente

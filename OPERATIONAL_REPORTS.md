@@ -174,6 +174,10 @@ XLSX abas (conforme permissão): Resumo · Procedimentos · Materiais · Pacient
 
 Agregação server-side nos services. Sem materialized views nesta fase. Índices avaliados nos campos de período/clínica; criar só com medição.
 
+## Relação com Subfase 7
+
+Consumo histórico e previsto×real dos relatórios alimentam **alertas** de reposição (`REPLENISHMENT.md`), sem alterar automaticamente fichas ou quantidades de compra.
+
 ## Fora do escopo
 
 Custo fixo/hora, rateio de aluguel, impostos, comissão, folha, lucro líquido, DRE, IA, benchmarking entre dentistas, recomendação de preço/clínica.

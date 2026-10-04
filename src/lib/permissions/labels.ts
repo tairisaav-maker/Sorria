@@ -98,6 +98,9 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "inventory.cost_view", label: "Ver custos de estoque" },
       { key: "inventory.forecast_view", label: "Ver previsão de materiais" },
       { key: "inventory.forecast_cost_view", label: "Ver custo estimado da previsão" },
+      { key: "inventory.replenishment_view", label: "Ver reposição inteligente" },
+      { key: "inventory.purchase_list_create", label: "Criar lista de compras" },
+      { key: "inventory.purchase_list_update", label: "Editar lista de compras" },
     ],
   },
   {

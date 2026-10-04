@@ -48,6 +48,7 @@ Acesso financeiro é independente do clínico.
 | Previsão Agenda → materiais → estoque (Subfase 4) | ✅ |
 | Procedimento + evolução + cobrado + financeiro (Subfase 5) | ✅ |
 | Dashboard operacional / rentabilidade (Subfase 6) | ✅ |
+| Reposição inteligente / lista de compras (Subfase 7) | ✅ |
 
 ## Novo núcleo operacional
 
@@ -55,16 +56,17 @@ Acesso financeiro é independente do clínico.
 Agenda → Atendimento → Procedimento → Materiais previstos
   → Consumo real → Estoque → Custo → Evolução → Financeiro
   → Agregação → Relatórios operacionais
+  → Reposição (Agenda futura + mínimo + histórico) → Lista de compras
 ```
 
 Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro · Mais  
 Secundário: Procedimentos · Relatórios · Configurações  
 Portal / Assistente: fora da nav principal (flags / Mais).
 
-Services: `procedures/`, `inventory/` (+ `forecast`), `appointment-planned-procedures/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`, `patient-procedure-finance/`, `patient-summary/`, `reports/operational/`  
-Rotas: `/app/estoque/*` · `/app/estoque/previsao` · `/app/agenda/atendimento/[id]` · `/app/relatorios` · paciente → Procedimentos  
-Fluxo: Agenda → Atendimento → Procedimento → Consumo confirmado → Baixa → Custo → Evolução → Financeiro → Relatórios  
-Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md) · [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
+Services: `procedures/`, `inventory/` (+ `forecast`, `replenishment`, `purchase-lists`), `appointment-planned-procedures/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`, `patient-procedure-finance/`, `patient-summary/`, `reports/operational/`  
+Rotas: `/app/estoque/*` · `/app/estoque/reposicao` · `/app/estoque/previsao` · `/app/agenda/atendimento/[id]` · `/app/relatorios` · paciente → Procedimentos  
+Fluxo: Agenda → Atendimento → Procedimento → Consumo → Estoque → Custo → Financeiro → Relatórios → Reposição  
+Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md) · [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md) · [REPLENISHMENT.md](./REPLENISHMENT.md)
 
 ## Financeiro (Fase 6)
 
@@ -199,4 +201,4 @@ Onboarding retomável · configurações de clínica/agenda/perfil/segurança ·
 
 ## Fora do escopo V1
 
-Integração bancária/adquirente, boleto, NF, contabilidade completa/DRE, WhatsApp automático, cobrança SaaS do Sorria, IA clínica, pagamento online no Portal, BI externo, reposição inteligente (Subfase 7), convênios.
+Integração bancária/adquirente, boleto, NF, contabilidade completa/DRE, WhatsApp automático, cobrança SaaS do Sorria, IA clínica, pagamento online no Portal, BI externo, custo fixo/hora clínica (próxima subfase), convênios, compra automática/marketplace.

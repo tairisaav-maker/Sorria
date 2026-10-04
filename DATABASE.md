@@ -192,6 +192,17 @@ Notificações internas do Portal (sem push externo).
 `has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`
 
 
+## Subfase 7 — Reposição / listas de compras
+
+Migration: `20251020000000_reestruturacao_replenishment.sql`
+
+- `purchase_lists` — rascunho/pronta/parcial/concluída/cancelada; snapshots de período
+- `purchase_list_items` — snapshots de estoque/mínimo/previsão/embalagem/preço; link opcional `inventory_purchase_item_id`
+- RLS por `clinic_id` + `inventory.replenishment_view` / `purchase_list_*`
+- Índices: `clinic_id+status`, `purchase_list_id`, `inventory_item_id`
+
+Lista **não** altera `inventory_items.current_quantity`. Só a compra real (Subfase 2) move estoque.
+
 ## Fase 8 / Subfase 6 — Relatórios
 
 Sem novas tabelas de fatos nem materialized views. Permissões:
