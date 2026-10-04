@@ -15,6 +15,21 @@
 11. `20251014000000_fase10_producao.sql`
 12. `20251015000000_reestruturacao_procedures_inventory.sql`
 13. `20251016000000_reestruturacao_inventory_purchases.sql`
+14. `20251017000000_reestruturacao_performed_procedures.sql`
+
+## Reestruturação Subfase 3 — Procedimento do paciente
+
+### `performed_procedures`
+
+Instância por paciente/consulta; snapshots de preço e custos; `treatment_item_id` opcional.
+
+### `procedure_consumptions`
+
+Snapshot exclusivo da ficha; previsto/real; `unit_cost_snapshot`; link a `inventory_movement`.
+
+### `appointment_consumptions`
+
+Materiais `per_appointment` — uma baixa física; custo rateado.
 
 ## Reestruturação Subfase 2 — Compras / Movimentos
 

@@ -10,9 +10,8 @@
 
 1. ✅ Subfase 1 — Nav + Procedures + Inventory items + Procedure materials  
 2. ✅ Subfase 2 — Compras, movimentos, custo médio ponderado  
-3. Subfase 3 — Procedimento realizado + consumo real + baixa  
-4. Subfase 4 — Custo real × padrão; evolução; financeiro  
-5. Subfase 5 — Previsão de estoque via Agenda; relatórios essenciais  
+3. ✅ Subfase 3 — Procedimento do paciente + consumo previsto×real + baixa  
+4. Subfase 4 — Previsão de estoque via Agenda + relatórios essenciais de custo  
 
 ## Despriorizado no V1 comercial
 

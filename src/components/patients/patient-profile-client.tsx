@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Copy, Pencil, Phone } from "lucide-react";
 import { PatientCompletion } from "@/components/patients/patient-completion";
 import { PatientStatusBadge } from "@/components/patients/patient-status-badge";
+import { PatientProceduresClient } from "@/components/performed-procedures/patient-procedures-client";
 import { PatientTreatmentTab } from "@/components/treatments/patient-treatment-tab";
 import { Button } from "@/components/ui/button";
 // Financeiro: link dedicado (não mistura despesas da clínica)
@@ -23,6 +24,7 @@ import { cn } from "@/lib/utils";
 const tabs = [
   "Resumo",
   "Prontuário",
+  "Procedimentos",
   "Tratamento",
   "Financeiro",
   "Documentos",
@@ -46,6 +48,8 @@ export function PatientProfileClient({
   canViewTreatments,
   canCreateTreatment,
   canViewFinance,
+  canViewProcedures,
+  canViewProcedureCosts,
   nextAppointment,
   lastAppointment,
   followUp,
@@ -58,6 +62,8 @@ export function PatientProfileClient({
   canViewTreatments: boolean;
   canCreateTreatment: boolean;
   canViewFinance: boolean;
+  canViewProcedures?: boolean;
+  canViewProcedureCosts?: boolean;
   nextAppointment: AppointmentWithPatient | null;
   lastAppointment: AppointmentWithPatient | null;
   followUp: { intervalDays: number | null; pending: boolean } | null;
@@ -177,7 +183,9 @@ export function PatientProfileClient({
         role="tablist"
         aria-label="Áreas do paciente"
       >
-        {tabs.map((item) => (
+        {tabs
+          .filter((item) => item !== "Procedimentos" || canViewProcedures)
+          .map((item) => (
           <button
             key={item}
             type="button"
@@ -430,6 +438,16 @@ export function PatientProfileClient({
           </div>
         ) : (
           <Placeholder text="Você não tem permissão para acessar o prontuário deste paciente." />
+        )
+      ) : null}
+      {tab === "Procedimentos" ? (
+        canViewProcedures ? (
+          <PatientProceduresClient
+            patientId={patient.id}
+            canViewCosts={Boolean(canViewProcedureCosts)}
+          />
+        ) : (
+          <Placeholder text="Você não tem permissão para ver procedimentos realizados." />
         )
       ) : null}
       {tab === "Tratamento" ? (

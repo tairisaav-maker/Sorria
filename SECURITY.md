@@ -68,24 +68,19 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
 
 
-## Procedures / Inventory (Reestruturação Subfases 1–2)
+## Procedures / Inventory (Reestruturação Subfases 1–3)
 
 | Key | Uso |
 | --- | --- |
-| `procedures.view/create/update` | Catálogo |
-| `procedure_costs.view/update` | Ficha técnica e custos |
-| `procedure_consumption.view/confirm` | Consumo (confirm = subfase futura) |
-| `inventory.view/create/update` | Itens (cadastro; sem editar saldo/custo) |
-| `inventory.adjust` | Estoque inicial, ajuste, perda, vencimento |
-| `inventory.purchase_create` | Compra / cancelamento controlado |
-| `inventory.movements_view` | Histórico de movimentos |
-| `inventory.cost_view` | Custo médio e valor estimado |
-| `cost_reports.view` | Relatórios de custo |
+| `procedures.*` / `procedure_costs.*` | Catálogo e custos padrão |
+| `performed_procedures.view/create/update/complete` | Execução no paciente |
+| `procedure_consumption.view/update/confirm/correct` | Previsto × real / baixa / correção |
+| `inventory.*` | Itens, compras, movimentos, custos de estoque |
 
-- Clinic A ≠ Clinic B (procedure, item, material, compra, lote, movimento)
-- Procedure/purchase A + Inventory B → negado
-- `inventory.view` sem `cost_view` → vê quantidade, não custos
-- Servidor é autoridade; saldo só via movimentos
+- Clinic A ≠ Clinic B (performed, consumo, compra, lote, movimento)
+- Custos monetários exigem `procedure_costs.view` / `inventory.cost_view`
+- Baixa só após confirmação; idempotente; correção sem delete
+- Servidor é autoridade nos cálculos
 
 ## Relatórios (Fase 8)
 

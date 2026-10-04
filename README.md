@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.2.0** — Reestruturação Subfase 2 (Compras, movimentos, custo médio)
+**1.3.0** — Reestruturação Subfase 3 (Consumo real por paciente)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -23,7 +23,8 @@ npm run dev
 
 Núcleo: Agenda · Pacientes · Estoque · Financeiro
 
-- Procedimentos: `/app/procedimentos`
+- Procedimentos (catálogo): `/app/procedimentos`
+- Atendimento / consumo: `/app/agenda/atendimento/[id]`
 - Estoque: `/app/estoque` · Compras · Movimentações
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`

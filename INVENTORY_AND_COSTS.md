@@ -161,16 +161,51 @@ Requer `inventory.cost_view`.
 Quando consumo for confirmado (Subfase 3), gravar `unit_cost_snapshot`.  
 Não recalcular histórico com custo atual.
 
-## Forecasting (futuro)
+## Performed procedure (Subfase 3)
 
-Agenda + procedimentos + ficha → necessidade. Previsão ≠ baixa.
+`performed_procedures` = execução em paciente específico (≠ catálogo).
+
+Snapshot ao criar: ficha → `procedure_consumptions` (exclusivos) + `appointment_consumptions` (`per_appointment`).
+
+### Consumo previsto × real
+
+- UI pré-preenche `actual = planned` (não confirma sozinho)
+- Confirmação → baixa `procedure_consumption` + custos
+- Idempotente (`consumption_confirmed`)
+- Extra / substituição: baixa só o item real
+- Correção: movimentos compensatórios; histórico preservado
+
+### Material compartilhado e rateio
+
+Uma máscara no atendimento = **1 baixa física**.  
+Custo rateado igualmente entre procedimentos ativos do appointment.  
+Rateio ≠ segunda baixa.
+
+### Custo histórico
+
+`unit_cost_snapshot` no momento da confirmação.  
+Custo médio futuro do estoque **não** altera procedimento antigo.
+
+### Preço
+
+`standard_price_snapshot` ≠ `charged_amount` do paciente.  
+`charged_amount = 0` → margem `—` (sem divisão por zero).  
+Valor cobrado ≠ pagamento; plano já faturado não gera cobrança duplicada.
+
+### Hierarquia
+
+Material → Procedimento realizado → Consulta → Paciente → Período
+
+## Forecasting (agenda futura completa = próxima subfase)
+
+Previsão do atendimento atual: materiais planejados vs estoque (alerta, sem bloquear).
 
 ## Permissions
 
-`inventory.view` · `create` · `update` · `adjust` · `purchase_create` · `movements_view` · `cost_view`  
-(+ procedures / procedure_costs / cost_reports)
+`performed_procedures.*` · `procedure_consumption.*` · `procedure_costs.view`  
+`inventory.*` (view/create/update/adjust/purchase/movements/cost)
 
 ## RLS / tenant
 
-Tabelas Subfase 2 com RLS + triggers cross-clinic.  
-Clinic A ≠ compra/lote/movimento Clinic B.
+Clinic A ≠ performed/consumo/compra/lote B.  
+Patient/appointment/procedure/item devem ser da mesma clínica.

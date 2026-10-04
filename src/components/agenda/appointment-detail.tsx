@@ -109,8 +109,8 @@ export function AppointmentDetail({
       setError(data.error ?? "Não foi possível concluir esta ação. Tente novamente.");
       return;
     }
-    if (status === "in_progress" && canOpenClinical) {
-      window.location.href = `/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`;
+    if (status === "in_progress") {
+      window.location.href = `/app/agenda/atendimento/${appointment.id}`;
       return;
     }
     onChanged();
@@ -258,13 +258,23 @@ export function AppointmentDetail({
           </form>
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
+            {appointment.status === "in_progress" ||
+            appointment.status === "arrived" ||
+            appointment.status === "confirmed" ? (
+              <Link
+                href={`/app/agenda/atendimento/${appointment.id}`}
+                className="inline-flex h-9 items-center rounded-xl bg-[var(--brand-primary)] px-3 text-sm font-medium text-white"
+              >
+                Procedimentos / consumo
+              </Link>
+            ) : null}
             {canOpenClinical &&
             (appointment.status === "arrived" ||
               appointment.status === "in_progress" ||
               appointment.status === "confirmed") ? (
               <Link
                 href={`/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`}
-                className="inline-flex h-9 items-center rounded-xl bg-[var(--brand-primary)] px-3 text-sm font-medium text-white"
+                className="inline-flex h-9 items-center rounded-xl border border-[var(--border)] px-3 text-sm font-medium"
               >
                 Abrir prontuário
               </Link>

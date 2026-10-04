@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 — 2026-10-04
+
+### Added
+- **Subfase 3:** `performed_procedures`, `procedure_consumptions`, `appointment_consumptions`
+- Snapshot da ficha, consumo previsto×real, material extra/substituto
+- Baixa idempotente, rateio per_appointment, correção com histórico
+- Custo/resultado bruto/margem por procedimento do paciente
+- UI atendimento + aba Procedimentos no paciente; evolução e financeiro sem cobrança duplicada
+
 ## 1.2.0 — 2026-10-04
 
 ### Added
