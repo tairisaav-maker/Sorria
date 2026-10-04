@@ -439,6 +439,14 @@ function createTransactionBase(
   const net = gross - discount;
 
   const now = new Date().toISOString();
+  const isExpense = data.type === "expense";
+  const refMonth =
+    data.reference_month ??
+    (data.competence_date
+      ? data.competence_date.slice(0, 7)
+      : data.due_date
+        ? data.due_date.slice(0, 7)
+        : now.slice(0, 7));
   const tx: FinancialTransaction = {
     id: crypto.randomUUID(),
     clinic_id: ctx.clinicId,
@@ -448,6 +456,19 @@ function createTransactionBase(
     type: data.type,
     description: data.description,
     category: data.category ?? null,
+    cost_behavior: isExpense
+      ? (data.cost_behavior ?? "fixed")
+      : null,
+    recurrence_type: isExpense
+      ? (data.recurrence_type ?? "one_time")
+      : null,
+    allocation_eligible: isExpense
+      ? (data.allocation_eligible ?? true)
+      : null,
+    reference_month: isExpense ? refMonth : null,
+    competence_date: isExpense
+      ? (data.competence_date ?? data.due_date ?? null)
+      : null,
     gross_amount_cents: gross,
     discount_amount_cents: discount,
     net_amount_cents: net,

@@ -100,6 +100,16 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Conversão planned→performed idempotente
 - Servidor é autoridade nos cálculos e no rateio
 
+## Custeio operacional (Subfase 8)
+
+- Permissions: `clinic_costs.view|manage`, `operational_costs.view`, `procedure_operational_costs.view`, `expense_categories.manage`, `cost_reports.view`
+- Secretária: pode registrar despesas (`finance.expense_create`); **sem** custo/hora/margem por padrão
+- Dentista: `procedure_operational_costs.view` — custo do próprio procedimento; sem gestão de custos da clínica
+- Owner/gestor: configuração de horas, templates, composição do custo/hora
+- Cross-clinic: settings, templates, snapshots e despesas isolados por `clinic_id`
+- Snapshots de custo/hora não são atualizados (histórico imutável)
+- Detalhes: [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md)
+
 ## Relatórios (Fase 8 + Subfase 6)
 
 - Acesso por seção: `reports.view_*` / `reports.*_view` — API não retorna dados de seções negadas

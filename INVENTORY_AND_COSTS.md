@@ -282,14 +282,27 @@ appointment elegível (scheduled|confirmed|arrived)
 Requer `inventory.forecast_cost_view` ou `procedure_costs.view`.  
 Sempre rotulado **Estimado** (≠ custo real confirmado).
 
+## Custeio operacional (Subfase 8)
+
+Além do custo direto de materiais, o Sorria calcula:
+
+**Custo operacional estimado** = materiais + custos diretos + (duração × custo/minuto)
+
+onde custo/hora = despesas alocáveis do mês ÷ horas produtivas.
+
+Ver [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md).  
+Resultado bruto direto (materiais) permanece disponível e **não** é substituído.
+
 ## Permissions
 
 `appointment_planned_procedures.view|create|update`  
 `inventory.forecast_view` · `inventory.forecast_cost_view`  
 `performed_procedures.*` · `procedure_consumption.*` · `procedure_costs.view`  
-`inventory.*` (view/create/update/adjust/purchase/movements/cost)
+`inventory.*` (view/create/update/adjust/purchase/movements/cost)  
+`clinic_costs.*` · `operational_costs.view` · `procedure_operational_costs.view`
 
 ## RLS / tenant
 
 Clinic A ≠ planned/performed/consumo/compra/lote/forecast B.  
-Patient/appointment/procedure/item devem ser da mesma clínica.
+Patient/appointment/procedure/item devem ser da mesma clínica.  
+Clinic A ≠ despesas / cost settings / hourly snapshots da Clinic B.

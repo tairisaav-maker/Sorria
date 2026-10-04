@@ -19,13 +19,26 @@ export type ExpenseCategory =
   | "material"
   | "laboratorio"
   | "aluguel"
+  | "condominio"
   | "energia"
+  | "agua"
   | "internet"
+  | "telefone"
+  | "pessoas"
+  | "pro_labore"
+  | "software"
+  | "contador"
+  | "limpeza"
+  | "seguranca"
+  | "equipamentos"
   | "servicos"
   | "marketing"
   | "manutencao"
   | "impostos"
   | "outros";
+
+export type CostBehavior = "fixed" | "variable";
+export type RecurrenceType = "recurring" | "one_time";
 
 export type FinancialTransaction = {
   id: string;
@@ -36,6 +49,16 @@ export type FinancialTransaction = {
   type: FinancialTransactionType;
   description: string;
   category: ExpenseCategory | null;
+  /** Custeio: fixa × variável (despesas). */
+  cost_behavior: CostBehavior | null;
+  /** Custeio: recorrente × eventual. */
+  recurrence_type: RecurrenceType | null;
+  /** Se entra no cálculo de custo/hora. */
+  allocation_eligible: boolean | null;
+  /** Mês de competência YYYY-MM (custeio operacional). */
+  reference_month: string | null;
+  /** Data de competência (opcional). */
+  competence_date: string | null;
   gross_amount_cents: number;
   discount_amount_cents: number;
   net_amount_cents: number;
@@ -144,8 +167,18 @@ export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   material: "Material",
   laboratorio: "Laboratório",
   aluguel: "Aluguel",
+  condominio: "Condomínio",
   energia: "Energia",
+  agua: "Água",
   internet: "Internet",
+  telefone: "Telefone",
+  pessoas: "Pessoas / equipe",
+  pro_labore: "Pró-labore",
+  software: "Software",
+  contador: "Contador",
+  limpeza: "Limpeza",
+  seguranca: "Segurança",
+  equipamentos: "Equipamentos",
   servicos: "Serviços",
   marketing: "Marketing",
   manutencao: "Manutenção",

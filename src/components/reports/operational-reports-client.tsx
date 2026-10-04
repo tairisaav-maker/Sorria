@@ -22,6 +22,7 @@ import { MetricCard } from "@/components/reports/metric-card";
 import { formatBRL } from "@/lib/money";
 import type {
   MaterialConsumptionRow,
+  OperationalCostCoverageReport,
   OperationalOverview,
   PatientOperationalRow,
   ProcedurePerformanceRow,
@@ -56,12 +57,14 @@ type Bundle = {
   clinicName: string;
   overview: OperationalOverview;
   coverage: CostCoverageReport;
+  operational_coverage: OperationalCostCoverageReport | null;
   procedures: ProcedurePerformanceRow[];
   materials: MaterialConsumptionRow[] | null;
   patients: PatientOperationalRow[] | null;
   financial: FinancialOperationalReport | null;
   capabilities: {
     costs: boolean;
+    operationalCosts?: boolean;
     materials: boolean;
     patientFinancial: boolean;
     financial: boolean;
@@ -397,10 +400,32 @@ function OverviewTab({
           <MetricCard
             metric={opMetric(
               "gross",
-              "Resultado bruto",
+              "Resultado bruto direto",
               o.gross_result_charged_cents,
               "currency_cents",
               "Cobrado − custos diretos (não é lucro líquido)",
+            )}
+          />
+        ) : null}
+        {o.operational_total_cost_cents != null ? (
+          <MetricCard
+            metric={opMetric(
+              "op_cost",
+              "Custo operacional estimado",
+              o.operational_total_cost_cents,
+              "currency_cents",
+              "Materiais + diretos + tempo de clínica",
+            )}
+          />
+        ) : null}
+        {o.operational_result_cents != null ? (
+          <MetricCard
+            metric={opMetric(
+              "op_result",
+              "Resultado operacional estimado",
+              o.operational_result_cents,
+              "currency_cents",
+              "≠ lucro líquido",
             )}
           />
         ) : null}
@@ -421,6 +446,15 @@ function OverviewTab({
           Cobertura de custos: {c.coverage_percent}%
           {c.incomplete_count > 0
             ? ` · ${c.incomplete_count} procedimento(s) com custo incompleto`
+            : ""}
+        </p>
+      ) : null}
+      {bundle.operational_coverage?.coverage_percent != null ? (
+        <p className="text-sm text-[var(--text-muted)]">
+          Cobertura de custo operacional:{" "}
+          {bundle.operational_coverage.coverage_percent}%
+          {bundle.operational_coverage.incomplete_count > 0
+            ? ` · ${bundle.operational_coverage.incomplete_count} sem duração/snapshot`
             : ""}
         </p>
       ) : null}
@@ -515,11 +549,12 @@ function ProceduresTab({
             <tr>
               <th className="px-3 py-2">Procedimento</th>
               <th className="px-3 py-2">Realizados</th>
-              {canCosts ? <th className="px-3 py-2">Custo médio real</th> : null}
-              <th className="px-3 py-2">Valor médio cobrado</th>
-              {canCosts ? <th className="px-3 py-2">Resultado bruto</th> : null}
-              {canCosts ? <th className="px-3 py-2">Margem</th> : null}
-              {canCosts ? <th className="px-3 py-2">Desvio custo</th> : null}
+              <th className="px-3 py-2">Duração média</th>
+              {canCosts ? <th className="px-3 py-2">Custo direto</th> : null}
+              <th className="px-3 py-2">Custo operacional</th>
+              <th className="px-3 py-2">Cobrado</th>
+              <th className="px-3 py-2">Resultado</th>
+              {canCosts ? <th className="px-3 py-2">Margem direta</th> : null}
             </tr>
           </thead>
           <tbody>
@@ -533,6 +568,13 @@ function ProceduresTab({
                   >
                     {r.procedure_name}
                   </button>
+                  {r.duration_delta_percent != null &&
+                  r.duration_delta_percent > 0 ? (
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Tempo médio acima do previsto ({r.duration_delta_percent}
+                      %)
+                    </p>
+                  ) : null}
                   {r.incomplete_cost_count > 0 ? (
                     <p className="text-xs text-[var(--warning)]">
                       {r.incomplete_cost_count} com custo incompleto
@@ -540,6 +582,11 @@ function ProceduresTab({
                   ) : null}
                 </td>
                 <td className="px-3 py-2">{r.count}</td>
+                <td className="px-3 py-2">
+                  {r.avg_duration_minutes != null
+                    ? `${r.avg_duration_minutes} min`
+                    : "—"}
+                </td>
                 {canCosts ? (
                   <td className="px-3 py-2">
                     {r.avg_actual_cost_cents != null
@@ -548,30 +595,25 @@ function ProceduresTab({
                   </td>
                 ) : null}
                 <td className="px-3 py-2">
+                  {r.avg_operational_cost_cents != null
+                    ? formatBRL(r.avg_operational_cost_cents)
+                    : "—"}
+                </td>
+                <td className="px-3 py-2">
                   {r.avg_charged_cents != null
                     ? formatBRL(r.avg_charged_cents)
                     : "—"}
                 </td>
-                {canCosts ? (
-                  <td className="px-3 py-2">
-                    {r.gross_result_cents != null
+                <td className="px-3 py-2">
+                  {r.operational_result_cents != null
+                    ? formatBRL(r.operational_result_cents)
+                    : r.gross_result_cents != null
                       ? formatBRL(r.gross_result_cents)
                       : "—"}
-                  </td>
-                ) : null}
+                </td>
                 {canCosts ? (
                   <td className="px-3 py-2">
                     {r.margin_percent != null ? `${r.margin_percent}%` : "—"}
-                  </td>
-                ) : null}
-                {canCosts ? (
-                  <td className="px-3 py-2">
-                    {r.cost_deviation_percent != null
-                      ? `${r.cost_deviation_percent > 0 ? "+" : ""}${r.cost_deviation_percent}% acima/abaixo do previsto`.replace(
-                          "acima/abaixo",
-                          r.cost_deviation_percent >= 0 ? "acima" : "abaixo",
-                        )
-                      : "—"}
                   </td>
                 ) : null}
               </tr>
@@ -676,11 +718,12 @@ function PatientsTab({
             <th className="px-3 py-2">Paciente</th>
             <th className="px-3 py-2">Procedimentos</th>
             {canCosts ? <th className="px-3 py-2">Custo direto</th> : null}
+            <th className="px-3 py-2">Custo operacional</th>
             <th className="px-3 py-2">Cobrado</th>
             {canFin ? <th className="px-3 py-2">Recebido</th> : null}
             {canFin ? <th className="px-3 py-2">Saldo</th> : null}
             {canCosts ? (
-              <th className="px-3 py-2">Resultado bruto associado</th>
+              <th className="px-3 py-2">Resultado operacional</th>
             ) : null}
           </tr>
         </thead>
@@ -704,6 +747,11 @@ function PatientsTab({
                 </td>
               ) : null}
               <td className="px-3 py-2">
+                {r.operational_cost_cents != null
+                  ? formatBRL(r.operational_cost_cents)
+                  : "—"}
+              </td>
+              <td className="px-3 py-2">
                 {r.charged_cents != null ? formatBRL(r.charged_cents) : "—"}
               </td>
               {canFin ? (
@@ -720,9 +768,11 @@ function PatientsTab({
               ) : null}
               {canCosts ? (
                 <td className="px-3 py-2">
-                  {r.gross_result_cents != null
-                    ? formatBRL(r.gross_result_cents)
-                    : "—"}
+                  {r.operational_result_cents != null
+                    ? formatBRL(r.operational_result_cents)
+                    : r.gross_result_cents != null
+                      ? formatBRL(r.gross_result_cents)
+                      : "—"}
                 </td>
               ) : null}
             </tr>

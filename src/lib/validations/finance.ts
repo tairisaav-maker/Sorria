@@ -13,8 +13,18 @@ export const expenseCategorySchema = z.enum([
   "material",
   "laboratorio",
   "aluguel",
+  "condominio",
   "energia",
+  "agua",
   "internet",
+  "telefone",
+  "pessoas",
+  "pro_labore",
+  "software",
+  "contador",
+  "limpeza",
+  "seguranca",
+  "equipamentos",
   "servicos",
   "marketing",
   "manutencao",
@@ -29,6 +39,15 @@ export const financialTransactionSchema = z.object({
   treatment_plan_id: z.string().optional().nullable(),
   appointment_id: z.string().optional().nullable(),
   category: expenseCategorySchema.optional().nullable(),
+  cost_behavior: z.enum(["fixed", "variable"]).optional().nullable(),
+  recurrence_type: z.enum(["recurring", "one_time"]).optional().nullable(),
+  allocation_eligible: z.boolean().optional().nullable(),
+  reference_month: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .optional()
+    .nullable(),
+  competence_date: z.string().optional().nullable(),
   gross_amount_reais: z.number().min(0),
   discount_amount_reais: z.number().min(0).optional().default(0),
   due_date: z.string().optional().nullable(),
@@ -47,6 +66,12 @@ export const financialTransactionSchema = z.object({
 export const expenseSchema = financialTransactionSchema.extend({
   type: z.literal("expense"),
   category: expenseCategorySchema,
+  cost_behavior: z.enum(["fixed", "variable"]).optional().default("fixed"),
+  recurrence_type: z
+    .enum(["recurring", "one_time"])
+    .optional()
+    .default("one_time"),
+  allocation_eligible: z.boolean().optional().default(true),
 });
 
 export const installmentPlanSchema = z.object({

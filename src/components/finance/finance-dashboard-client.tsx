@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -124,6 +125,11 @@ export function FinanceDashboardClient({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link href="/app/financeiro/custos">
+            <Button type="button" size="sm" variant="secondary">
+              Custos do consultório
+            </Button>
+          </Link>
           {canExport ? (
             <>
               <Button type="button" size="sm" variant="secondary" loading={busy} onClick={() => exportFile("csv")}>
@@ -468,6 +474,14 @@ function LaunchForm({
   const [count, setCount] = useState(1);
   const [category, setCategory] = useState("material");
   const [notes, setNotes] = useState("");
+  const [costBehavior, setCostBehavior] = useState<"fixed" | "variable">("fixed");
+  const [recurrenceType, setRecurrenceType] = useState<"recurring" | "one_time">(
+    "one_time",
+  );
+  const [allocationEligible, setAllocationEligible] = useState(true);
+  const [referenceMonth, setReferenceMonth] = useState(
+    () => new Date().toISOString().slice(0, 7),
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
@@ -481,6 +495,10 @@ function LaunchForm({
             due_date: due,
             installments_count: count,
             category: type === "expense" ? category : null,
+            cost_behavior: type === "expense" ? costBehavior : null,
+            recurrence_type: type === "expense" ? recurrenceType : null,
+            allocation_eligible: type === "expense" ? allocationEligible : null,
+            reference_month: type === "expense" ? referenceMonth : null,
             notes,
             type,
           });
@@ -502,14 +520,62 @@ function LaunchForm({
           <Input value={description} onChange={(e) => setDescription(e.target.value)} required />
         </div>
         {type === "expense" ? (
-          <div>
-            <Label>Categoria</Label>
-            <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-              {Object.entries(EXPENSE_CATEGORY_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
-              ))}
-            </Select>
-          </div>
+          <>
+            <div>
+              <Label>Categoria</Label>
+              <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+                {Object.entries(EXPENSE_CATEGORY_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </Select>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Fixa / Variável</Label>
+                <Select
+                  value={costBehavior}
+                  onChange={(e) =>
+                    setCostBehavior(e.target.value as "fixed" | "variable")
+                  }
+                >
+                  <option value="fixed">Fixa</option>
+                  <option value="variable">Variável</option>
+                </Select>
+              </div>
+              <div>
+                <Label>Recorrente / Eventual</Label>
+                <Select
+                  value={recurrenceType}
+                  onChange={(e) =>
+                    setRecurrenceType(e.target.value as "recurring" | "one_time")
+                  }
+                >
+                  <option value="recurring">Recorrente</option>
+                  <option value="one_time">Eventual</option>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Mês de competência</Label>
+                <Input
+                  type="month"
+                  value={referenceMonth}
+                  onChange={(e) => setReferenceMonth(e.target.value)}
+                />
+              </div>
+              <div className="flex items-end pb-2">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={allocationEligible}
+                    onChange={(e) => setAllocationEligible(e.target.checked)}
+                  />
+                  Incluir no custo/hora
+                </label>
+              </div>
+            </div>
+          </>
         ) : null}
         <div className="grid gap-3 sm:grid-cols-3">
           <div>

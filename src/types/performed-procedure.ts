@@ -1,3 +1,4 @@
+import type { DurationSource } from "@/types/clinic-costs";
 import type { ConsumptionMode, InventoryUnit } from "@/types/inventory";
 import type { PerformedFinancialStatus } from "@/types/patient-procedure-finance";
 
@@ -52,6 +53,15 @@ export type PerformedProcedure = {
   actual_total_cost_cents: number | null;
   gross_result_cents: number | null;
   gross_margin_percent: number | null;
+  /** Duração usada no custeio operacional (minutos). */
+  actual_duration_minutes: number | null;
+  duration_source: DurationSource | null;
+  /** Snapshot do custo/hora no mês de competência (centavos). */
+  productive_hour_cost_snapshot_cents: number | null;
+  allocated_time_cost_cents: number | null;
+  operational_total_cost_cents: number | null;
+  operational_result_cents: number | null;
+  operational_margin_percent: number | null;
   consumption_confirmed: boolean;
   consumption_confirmed_at: string | null;
   started_at: string | null;

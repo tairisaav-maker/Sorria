@@ -95,6 +95,12 @@ export const PERMISSIONS = [
   "inventory.purchase_list_create",
   "inventory.purchase_list_update",
 
+  "clinic_costs.view",
+  "clinic_costs.manage",
+  "operational_costs.view",
+  "procedure_operational_costs.view",
+  "expense_categories.manage",
+
   "cost_reports.view",
 
   "team.view",
@@ -216,6 +222,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.forecast_view",
     "inventory.forecast_cost_view",
     "inventory.replenishment_view",
+    "procedure_operational_costs.view",
     "cost_reports.view",
   ],
   secretary: [
@@ -261,6 +268,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.replenishment_view",
     "inventory.purchase_list_create",
     "inventory.purchase_list_update",
+    "expense_categories.manage",
   ],
 };
 

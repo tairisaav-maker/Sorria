@@ -16,6 +16,7 @@ import {
   type ProcedureMaterialLine,
   type ProcedureStandardCost,
 } from "@/types/inventory";
+import type { StandardOperationalEstimate } from "@/types/clinic-costs";
 
 export function ProcedureDetailClient({
   procedureId,
@@ -32,6 +33,8 @@ export function ProcedureDetailClient({
   const [procedure, setProcedure] = useState<Procedure | null>(null);
   const [materials, setMaterials] = useState<ProcedureMaterialLine[]>([]);
   const [cost, setCost] = useState<ProcedureStandardCost | null>(null);
+  const [opEstimate, setOpEstimate] =
+    useState<StandardOperationalEstimate | null>(null);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [itemId, setItemId] = useState("");
@@ -40,6 +43,12 @@ export function ProcedureDetailClient({
     "per_procedure",
   );
   const [saving, setSaving] = useState(false);
+  const [simPrice, setSimPrice] = useState("");
+  const [simResult, setSimResult] = useState<{
+    result: number | null;
+    margin: number | null;
+    message: string | null;
+  } | null>(null);
 
   async function load() {
     const [procRes, invRes] = await Promise.all([
@@ -55,6 +64,20 @@ export function ProcedureDetailClient({
     setCost(procRes.cost ?? null);
     setInventory(invRes.items ?? []);
     if (!itemId && invRes.items?.[0]) setItemId(invRes.items[0].id);
+    if (canSeeCosts) {
+      try {
+        const opRes = await fetch(
+          `/api/demo/clinic-costs?resource=procedure-estimate&procedureId=${procedureId}`,
+        );
+        if (opRes.ok) {
+          setOpEstimate(await opRes.json());
+        } else {
+          setOpEstimate(null);
+        }
+      } catch {
+        setOpEstimate(null);
+      }
+    }
   }
 
   useEffect(() => {
@@ -277,13 +300,15 @@ export function ProcedureDetailClient({
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-[var(--text-muted)]">Custo materiais</dt>
+              <dt className="text-[var(--text-muted)]">Custo de materiais</dt>
               <dd className="font-medium">
                 {formatBRL(cost.materials_cost_cents)}
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-[var(--text-muted)]">Resultado bruto</dt>
+              <dt className="text-[var(--text-muted)]">
+                Resultado sobre custos diretos
+              </dt>
               <dd className="font-medium">
                 {cost.gross_result_cents != null
                   ? formatBRL(cost.gross_result_cents)
@@ -291,16 +316,143 @@ export function ProcedureDetailClient({
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-[var(--text-muted)]">Margem do procedimento</dt>
+              <dt className="text-[var(--text-muted)]">Margem direta</dt>
               <dd className="font-medium">
                 {cost.margin_percent != null ? `${cost.margin_percent}%` : "—"}
               </dd>
             </div>
           </dl>
+        </section>
+      ) : null}
+
+      {canSeeCosts && opEstimate ? (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise">
+          <h2 className="text-lg font-medium text-[var(--brand-ink)]">
+            Custo operacional estimado
+          </h2>
+          {opEstimate.insufficient_data ? (
+            <p className="mt-2 text-sm text-[var(--text-muted)]">
+              Configure suas horas produtivas e despesas para calcular o custo
+              operacional.
+            </p>
+          ) : (
+            <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">Duração padrão</dt>
+                <dd className="font-medium">
+                  {opEstimate.default_duration_minutes != null
+                    ? `${opEstimate.default_duration_minutes} min`
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">Custo/hora atual</dt>
+                <dd className="font-medium">
+                  {opEstimate.hourly_cost_cents != null
+                    ? formatBRL(opEstimate.hourly_cost_cents)
+                    : "Dados insuficientes"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">Custo estimado do tempo</dt>
+                <dd className="font-medium">
+                  {opEstimate.time_cost_cents != null
+                    ? formatBRL(opEstimate.time_cost_cents)
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">
+                  Custo operacional estimado
+                </dt>
+                <dd className="font-medium">
+                  {opEstimate.operational_total_cents != null
+                    ? formatBRL(opEstimate.operational_total_cents)
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">
+                  Resultado operacional estimado
+                </dt>
+                <dd className="font-medium">
+                  {opEstimate.operational_result_cents != null
+                    ? formatBRL(opEstimate.operational_result_cents)
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 sm:block">
+                <dt className="text-[var(--text-muted)]">Margem operacional estimada</dt>
+                <dd className="font-medium">
+                  {opEstimate.operational_margin_percent != null
+                    ? `${opEstimate.operational_margin_percent}%`
+                    : "—"}
+                </dd>
+              </div>
+            </dl>
+          )}
           <p className="mt-3 text-xs text-[var(--text-subtle)]">
-            Estimativa operacional — não é lucro líquido. Custos reais e
-            snapshot histórico virão nas próximas subfases.
+            {opEstimate.disclaimer} Não é lucro líquido.
           </p>
+
+          {opEstimate.operational_total_cents != null ? (
+            <div className="mt-4 space-y-2 border-t border-[var(--border)] pt-3">
+              <p className="text-sm font-medium">Simular preço</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                Matemática auxiliar — não é recomendação de preço do Sorria.
+              </p>
+              <div className="flex flex-wrap items-end gap-2">
+                <div>
+                  <Label htmlFor="sim-price">Preço simulado (R$)</Label>
+                  <Input
+                    id="sim-price"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={simPrice}
+                    onChange={(e) => setSimPrice(e.target.value)}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={async () => {
+                    const res = await fetch("/api/demo/clinic-costs", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        action: "simulate_price",
+                        operational_cost_cents:
+                          opEstimate.operational_total_cents,
+                        simulated_price_cents: Math.round(
+                          Number(simPrice) * 100,
+                        ),
+                      }),
+                    }).then((r) => r.json());
+                    setSimResult({
+                      result: res.operational_result_cents ?? null,
+                      margin: res.operational_margin_percent ?? null,
+                      message: res.message ?? null,
+                    });
+                  }}
+                >
+                  Simular
+                </Button>
+              </div>
+              {simResult ? (
+                <p className="text-sm">
+                  Resultado:{" "}
+                  {simResult.result != null
+                    ? formatBRL(simResult.result)
+                    : "—"}
+                  {" · "}
+                  Margem:{" "}
+                  {simResult.margin != null ? `${simResult.margin}%` : "—"}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </section>
       ) : null}
 

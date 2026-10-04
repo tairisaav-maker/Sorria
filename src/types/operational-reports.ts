@@ -10,6 +10,10 @@ export type OperationalOverview = {
   receivable_cents: number | null;
   cost_coverage_percent: number | null;
   incomplete_cost_procedures: number;
+  /** Soma de custo operacional estimado (quando houver snapshot). */
+  operational_total_cost_cents: number | null;
+  operational_result_cents: number | null;
+  operational_coverage_percent: number | null;
   planned_vs_actual_percent: number | null;
   planned_vs_actual_label: string | null;
   previous_comparison: {
@@ -34,6 +38,12 @@ export type ProcedurePerformanceRow = {
   margin_percent: number | null;
   cost_deviation_percent: number | null;
   incomplete_cost_count: number;
+  avg_duration_minutes: number | null;
+  default_duration_minutes: number | null;
+  duration_delta_percent: number | null;
+  avg_operational_cost_cents: number | null;
+  total_operational_cost_cents: number | null;
+  operational_result_cents: number | null;
 };
 
 export type ProcedurePerformanceDetail = ProcedurePerformanceRow & {
@@ -92,6 +102,16 @@ export type PatientOperationalRow = {
   received_cents: number | null;
   outstanding_cents: number | null;
   gross_result_cents: number | null;
+  /** Resumo operacional — não chamar de rentabilidade do paciente. */
+  operational_cost_cents: number | null;
+  operational_result_cents: number | null;
+};
+
+export type OperationalCostCoverageReport = {
+  completed: number;
+  with_operational_cost: number;
+  coverage_percent: number | null;
+  incomplete_count: number;
 };
 
 export type FinancialOperationalReport = {

@@ -178,6 +178,19 @@ Agregação server-side nos services. Sem materialized views nesta fase. Índice
 
 Consumo histórico e previsto×real dos relatórios alimentam **alertas** de reposição (`REPLENISHMENT.md`), sem alterar automaticamente fichas ou quantidades de compra.
 
+## Camada Subfase 8 — custo operacional
+
+Sem substituir métricas de custo direto. Adiciona quando houver cobertura:
+
+- Custo operacional estimado (materiais + diretos + tempo)
+- Resultado operacional estimado
+- Cobertura de custo operacional (duração válida + snapshot de custo/hora)
+- Comparativo por procedimento: duração média, custo direto, custo operacional, cobrado, resultado
+- Paciente: resumo operacional (não “rentabilidade do paciente”)
+- Tempo médio acima do previsto (não “baixa eficiência”)
+
+Detalhes: [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md).
+
 ## Fora do escopo
 
-Custo fixo/hora, rateio de aluguel, impostos, comissão, folha, lucro líquido, DRE, IA, benchmarking entre dentistas, recomendação de preço/clínica.
+Impostos, comissão avançada, folha, lucro líquido, DRE fiscal, IA, benchmarking entre dentistas, recomendação automática de preço.

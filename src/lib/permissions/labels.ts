@@ -50,6 +50,11 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "finance.payment_reverse", label: "Estornar pagamento" },
       { key: "finance.expense_create", label: "Registrar despesa" },
       { key: "finance.export", label: "Exportar" },
+      { key: "clinic_costs.view", label: "Ver custos do consultório" },
+      { key: "clinic_costs.manage", label: "Configurar custos / horas produtivas" },
+      { key: "operational_costs.view", label: "Ver custo/hora operacional" },
+      { key: "procedure_operational_costs.view", label: "Ver custo operacional do procedimento" },
+      { key: "expense_categories.manage", label: "Gerenciar categorias de despesa" },
     ],
   },
   {

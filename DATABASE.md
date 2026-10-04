@@ -192,6 +192,18 @@ Notificações internas do Portal (sem push externo).
 `has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`
 
 
+## Subfase 8 — Custeio operacional
+
+Migration: `20251021000000_reestruturacao_operational_costing.sql`
+
+- Metadados em `financial_transactions`: `cost_behavior`, `recurrence_type`, `allocation_eligible`, `reference_month`, `competence_date`
+- `clinic_cost_settings` — horas produtivas / modo de cálculo (unique por clínica)
+- `recurring_expense_templates` — previsão mensal (≠ pagamento)
+- `clinic_hourly_cost_snapshots` — custo/hora mensal imutável após criação
+- `performed_procedures`: `actual_duration_minutes`, `duration_source`, `productive_hour_cost_snapshot`, `allocated_time_cost`, `operational_total_cost`, `operational_result`, `operational_margin_percent`
+- RLS: `clinic_id` + `clinic_costs.*` / `operational_costs.view` / `performed_procedures.complete` (insert snapshot)
+- Detalhes: [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md)
+
 ## Subfase 7 — Reposição / listas de compras
 
 Migration: `20251020000000_reestruturacao_replenishment.sql`

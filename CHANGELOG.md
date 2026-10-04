@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0 — 2026-10-04
+
+### Added
+- **Subfase 8:** despesas gerais, custo/hora clínica e custo operacional do procedimento
+- `/app/financeiro/custos` — configuração de horas, composição, simuladores
+- Metadados em `financial_transactions` (fixa/variável, recorrência, alocável, competência)
+- `clinic_cost_settings`, `recurring_expense_templates`, `clinic_hourly_cost_snapshots`
+- Snapshot de custo/hora + duração em `performed_procedures` (histórico não recalcula silencioso)
+- Permissions `clinic_costs.*`, `operational_costs.view`, `procedure_operational_costs.view`
+- [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md)
+
 ## 1.7.0 — 2026-10-04
 
 ### Added

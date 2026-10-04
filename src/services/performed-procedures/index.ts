@@ -28,6 +28,7 @@ import {
   calculateGrossResult,
   canViewProcedureCosts,
 } from "@/services/performed-procedures/costs";
+import { applyOperationalCostOnComplete } from "@/services/procedure-operational-costs";
 import type {
   AppointmentConsumption,
   PerformedProcedure,
@@ -316,6 +317,13 @@ export function createPerformedProcedure(ctx: AuthzContext, input: unknown) {
     actual_total_cost_cents: null,
     gross_result_cents: null,
     gross_margin_percent: null,
+    actual_duration_minutes: null,
+    duration_source: null,
+    productive_hour_cost_snapshot_cents: null,
+    allocated_time_cost_cents: null,
+    operational_total_cost_cents: null,
+    operational_result_cents: null,
+    operational_margin_percent: null,
     consumption_confirmed: false,
     consumption_confirmed_at: null,
     started_at: null,
@@ -365,7 +373,11 @@ export function startPerformedProcedure(ctx: AuthzContext, id: string) {
   return getPerformedProcedure(ctx, id);
 }
 
-export function completePerformedProcedure(ctx: AuthzContext, id: string) {
+export function completePerformedProcedure(
+  ctx: AuthzContext,
+  id: string,
+  opts?: { duration_minutes?: number | null },
+) {
   assertPermission(ctx, "performed_procedures.complete");
   const row = findPerformed(ctx, id);
   if (row.status === "cancelled") throw new Error("INVALID_STATUS");
@@ -381,6 +393,10 @@ export function completePerformedProcedure(ctx: AuthzContext, id: string) {
   );
   row.gross_result_cents = gross.gross_result_cents;
   row.gross_margin_percent = gross.gross_margin_percent;
+
+  // Custeio operacional (Subfase 8) — snapshot; não recalcula histórico depois
+  applyOperationalCostOnComplete(ctx, row, opts?.duration_minutes);
+
   writePerformedAudit({
     clinic_id: ctx.clinicId,
     actor_user_id: ctx.userId,

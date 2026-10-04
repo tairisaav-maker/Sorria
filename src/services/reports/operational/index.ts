@@ -33,6 +33,7 @@ import type {
   FinancialOperationalReport,
   MaterialConsumptionDetail,
   MaterialConsumptionRow,
+  OperationalCostCoverageReport,
   OperationalOverview,
   PatientOperationalRow,
   ProcedurePerformanceDetail,
@@ -59,6 +60,24 @@ function canViewProcedureCosts(ctx: AuthzContext) {
     can(ctx, "reports.procedure_costs_view").allowed ||
     can(ctx, "procedure_costs.view").allowed ||
     can(ctx, "cost_reports.view").allowed
+  );
+}
+
+function canViewOperationalCosts(ctx: AuthzContext) {
+  return (
+    can(ctx, "procedure_operational_costs.view").allowed ||
+    can(ctx, "operational_costs.view").allowed ||
+    can(ctx, "clinic_costs.view").allowed ||
+    can(ctx, "cost_reports.view").allowed
+  );
+}
+
+function hasOperationalCost(p: PerformedProcedure) {
+  return (
+    p.actual_duration_minutes != null &&
+    p.actual_duration_minutes > 0 &&
+    p.productive_hour_cost_snapshot_cents != null &&
+    p.operational_total_cost_cents != null
   );
 }
 
@@ -187,6 +206,18 @@ function overviewForPeriod(
     }
   }
 
+  const showOp = canViewOperationalCosts(ctx);
+  let opTotal = 0;
+  let opComplete = 0;
+  for (const p of items) {
+    if (hasOperationalCost(p)) {
+      opTotal += p.operational_total_cost_cents ?? 0;
+      opComplete += 1;
+    }
+  }
+  const opResult =
+    showOp && opComplete > 0 ? charged - opTotal : null;
+
   return {
     procedures_completed: items.length,
     materials_cost_cents: showCost ? costSum : null,
@@ -201,6 +232,38 @@ function overviewForPeriod(
     receivable_cents: receivable,
     cost_coverage_percent: costCoverage(complete, items.length),
     incomplete_cost_procedures: items.length - complete,
+    operational_total_cost_cents: showOp && opComplete > 0 ? opTotal : null,
+    operational_result_cents: opResult,
+    operational_coverage_percent: showOp
+      ? costCoverage(opComplete, items.length)
+      : null,
+  };
+}
+
+export function getOperationalCostCoverageReport(
+  ctx: AuthzContext,
+  filter: ReportFilter,
+): OperationalCostCoverageReport {
+  assertPermission(ctx, "reports.view");
+  if (!canViewOperationalCosts(ctx)) {
+    return {
+      completed: 0,
+      with_operational_cost: 0,
+      coverage_percent: null,
+      incomplete_count: 0,
+    };
+  }
+  const period = periodOf(ctx, filter);
+  const items = completedInPeriod(ctx, period);
+  let withOp = 0;
+  for (const p of items) {
+    if (hasOperationalCost(p)) withOp += 1;
+  }
+  return {
+    completed: items.length,
+    with_operational_cost: withOp,
+    coverage_percent: costCoverage(withOp, items.length),
+    incomplete_count: items.length - withOp,
   };
 }
 
@@ -351,6 +414,33 @@ export function getProcedurePerformanceReport(
           }).percent
         : null;
 
+    const showOp = canViewOperationalCosts(ctx);
+    const withDuration = list.filter(
+      (p) => p.actual_duration_minutes != null && p.actual_duration_minutes > 0,
+    );
+    const avgDuration = averageOrNull(
+      withDuration.reduce((s, p) => s + (p.actual_duration_minutes ?? 0), 0),
+      withDuration.length,
+    );
+    const defaultDuration =
+      inv.procedures.find((p) => p.id === procedureId)?.default_duration_minutes ??
+      null;
+    const durationDelta =
+      avgDuration != null && defaultDuration != null && defaultDuration > 0
+        ? Math.round(
+            ((avgDuration - defaultDuration) / defaultDuration) * 1000,
+          ) / 10
+        : null;
+    const withOp = list.filter(hasOperationalCost);
+    const opSum = withOp.reduce(
+      (s, p) => s + (p.operational_total_cost_cents ?? 0),
+      0,
+    );
+    const opResultSum = withOp.reduce(
+      (s, p) => s + (p.operational_result_cents ?? 0),
+      0,
+    );
+
     rows.push({
       procedure_id: procedureId,
       procedure_name: name,
@@ -366,6 +456,15 @@ export function getProcedurePerformanceReport(
       margin_percent: margin,
       cost_deviation_percent: costDev,
       incomplete_cost_count: list.length - complete,
+      avg_duration_minutes: showOp ? avgDuration : null,
+      default_duration_minutes: showOp ? defaultDuration : null,
+      duration_delta_percent: showOp ? durationDelta : null,
+      avg_operational_cost_cents: showOp
+        ? averageOrNull(opSum, withOp.length)
+        : null,
+      total_operational_cost_cents: showOp && withOp.length > 0 ? opSum : null,
+      operational_result_cents:
+        showOp && withOp.length > 0 ? opResultSum : null,
     });
   }
 
@@ -653,6 +752,17 @@ export function getPatientOperationalReport(
         0,
       );
     }
+    const showOp = canViewOperationalCosts(ctx);
+    const withOp = list.filter(hasOperationalCost);
+    const opSum = withOp.reduce(
+      (s, p) => s + (p.operational_total_cost_cents ?? 0),
+      0,
+    );
+    const opResult = withOp.reduce(
+      (s, p) => s + (p.operational_result_cents ?? 0),
+      0,
+    );
+
     rows.push({
       patient_id: patientId,
       patient_name: patient?.full_name ?? "Paciente",
@@ -662,6 +772,8 @@ export function getPatientOperationalReport(
       received_cents: received,
       outstanding_cents: outstanding,
       gross_result_cents: showCost ? grossResult(charged, costSum) : null,
+      operational_cost_cents: showOp && withOp.length > 0 ? opSum : null,
+      operational_result_cents: showOp && withOp.length > 0 ? opResult : null,
     });
   }
 
@@ -753,11 +865,15 @@ export function getOperationalBundle(ctx: AuthzContext, filter: ReportFilter) {
   const showPatientFin = canViewPatientFinancial(ctx);
   const showFin = canViewFinancialOps(ctx);
 
+  const showOp = canViewOperationalCosts(ctx);
   return {
     period,
     clinicName: clinic?.name ?? "Clínica",
     overview: getOperationalOverview(ctx, filter),
     coverage: getCostCoverageReport(ctx, filter),
+    operational_coverage: showOp
+      ? getOperationalCostCoverageReport(ctx, filter)
+      : null,
     procedures: getProcedurePerformanceReport(ctx, filter),
     materials: showMaterials ? getMaterialConsumptionReport(ctx, filter) : null,
     patients:
@@ -767,6 +883,7 @@ export function getOperationalBundle(ctx: AuthzContext, filter: ReportFilter) {
     financial: showFin ? getFinancialOperationalReport(ctx, filter) : null,
     capabilities: {
       costs: showCost,
+      operationalCosts: showOp,
       materials: showMaterials,
       patientFinancial: showPatientFin,
       financial: showFin,
