@@ -11,6 +11,14 @@
 7. `20251010000000_fase6_financeiro.sql`
 8. `20251011000000_fase7_portal.sql`
 9. `20251012000000_fase8_relatorios.sql`
+10. `20251013000000_fase9_assistente.sql`
+
+## Fase 9 — Secretária Virtual
+
+### `assistant_threads` / `assistant_messages` / `assistant_action_plans`
+
+- Tenant (`clinic_id`) + dono (`user_id`); RLS com `assistant.use`
+- Action plans: status + `expires_at` (TTL); confirmação explícita antes de mutar
 
 ## Fase 6 — Financeiro
 

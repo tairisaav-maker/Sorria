@@ -21,6 +21,6 @@ export type {
 export type NavItem = {
   href: string;
   label: string;
-  icon: "home" | "calendar" | "users" | "wallet" | "more";
+  icon: "home" | "calendar" | "users" | "wallet" | "assistant" | "more";
   enabled: boolean;
 };

@@ -40,7 +40,7 @@ Acesso financeiro é independente do clínico.
 | Financeiro V1 | ✅ |
 | Portal do paciente | ✅ |
 | Relatórios e indicadores | ✅ |
-| Secretária Virtual / IA | ❌ |
+| Secretária Virtual | ✅ |
 
 ## Financeiro (Fase 6)
 
@@ -149,6 +149,21 @@ Ocupação da agenda **não** é inventada sem horários de atendimento.
 
 Definições: [REPORTS.md](./REPORTS.md).
 
+## Secretária Virtual (Fase 9)
+
+Rota: `/app/assistente`.
+
+```text
+UI → Orquestrador → Authz → Tool Registry → Services Sorria → RLS
+```
+
+- Provider abstrato (`AIProvider`); demo sem API externa
+- Tools explícitas + permissão de domínio **antes** da execução
+- Mutações via `assistant_action_plans` (TTL 15 min, confirmação explícita, revalidação)
+- Sem SQL arbitrário, sem IA clínica, sem envio automático de mensagens
+
+Detalhes: [ASSISTANT.md](./ASSISTANT.md).
+
 ## Fora do escopo atual
 
-Integração bancária/adquirente, boleto, NF, contabilidade, Secretária Virtual, IA, WhatsApp, pagamento online no Portal, BI externo.
+Integração bancária/adquirente, boleto, NF, contabilidade, WhatsApp automático, cobrança automática, IA clínica, pagamento online no Portal, BI externo.

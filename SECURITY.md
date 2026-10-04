@@ -77,3 +77,15 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Portal paciente: sem acesso a `/app/relatorios`
 - Exportação audita `report.exported` sem armazenar o arquivo
 - Cross-clinic: membership obrigatória
+
+## Secretária Virtual (Fase 9)
+
+- Permissão de entrada: `assistant.use` (+ permissão de domínio por tool)
+- Sem `assistant.all_access` / sem SQL gerado pelo modelo / sem tool clínica genérica
+- Autorização **antes** da tool; RLS em `assistant_threads` / `messages` / `action_plans`
+- Action plans: confirmação explícita, TTL, revalidação, serviços de domínio existentes
+- Prompt injection: conteúdo do banco = dado; dumps bloqueados
+- Minimização: agregados nas tools; modelo não soma financeiro
+- Dentista com prontuário ≠ Secretária como IA clínica
+- Auditoria: `assistant.*` sem chain-of-thought; rate limit por usuário/tenant
+- Detalhes: [ASSISTANT.md](./ASSISTANT.md)

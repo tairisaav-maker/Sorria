@@ -2,6 +2,7 @@ import {
   CalendarDays,
   CircleEllipsis,
   Home,
+  Sparkles,
   Users,
   Wallet,
   type LucideIcon,
@@ -13,6 +14,7 @@ const icons: Record<NavItem["icon"], LucideIcon> = {
   calendar: CalendarDays,
   users: Users,
   wallet: Wallet,
+  assistant: Sparkles,
   more: CircleEllipsis,
 };
 

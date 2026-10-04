@@ -61,6 +61,12 @@ export const ACCESS_GROUPS: AccessGroup[] = [
     ],
   },
   {
+    title: "Secretária Virtual",
+    items: [
+      { key: "assistant.use", label: "Usar Secretária Virtual" },
+    ],
+  },
+  {
     title: "Equipe",
     items: [
       { key: "team.view", label: "Ver equipe" },

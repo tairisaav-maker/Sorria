@@ -4,10 +4,10 @@
 
 ## Fase atual
 
-**FASE 8 — Relatórios e Indicadores**
+**FASE 9 — Secretária Virtual**
 
-> Dado → contexto → decisão  
-> Plano aceito ≠ Receita · Resultado do período ≠ lucro líquido · Paciente ativo ≠ atendido
+> Assistente administrativa permissionada  
+> IA ≠ banco · Tool ≠ permissão · Prévia ≠ execução · Sem IA clínica
 
 ## Como rodar
 
@@ -21,6 +21,7 @@ npm run dev
 
 `demo@sorria.app` / `sorria-demo` → `/app`
 
+Secretária Virtual: `/app/assistente`  
 Relatórios: **Mais → Relatórios** ou `/app/relatorios`
 
 ### Login Portal (demo)
@@ -42,4 +43,5 @@ npm run build
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)
 - [REPORTS.md](./REPORTS.md) — definições de métricas
+- [ASSISTANT.md](./ASSISTANT.md) — Secretária Virtual
 - [ROADMAP.md](./ROADMAP.md)

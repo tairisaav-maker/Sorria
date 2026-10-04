@@ -55,6 +55,8 @@ export const PERMISSIONS = [
   "reports.view_financial",
   "reports.export",
 
+  "assistant.use",
+
   "team.view",
   "team.invite",
   "team.change_role",
@@ -151,6 +153,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "reports.view_patients",
     "reports.view_treatments",
     "reports.export",
+    "assistant.use",
   ],
   secretary: [
     "dashboard.view",
@@ -174,6 +177,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "reports.view_schedule",
     "reports.view_patients",
     "reports.export",
+    "assistant.use",
   ],
 };
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
-import { CalendarClock, FileBarChart2, Shield, Users, Wallet } from "lucide-react";
+import { CalendarClock, FileBarChart2, Shield, Sparkles, Users, Wallet } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Mais",
@@ -15,8 +15,17 @@ export default async function MaisPage() {
   const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
   const canFinance = can(actor.ctx, "finance.view_administrative").allowed;
   const canReports = can(actor.ctx, "reports.view").allowed;
+  const canAssistant = can(actor.ctx, "assistant.use").allowed;
 
   const links = [
+    canAssistant
+      ? {
+          href: "/app/assistente",
+          title: "Secretária Virtual",
+          description: "Consulte informações e organize tarefas administrativas",
+          icon: Sparkles,
+        }
+      : null,
     canFinance
       ? {
           href: "/app/financeiro",

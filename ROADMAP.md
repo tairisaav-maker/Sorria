@@ -19,10 +19,14 @@
 - Exportação PDF / XLSX / CSV
 - Permissões granulares + REPORTS.md
 
+## Concluído (Fase 9)
+
+- Secretária Virtual: tools permissionadas, action plans, sem IA clínica
+
 ## Próximo
 
-**FASE 9 — Secretária Virtual**
+**FASE 10 — Polimento, segurança final, onboarding e preparação comercial**
 
 ## Fora da V1
 
-IA clínica, BI externo, data warehouse, previsão, benchmarking, comissão, DRE contábil, WhatsApp
+IA clínica, BI externo, data warehouse, previsão, benchmarking, comissão, DRE contábil, WhatsApp automático, cobrança automática
