@@ -508,6 +508,7 @@ function EntriesTab({
 
   useEffect(() => {
     void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
   async function saveDraft(id?: string) {
@@ -896,6 +897,7 @@ function OdontogramTab({
 
   useEffect(() => {
     void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
   const byNumber = useMemo(() => {
@@ -1063,6 +1065,7 @@ function FilesTab({
 
   useEffect(() => {
     void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
   async function upload() {
