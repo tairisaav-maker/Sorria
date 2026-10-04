@@ -56,6 +56,7 @@ function seed(): InventoryStore {
     created_at: stamp(48),
     updated_at: stamp(48),
     archived_at: null,
+    source_material_template_id: "mt-luva",
   };
 
   const mask: InventoryItem = {
@@ -78,6 +79,7 @@ function seed(): InventoryStore {
     created_at: stamp(48),
     updated_at: stamp(48),
     archived_at: null,
+    source_material_template_id: "mt-mascara",
   };
 
   const resin: InventoryItem = {
@@ -100,6 +102,7 @@ function seed(): InventoryStore {
     created_at: stamp(40),
     updated_at: stamp(40),
     archived_at: null,
+    source_material_template_id: "mt-resina",
   };
 
   const anesthetic: InventoryItem = {
@@ -122,6 +125,7 @@ function seed(): InventoryStore {
     created_at: stamp(36),
     updated_at: stamp(36),
     archived_at: null,
+    source_material_template_id: "mt-anestesioco",
   };
 
   const needle: InventoryItem = {
@@ -144,6 +148,7 @@ function seed(): InventoryStore {
     created_at: stamp(36),
     updated_at: stamp(36),
     archived_at: null,
+    source_material_template_id: "mt-agulha-curta",
   };
 
   const acid: InventoryItem = {
@@ -166,6 +171,7 @@ function seed(): InventoryStore {
     created_at: stamp(35),
     updated_at: stamp(35),
     archived_at: null,
+    source_material_template_id: "mt-acido",
   };
 
   const adhesive: InventoryItem = {
@@ -188,6 +194,7 @@ function seed(): InventoryStore {
     created_at: stamp(35),
     updated_at: stamp(35),
     archived_at: null,
+    source_material_template_id: "mt-adesivo",
   };
 
   const gauze: InventoryItem = {
@@ -210,6 +217,7 @@ function seed(): InventoryStore {
     created_at: stamp(34),
     updated_at: stamp(34),
     archived_at: null,
+    source_material_template_id: "mt-gaze",
   };
 
   const microbrush: InventoryItem = {
@@ -232,6 +240,7 @@ function seed(): InventoryStore {
     created_at: stamp(34),
     updated_at: stamp(34),
     archived_at: null,
+    source_material_template_id: "mt-microbrush",
   };
 
   // Clinic B — isolado
@@ -255,6 +264,7 @@ function seed(): InventoryStore {
     created_at: stamp(20),
     updated_at: stamp(20),
     archived_at: null,
+    source_material_template_id: null,
   };
 
   const restoration: Procedure = {
@@ -270,6 +280,11 @@ function seed(): InventoryStore {
     created_at: stamp(30),
     updated_at: stamp(30),
     archived_at: null,
+    source_template_id: "pt-rest-media",
+    source_template_version: 1,
+    favorited: true,
+    use_count: 12,
+    last_used_at: stamp(2),
   };
 
   const restorationSmall: Procedure = {
@@ -285,6 +300,11 @@ function seed(): InventoryStore {
     created_at: stamp(30),
     updated_at: stamp(30),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
 
   const restorationLarge: Procedure = {
@@ -300,6 +320,11 @@ function seed(): InventoryStore {
     created_at: stamp(30),
     updated_at: stamp(30),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
 
   const prophylaxis: Procedure = {
@@ -315,6 +340,11 @@ function seed(): InventoryStore {
     created_at: stamp(28),
     updated_at: stamp(28),
     archived_at: null,
+    source_template_id: "pt-profilaxia",
+    source_template_version: 1,
+    favorited: true,
+    use_count: 8,
+    last_used_at: stamp(5),
   };
 
   const whiteningA: Procedure = {
@@ -330,6 +360,11 @@ function seed(): InventoryStore {
     created_at: stamp(27),
     updated_at: stamp(27),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
 
   const evaluation: Procedure = {
@@ -345,6 +380,11 @@ function seed(): InventoryStore {
     created_at: stamp(26),
     updated_at: stamp(26),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
 
   const procB: Procedure = {
@@ -360,6 +400,11 @@ function seed(): InventoryStore {
     created_at: stamp(18),
     updated_at: stamp(18),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
 
   const materials: ProcedureMaterial[] = [
@@ -373,6 +418,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_appointment",
       optional: false,
       notes: "EPI compartilhado no atendimento",
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -386,6 +433,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_appointment",
       optional: false,
       notes: "EPI compartilhado no atendimento",
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -399,6 +448,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_unit",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -412,6 +463,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -425,6 +478,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -438,6 +493,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: true,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -451,6 +508,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: true,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -464,6 +523,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -477,6 +538,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -490,6 +553,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_appointment",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(27),
       updated_at: stamp(27),
     },
@@ -503,6 +568,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_appointment",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(27),
       updated_at: stamp(27),
     },
@@ -516,6 +583,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_unit",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -529,6 +598,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_unit",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(29),
       updated_at: stamp(29),
     },
@@ -542,6 +613,8 @@ function seed(): InventoryStore {
       consumption_mode: "per_procedure",
       optional: false,
       notes: null,
+      clinically_variable: false,
+      source_material_template_id: null,
       created_at: stamp(17),
       updated_at: stamp(17),
     },

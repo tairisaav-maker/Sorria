@@ -149,6 +149,7 @@ export function createInventoryItem(
     created_at: now(),
     updated_at: now(),
     archived_at: null,
+    source_material_template_id: data.source_material_template_id ?? null,
   };
   store.inventoryItems.push(item);
   writeInventoryAudit({

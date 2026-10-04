@@ -5,10 +5,12 @@ import {
   archiveProcedure,
   calculateProcedureStandardCost,
   createProcedure,
+  duplicateProcedure,
   getProcedure,
   listProcedureMaterials,
   listProcedures,
   removeProcedureMaterial,
+  setProcedureFavorite,
   updateProcedure,
   updateProcedureMaterial,
 } from "@/services/procedures";
@@ -105,6 +107,24 @@ export async function POST(request: Request) {
     if (action === "archive") {
       return NextResponse.json({
         procedure: archiveProcedure(session, body.data),
+      });
+    }
+    if (action === "duplicate") {
+      return NextResponse.json({
+        procedure: duplicateProcedure(
+          session,
+          body.data.id,
+          body.data.name,
+        ),
+      });
+    }
+    if (action === "favorite") {
+      return NextResponse.json({
+        procedure: setProcedureFavorite(
+          session,
+          body.data.id,
+          Boolean(body.data.favorited),
+        ),
       });
     }
     if (action === "add_material") {

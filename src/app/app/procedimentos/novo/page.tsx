@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { ProcedureFormClient } from "@/components/procedures/procedure-form-client";
+import { ProcedureLibraryPicker } from "@/components/procedures/procedure-library-picker";
 import { requirePermission } from "@/lib/authz/guards";
 
 export const metadata: Metadata = {
-  title: "Novo procedimento",
+  title: "Adicionar procedimento",
 };
 
-export default async function NovoProcedimentoPage() {
+export default async function NovoProcedimentoPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ from?: string }>;
+}) {
   await requirePermission("procedures.create");
-  return <ProcedureFormClient mode="create" />;
+  const sp = searchParams ? await searchParams : {};
+  const mode =
+    sp.from === "onboarding" ? ("onboarding" as const) : ("catalog" as const);
+  return <ProcedureLibraryPicker mode={mode} />;
 }

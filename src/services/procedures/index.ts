@@ -90,6 +90,11 @@ export function createProcedure(
     created_at: now(),
     updated_at: now(),
     archived_at: null,
+    source_template_id: null,
+    source_template_version: null,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
   };
   store.procedures.push(proc);
   writeInventoryAudit({
@@ -270,9 +275,11 @@ export function addProcedureMaterial(
     consumption_unit: item.consumption_unit,
     consumption_mode: data.consumption_mode,
     optional: data.optional ?? false,
+    clinically_variable: data.clinically_variable ?? false,
     notes: data.notes ?? null,
     created_at: now(),
     updated_at: now(),
+    source_material_template_id: data.source_material_template_id ?? null,
   };
   store.procedureMaterials.push(row);
   writeInventoryAudit({
@@ -304,9 +311,85 @@ export function updateProcedureMaterial(
     row.consumption_mode = data.consumption_mode;
   }
   if (data.optional !== undefined) row.optional = data.optional;
+  if (data.clinically_variable !== undefined) {
+    row.clinically_variable = data.clinically_variable;
+  }
   if (data.notes !== undefined) row.notes = data.notes;
   row.updated_at = now();
   return row;
+}
+
+export function duplicateProcedure(
+  ctx: AuthzContext,
+  procedureId: string,
+  nameOverride?: string | null,
+): Procedure {
+  assertPermission(ctx, "procedures.create");
+  const source = findProcedure(ctx, procedureId);
+  const store = getInventoryStore();
+  const copy: Procedure = {
+    ...source,
+    id: `proc-${crypto.randomUUID()}`,
+    name: nameOverride?.trim() || `${source.name} (cópia)`,
+    created_by: ctx.userId,
+    created_at: now(),
+    updated_at: now(),
+    archived_at: null,
+    active: true,
+    favorited: false,
+    use_count: 0,
+    last_used_at: null,
+    // Cópia da clínica — mantém referência ao template original se houver
+    source_template_id: source.source_template_id,
+    source_template_version: source.source_template_version,
+  };
+  store.procedures.push(copy);
+  const mats = store.procedureMaterials.filter(
+    (m) => m.procedure_id === source.id && m.clinic_id === ctx.clinicId,
+  );
+  for (const m of mats) {
+    store.procedureMaterials.push({
+      ...m,
+      id: `pm-${crypto.randomUUID()}`,
+      procedure_id: copy.id,
+      created_at: now(),
+      updated_at: now(),
+    });
+  }
+  writeInventoryAudit({
+    clinic_id: ctx.clinicId,
+    actor_user_id: ctx.userId,
+    action: "procedure.duplicated",
+    target_type: "procedure",
+    target_id: copy.id,
+    metadata: { source_procedure_id: source.id },
+  });
+  return copy;
+}
+
+export function setProcedureFavorite(
+  ctx: AuthzContext,
+  procedureId: string,
+  favorited: boolean,
+): Procedure {
+  assertPermission(ctx, "procedures.update");
+  const proc = findProcedure(ctx, procedureId);
+  proc.favorited = favorited;
+  proc.updated_at = now();
+  return proc;
+}
+
+export function recordProcedureUsage(
+  ctx: AuthzContext,
+  procedureId: string,
+): void {
+  const proc = getInventoryStore().procedures.find(
+    (p) => p.id === procedureId && p.clinic_id === ctx.clinicId,
+  );
+  if (!proc) return;
+  proc.use_count += 1;
+  proc.last_used_at = now();
+  proc.updated_at = now();
 }
 
 export function removeProcedureMaterial(

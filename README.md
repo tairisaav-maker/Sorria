@@ -4,11 +4,11 @@
 
 ## Versão
 
-**0.11.0-beta** — Beta comercial (landing, lead, demo, ativação) · preços definitivos pendentes
+**0.12.0-beta** — Biblioteca inteligente de procedimentos e materiais
 
-> Saiba quanto cada procedimento realmente custa.  
+> Escolha da biblioteca → revise a ficha → salve na clínica.  
 > Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
-> [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md) · [GO_TO_MARKET.md](./GO_TO_MARKET.md) · [SALES_DEMO.md](./SALES_DEMO.md)
+> [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) · [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md)
 
 ## Como rodar
 
@@ -59,6 +59,7 @@ npm run build
 
 ## Docs
 
+- [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) — biblioteca inteligente de procedimentos e materiais
 - [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
 - [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
 - [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md) · [GO_TO_MARKET.md](./GO_TO_MARKET.md) · [SALES_DEMO.md](./SALES_DEMO.md) · [PRICING_RESEARCH.md](./PRICING_RESEARCH.md)

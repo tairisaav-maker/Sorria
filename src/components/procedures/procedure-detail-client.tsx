@@ -135,6 +135,24 @@ export function ProcedureDetailClient({
     }
   }
 
+  async function duplicate() {
+    const res = await fetch("/api/demo/procedures", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "duplicate",
+        data: { id: procedureId },
+      }),
+    });
+    const json = await res.json();
+    if (res.ok) {
+      router.push(`/app/procedimentos/${json.procedure.id}`);
+      router.refresh();
+    } else {
+      setError(json.error ?? "Erro ao duplicar");
+    }
+  }
+
   async function addMaterial(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -205,12 +223,15 @@ export function ProcedureDetailClient({
             </p>
           </div>
           {canEdit ? (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Link href={`/app/procedimentos/${procedure.id}/editar`}>
                 <Button variant="secondary" size="sm">
                   Editar
                 </Button>
               </Link>
+              <Button variant="secondary" size="sm" onClick={() => void duplicate()}>
+                Duplicar
+              </Button>
               <Button variant="ghost" size="sm" onClick={archive}>
                 Arquivar
               </Button>
@@ -246,8 +267,12 @@ export function ProcedureDetailClient({
                 <div>
                   <p className="text-sm font-medium">{m.item_name}</p>
                   <p className="text-xs text-[var(--text-muted)]">
-                    {m.standard_quantity} {m.consumption_unit} ·{" "}
+                    {m.clinically_variable
+                      ? "Quantidade a confirmar no atendimento"
+                      : `${m.standard_quantity} ${m.consumption_unit}`}
+                    {" · "}
                     {CONSUMPTION_MODE_LABELS[m.consumption_mode]}
+                    {m.optional ? " · opcional" : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

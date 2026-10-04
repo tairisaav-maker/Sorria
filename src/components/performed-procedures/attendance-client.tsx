@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { ProcedureLibraryPicker } from "@/components/procedures/procedure-library-picker";
 import { formatBRL } from "@/lib/money";
 import { startFlowTimer, trackClientEvent } from "@/lib/pilot/client";
 import {
@@ -100,6 +101,7 @@ export function AttendanceClient({
   const [tooth, setTooth] = useState("");
   const [qty, setQty] = useState("1");
   const [charge, setCharge] = useState("");
+  const [showLibrary, setShowLibrary] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [extraItem, setExtraItem] = useState("");
   const [extraQty, setExtraQty] = useState("1");
@@ -251,10 +253,9 @@ export function AttendanceClient({
     await loadList();
   }
 
-  async function addProcedure(e: React.FormEvent) {
-    e.preventDefault();
+  async function addProcedureById(procedureId: string) {
     setError(null);
-    const cat = catalog.find((c) => c.id === procId);
+    const cat = catalog.find((c) => c.id === procedureId);
     const res = await fetch("/api/demo/performed-procedures", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -263,7 +264,7 @@ export function AttendanceClient({
         data: {
           patient_id: patientId,
           appointment_id: appointmentId,
-          procedure_id: procId,
+          procedure_id: procedureId,
           tooth_number: tooth ? Number(tooth) : null,
           quantity: Number(qty) || 1,
           charged_amount_reais: charge
@@ -279,8 +280,20 @@ export function AttendanceClient({
       setError(json.error ?? "Erro");
       return;
     }
+    setShowLibrary(false);
+    setTooth("");
+    setCharge("");
     await loadList();
     await openDetail(json.item.procedure.id);
+  }
+
+  async function addProcedure(e: React.FormEvent) {
+    e.preventDefault();
+    if (!procId) {
+      setShowLibrary(true);
+      return;
+    }
+    await addProcedureById(procId);
   }
 
   async function saveConsumption() {
@@ -509,50 +522,73 @@ export function AttendanceClient({
       ) : null}
 
       {canCreate ? (
-        <form
-          onSubmit={addProcedure}
-          className="grid gap-3 rounded-2xl border border-[var(--border)] p-4 sm:grid-cols-4"
-        >
-          <div className="sm:col-span-2 space-y-1.5">
-            <Label>Procedimento</Label>
-            <Select
-              value={procId}
-              onChange={(e) => setProcId(e.target.value)}
-              required
+        <div className="space-y-3 rounded-2xl border border-[var(--border)] p-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-[var(--brand-ink)]">
+                Procedimentos do atendimento
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                Favoritos e mais usados primeiro — 2 a 3 toques
+              </p>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setShowLibrary(true)}
             >
-              {catalog.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Dente</Label>
-            <Input
-              value={tooth}
-              onChange={(e) => setTooth(e.target.value)}
-              placeholder="16"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Qtd</Label>
-            <Input value={qty} onChange={(e) => setQty(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Valor cobrado (R$)</Label>
-            <Input
-              value={charge}
-              onChange={(e) => setCharge(e.target.value)}
-              placeholder="padrão do catálogo"
-            />
-          </div>
-          <div className="sm:col-span-4">
-            <Button type="submit" size="sm">
-              Adicionar procedimento
+              + Procedimento
             </Button>
           </div>
-        </form>
+          <form
+            onSubmit={addProcedure}
+            className="grid gap-3 sm:grid-cols-4"
+          >
+            <div className="sm:col-span-2 space-y-1.5">
+              <Label>Atalho do catálogo</Label>
+              <Select
+                value={procId}
+                onChange={(e) => setProcId(e.target.value)}
+              >
+                <option value="">Escolher…</option>
+                {catalog.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Dente</Label>
+              <Input
+                value={tooth}
+                onChange={(e) => setTooth(e.target.value)}
+                placeholder="16"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Qtd</Label>
+              <Input value={qty} onChange={(e) => setQty(e.target.value)} />
+            </div>
+            <div className="sm:col-span-4 flex flex-wrap gap-2">
+              <Button type="submit" size="sm" variant="secondary">
+                Adicionar do atalho
+              </Button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+
+      {showLibrary ? (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--surface)] p-4 sm:p-6">
+          <ProcedureLibraryPicker
+            mode="attendance"
+            onClose={() => setShowLibrary(false)}
+            onSelectClinicProcedure={(id) => {
+              void addProcedureById(id);
+            }}
+          />
+        </div>
       ) : null}
 
       <ul className="divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)]">

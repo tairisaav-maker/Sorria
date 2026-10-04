@@ -1,5 +1,5 @@
-/** Versão do produto Sorria (semver). Beta comercial: 0.11.x — primeiros clientes. */
-export const APP_VERSION = "0.11.0-beta";
+/** Versão do produto Sorria (semver). Biblioteca inteligente: 0.12.x. */
+export const APP_VERSION = "0.12.0-beta";
 export const APP_NAME = "Sorria";
 export const APP_TAGLINE = "Gestão inteligente para consultórios";
 export type AppChannel = "pilot" | "beta" | "production";

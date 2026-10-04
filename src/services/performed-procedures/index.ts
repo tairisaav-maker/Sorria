@@ -29,6 +29,7 @@ import {
   canViewProcedureCosts,
 } from "@/services/performed-procedures/costs";
 import { applyOperationalCostOnComplete } from "@/services/procedure-operational-costs";
+import { recordProcedureUsage } from "@/services/procedures";
 import {
   getCommercialActivation,
   touchOperationalActivity,
@@ -343,6 +344,7 @@ export function createPerformedProcedure(ctx: AuthzContext, input: unknown) {
   getPerformedStore().performedProcedures.push(performed);
   buildProcedureConsumptionSnapshot(ctx, performed);
   recalculatePlannedShared(ctx, performed.appointment_id);
+  recordProcedureUsage(ctx, procedure.id);
 
   writePerformedAudit({
     clinic_id: ctx.clinicId,

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.12.0-beta — 2026-10-04
+
+### Added
+- **Biblioteca inteligente de procedimentos e materiais** (prioridade sobre fases comerciais)
+- Templates globais: `procedure_templates`, `procedure_template_materials`, `material_templates`
+- Fluxo: Adicionar → biblioteca visual → revisar ficha → personalizar → salvar na clínica
+- Categorias (prevenção, dentística, periodontia, endodontia, cirurgia, estética, prótese, implantes, odontopediatria, ortodontia)
+- Favoritos · Mais usados · Recentes · busca fuzzy/aliases
+- Importação com matching de materiais (sem duplicar Gaze etc.)
+- `clinically_variable` + modo `manual` — estimativa operacional, não protocolo clínico
+- Preço de referência ≠ custo real (compras / média ponderada)
+- UX mobile-first + preview lateral desktop; atendimento com quick cards
+- Onboarding: “Quais procedimentos você mais realiza?” + importação em lote
+- Duplicar / arquivar procedimento · quick create de material
+- [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) · testes `src/tests/procedure-library/`
+
+### Notes
+- Fases comerciais pausadas nesta entrega
+- Modelo sugerido **nunca** é protocolo clínico
+
 ## 0.11.0-beta — 2026-10-04
 
 ### Added

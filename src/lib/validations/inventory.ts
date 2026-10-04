@@ -31,6 +31,7 @@ export const createInventoryItemSchema = z.object({
   supplier_name: z.string().trim().max(160).optional().nullable(),
   tracks_lot: z.boolean().optional().default(false),
   tracks_expiration: z.boolean().optional().default(false),
+  source_material_template_id: z.string().optional().nullable(),
 });
 
 export const updateInventoryItemSchema = createInventoryItemSchema.extend({
@@ -44,7 +45,9 @@ export const procedureMaterialSchema = z.object({
   standard_quantity: z.number().min(0),
   consumption_mode: z.enum(CONSUMPTION_MODES),
   optional: z.boolean().optional().default(false),
+  clinically_variable: z.boolean().optional().default(false),
   notes: z.string().trim().max(500).optional().nullable(),
+  source_material_template_id: z.string().optional().nullable(),
 });
 
 export const updateProcedureMaterialSchema = z.object({
@@ -52,6 +55,7 @@ export const updateProcedureMaterialSchema = z.object({
   standard_quantity: z.number().min(0).optional(),
   consumption_mode: z.enum(CONSUMPTION_MODES).optional(),
   optional: z.boolean().optional(),
+  clinically_variable: z.boolean().optional(),
   notes: z.string().trim().max(500).optional().nullable(),
 });
 

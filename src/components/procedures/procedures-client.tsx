@@ -34,8 +34,8 @@ export function ProceduresClient({ canCreate }: { canCreate: boolean }) {
               Procedimentos
             </h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Catálogo · ficha técnica · custo padrão estimado
-            </p>
+            Biblioteca Sorria · ficha técnica · custo padrão estimado
+          </p>
           </div>
           {canCreate ? (
             <Link
@@ -43,7 +43,7 @@ export function ProceduresClient({ canCreate }: { canCreate: boolean }) {
               className="inline-flex h-11 items-center gap-2 rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
             >
               <Plus className="size-4" />
-              Novo procedimento
+              Adicionar procedimento
             </Link>
           ) : null}
         </div>
@@ -60,11 +60,11 @@ export function ProceduresClient({ canCreate }: { canCreate: boolean }) {
       ) : items.length === 0 ? (
         <EmptyState
           title="Nenhum procedimento"
-          description="Cadastre os serviços da clínica para conectar materiais e custos."
+          description="Escolha modelos prontos da biblioteca Sorria ou crie um personalizado."
           action={
             canCreate ? (
               <Link href="/app/procedimentos/novo">
-                <Button>Criar procedimento</Button>
+                <Button>Adicionar da biblioteca</Button>
               </Link>
             ) : undefined
           }

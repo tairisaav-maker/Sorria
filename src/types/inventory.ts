@@ -56,6 +56,8 @@ export type InventoryItem = {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
+  /** Template global de origem (se importado) — não obriga marca */
+  source_material_template_id: string | null;
 };
 
 export type Procedure = {
@@ -72,6 +74,12 @@ export type Procedure = {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
+  /** Snapshot do template Sorria — alterações futuras no global NÃO sobrescrevem */
+  source_template_id: string | null;
+  source_template_version: number | null;
+  favorited: boolean;
+  use_count: number;
+  last_used_at: string | null;
 };
 
 export type ProcedureMaterial = {
@@ -84,9 +92,12 @@ export type ProcedureMaterial = {
   consumption_unit: InventoryUnit;
   consumption_mode: ConsumptionMode;
   optional: boolean;
+  /** Quantidade depende da situação clínica — confirmar no atendimento */
+  clinically_variable: boolean;
   notes: string | null;
   created_at: string;
   updated_at: string;
+  source_material_template_id: string | null;
 };
 
 export type ProcedureMaterialLine = ProcedureMaterial & {

@@ -13,9 +13,16 @@ import {
   type WeekdayKey,
 } from "@/types/clinic-settings";
 
-type Step = "welcome" | "clinic" | "profile" | "hours" | "next";
+type Step = "welcome" | "clinic" | "profile" | "hours" | "procedures" | "next";
 
-const STEPS: Step[] = ["welcome", "clinic", "profile", "hours", "next"];
+const STEPS: Step[] = [
+  "welcome",
+  "clinic",
+  "profile",
+  "hours",
+  "procedures",
+  "next",
+];
 
 export function OnboardingClient() {
   const router = useRouter();
@@ -42,6 +49,11 @@ export function OnboardingClient() {
     specialty: "",
   });
   const [hours, setHours] = useState<ClinicHoursConfig | null>(null);
+  const [procPicks, setProcPicks] = useState<
+    Array<{ id: string; label: string; template_ids: string[] }>
+  >([]);
+  const [selectedPicks, setSelectedPicks] = useState<Set<string>>(new Set());
+  const [importingProcs, setImportingProcs] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -85,10 +97,49 @@ export function OnboardingClient() {
         return "Seu perfil";
       case "hours":
         return "Horários de atendimento";
+      case "procedures":
+        return "Quais procedimentos você mais realiza?";
       default:
         return "Próximos passos";
     }
   }, [step]);
+
+  useEffect(() => {
+    if (step !== "procedures") return;
+    void fetch("/api/demo/procedure-library?view=onboarding_picks")
+      .then((r) => r.json())
+      .then((data) => setProcPicks(data.picks ?? []));
+  }, [step]);
+
+  async function importSelectedProcedures() {
+    const ids = procPicks
+      .filter((p) => selectedPicks.has(p.id))
+      .flatMap((p) => p.template_ids);
+    if (ids.length === 0) {
+      setStep("next");
+      return;
+    }
+    setImportingProcs(true);
+    setError(null);
+    const res = await fetch("/api/demo/procedure-library", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "import_batch",
+        data: {
+          procedure_template_ids: ids,
+          create_missing_materials: true,
+        },
+      }),
+    });
+    setImportingProcs(false);
+    if (!res.ok) {
+      const json = await res.json();
+      setError(json.error ?? "Não foi possível importar os modelos.");
+      return;
+    }
+    setStep("next");
+  }
 
   async function post(action: string, body: Record<string, unknown>) {
     setBusy(true);
@@ -139,7 +190,7 @@ export function OnboardingClient() {
   async function saveHours() {
     if (!hours) return;
     const ok = await post("update_hours", { hours });
-    if (ok) setStep("next");
+    if (ok) setStep("procedures");
   }
 
   function copyMondayToWeekdays() {
@@ -409,7 +460,76 @@ export function OnboardingClient() {
             <Button type="button" loading={busy} onClick={() => void saveHours()}>
               Continuar
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setStep("next")}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setStep("procedures")}
+            >
+              Pular
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === "procedures" ? (
+        <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-5 animate-rise">
+          <p className="text-sm text-[var(--text-muted)]">
+            Escolha os mais comuns. O Sorria importa modelos editáveis com ficha
+            de materiais — sem protocolo clínico obrigatório.
+          </p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {procPicks.map((p) => {
+              const checked = selectedPicks.has(p.id);
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new Set(selectedPicks);
+                      if (checked) next.delete(p.id);
+                      else next.add(p.id);
+                      setSelectedPicks(next);
+                    }}
+                    className={[
+                      "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors",
+                      checked
+                        ? "border-[var(--brand-primary)] bg-[var(--brand-soft)] text-[var(--brand-ink)]"
+                        : "border-[var(--border)] hover:bg-[var(--surface-muted)]/60",
+                    ].join(" ")}
+                  >
+                    <span
+                      className={[
+                        "flex size-5 items-center justify-center rounded border text-xs",
+                        checked
+                          ? "border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white"
+                          : "border-[var(--border)]",
+                      ].join(" ")}
+                    >
+                      {checked ? "✓" : ""}
+                    </span>
+                    {p.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-xs text-[var(--text-subtle)]">
+            Depois: configure materiais um a um (usar modelo / editar / pular) em
+            Procedimentos.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              loading={importingProcs}
+              onClick={() => void importSelectedProcedures()}
+            >
+              Adicionar à minha clínica
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setStep("next")}
+            >
               Pular
             </Button>
           </div>
@@ -419,10 +539,10 @@ export function OnboardingClient() {
       {step === "next" ? (
         <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-5">
           <p className="text-sm text-[var(--text-muted)]">
-            Comece com 5–10 procedimentos frequentes e os materiais. Ao montar a
-            ficha, o Sorria mostra o{" "}
-            <strong>custo estimado do procedimento</strong> — esse é o primeiro
-            momento de valor. Não é preciso cadastrar tudo de uma vez.
+            Vamos configurar os materiais? Abra um procedimento e use o modelo
+            ou personalize. O Sorria mostra o{" "}
+            <strong>custo estimado</strong> quando houver preços reais — sem
+            inventar totais.
           </p>
           <ol className="space-y-2 text-sm">
             <li>
@@ -430,7 +550,7 @@ export function OnboardingClient() {
                 href="/app/procedimentos/novo?from=onboarding"
                 className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
               >
-                3. Procedimentos principais
+                3. Biblioteca de procedimentos
               </Link>
             </li>
             <li>
