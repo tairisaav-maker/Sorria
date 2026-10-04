@@ -1,3 +1,5 @@
+> Fluxo V1: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md)
+
 # Operational Costing — Sorria (Subfase 8)
 
 Custeio gerencial simples para consultórios. **Não é contabilidade oficial.**

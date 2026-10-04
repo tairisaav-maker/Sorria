@@ -1,3 +1,5 @@
+> Fluxo V1: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md)
+
 # Pricing & Margin — Sorria (Subfase 9)
 
 Análise de **preço padrão × valor cobrado × custo direto × custo operacional × recebido**.

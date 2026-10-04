@@ -1,3 +1,5 @@
+> Fluxo V1: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md)
+
 # Relatórios operacionais — Subfase 6
 
 Rota: `/app/relatorios`  

@@ -1,3 +1,5 @@
+> Fluxo V1: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md)
+
 # Reposição inteligente e lista de compras — Subfase 7
 
 Rota: `/app/estoque/reposicao`  
