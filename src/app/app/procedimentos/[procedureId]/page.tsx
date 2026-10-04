@@ -20,6 +20,14 @@ export default async function ProcedureDetailPage({
       canEdit={can(actor.ctx, "procedures.update").allowed}
       canEditCosts={can(actor.ctx, "procedure_costs.update").allowed}
       canSeeCosts={can(actor.ctx, "procedure_costs.view").allowed}
+      canViewPricing={
+        can(actor.ctx, "procedure_pricing.view").allowed ||
+        can(actor.ctx, "procedure_pricing.manage").allowed
+      }
+      canManagePrice={
+        can(actor.ctx, "procedures.update_price").allowed ||
+        can(actor.ctx, "procedure_pricing.manage").allowed
+      }
     />
   );
 }

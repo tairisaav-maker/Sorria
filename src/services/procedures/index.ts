@@ -5,6 +5,10 @@ import {
   writeInventoryAudit,
 } from "@/lib/demo/inventory-store";
 import {
+  getPricingStore,
+  writePricingAudit,
+} from "@/lib/demo/pricing-store";
+import {
   consumptionCostCents,
   plannedQuantityForMode,
 } from "@/lib/inventory/units";
@@ -106,14 +110,69 @@ export function updateProcedure(
   assertPermission(ctx, "procedures.update");
   const data = updateProcedureSchema.parse(input);
   const proc = findProcedure(ctx, data.id);
+  const nextPrice =
+    data.default_price_reais == null
+      ? null
+      : reaisToCents(data.default_price_reais);
+  const priceChanged = nextPrice !== proc.default_price_cents;
+
+  if (priceChanged) {
+    if (
+      !can(ctx, "procedures.update_price").allowed &&
+      !can(ctx, "procedure_pricing.manage").allowed
+    ) {
+      assertPermission(ctx, "procedures.update_price");
+    }
+  }
+
   proc.name = data.name;
   proc.description = data.description ?? null;
   proc.category = data.category ?? null;
   proc.default_duration_minutes = data.default_duration_minutes ?? null;
-  proc.default_price_cents =
-    data.default_price_reais == null
-      ? null
-      : reaisToCents(data.default_price_reais);
+  if (priceChanged && nextPrice != null) {
+    const stamp = now();
+    const open = getPricingStore().priceHistory.find(
+      (h) =>
+        h.clinic_id === ctx.clinicId &&
+        h.procedure_id === proc.id &&
+        h.valid_until == null,
+    );
+    if (open) open.valid_until = stamp;
+    else if (proc.default_price_cents != null) {
+      getPricingStore().priceHistory.unshift({
+        id: `pph-${crypto.randomUUID()}`,
+        clinic_id: ctx.clinicId,
+        procedure_id: proc.id,
+        price_cents: proc.default_price_cents,
+        valid_from: proc.created_at,
+        valid_until: stamp,
+        changed_by: ctx.userId,
+        created_at: stamp,
+      });
+    }
+    getPricingStore().priceHistory.unshift({
+      id: `pph-${crypto.randomUUID()}`,
+      clinic_id: ctx.clinicId,
+      procedure_id: proc.id,
+      price_cents: nextPrice,
+      valid_from: stamp,
+      valid_until: null,
+      changed_by: ctx.userId,
+      created_at: stamp,
+    });
+    writePricingAudit({
+      clinic_id: ctx.clinicId,
+      actor_user_id: ctx.userId,
+      action: "procedure.price_updated",
+      target_type: "procedure",
+      target_id: proc.id,
+      metadata: {
+        old_price_cents: proc.default_price_cents,
+        new_price_cents: nextPrice,
+      },
+    });
+  }
+  proc.default_price_cents = nextPrice;
   if (data.active !== undefined) proc.active = data.active;
   proc.updated_at = now();
   writeInventoryAudit({

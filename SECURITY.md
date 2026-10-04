@@ -100,6 +100,15 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Conversão planned→performed idempotente
 - Servidor é autoridade nos cálculos e no rateio
 
+## Preço e margem (Subfase 9)
+
+- Permissions: `procedure_pricing.view|manage`, `procedures.update_price`, `reports.pricing_view`
+- Secretária: sem margens/custos operacionais no payload por padrão
+- Dentista: `procedure_pricing.view`; alteração de preço exige `procedures.update_price`
+- Cross-clinic: histórico e simulações isolados por `clinic_id`
+- Auditoria: `procedure.price_updated`, `procedure.pricing_viewed` (não audita slider)
+- Detalhes: [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md)
+
 ## Custeio operacional (Subfase 8)
 
 - Permissions: `clinic_costs.view|manage`, `operational_costs.view`, `procedure_operational_costs.view`, `expense_categories.manage`, `cost_reports.view`

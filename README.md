@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.8.0** — Reestruturação Subfase 8 (Despesas gerais, custo/hora e custo operacional)
+**1.9.0** — Reestruturação Subfase 9 (Preço, margem e simulação por procedimento)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -30,7 +30,8 @@ Núcleo: Agenda · Pacientes · Estoque · Financeiro
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
 - Custos do consultório: `/app/financeiro/custos` (despesas, horas produtivas, custo/hora, simuladores)
-- Relatórios operacionais: `/app/relatorios` (visão geral · procedimentos · materiais · pacientes · financeiro)
+- Preço e custos na ficha do procedimento: `/app/procedimentos/[id]`
+- Relatórios operacionais: `/app/relatorios` (visão geral · procedimentos · materiais · pacientes · financeiro · preços e margens)
 - Secretária Virtual (secundário): `/app/assistente`
 
 ### Login Portal (demo)
@@ -58,6 +59,7 @@ npm run build
 - [REPORTS.md](./REPORTS.md)
 - [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
 - [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md)
+- [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md)
 - [REPLENISHMENT.md](./REPLENISHMENT.md)
 - [ASSISTANT.md](./ASSISTANT.md)
 - [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md)

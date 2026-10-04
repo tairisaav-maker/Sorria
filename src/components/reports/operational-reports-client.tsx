@@ -29,6 +29,7 @@ import type {
   FinancialOperationalReport,
   CostCoverageReport,
 } from "@/types/operational-reports";
+import { PricingTab } from "@/components/reports/pricing-tab";
 import {
   PERIOD_PRESET_LABELS,
   type MetricValue,
@@ -50,7 +51,8 @@ type Tab =
   | "procedures"
   | "materials"
   | "patients"
-  | "financial";
+  | "financial"
+  | "pricing";
 
 type Bundle = {
   period: { label: string; start: string; end: string };
@@ -90,6 +92,7 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: "materials", label: "Materiais" },
   { id: "patients", label: "Pacientes" },
   { id: "financial", label: "Financeiro" },
+  { id: "pricing", label: "Preços e margens" },
 ];
 
 export function OperationalReportsClient() {
@@ -316,6 +319,9 @@ export function OperationalReportsClient() {
         ) : (
           <EmptyState title="Sem permissão para o relatório financeiro operacional." />
         )
+      ) : null}
+      {!loading && tab === "pricing" ? (
+        <PricingTab queryString={qs()} />
       ) : null}
 
       {detail && detailData ? (

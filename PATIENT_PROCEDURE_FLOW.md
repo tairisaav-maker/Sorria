@@ -54,13 +54,16 @@ Draft → finalized; correções versionadas.
 - Resultado bruto associado = cobrado − custo direto (não “lucro do paciente”)
 - Custo operacional estimado acumulado = Σ `operational_total_cost` (quando houver snapshot)
 - Resultado operacional estimado = cobrado − custo operacional (≠ rentabilidade do paciente)
+- Diferença vs preço padrão = cobrado − `standard_price_snapshot` (não chamar automaticamente de desconto)
+- NULL cobrado ≠ gratuidade (0)
 
-Relatórios: `/app/relatorios` → aba Pacientes (Subfase 6/8). Ver [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md) e [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md).
+Relatórios: `/app/relatorios` → Pacientes / Preços e margens. Ver [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md), [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md), [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md).
 
 ## Permissões
 
 - Custos: `procedure_costs.view` / `reports.procedure_costs_view`
 - Custo operacional: `procedure_operational_costs.view`
+- Preço e margem: `procedure_pricing.view`
 - Financeiro (recebido/saldo): `finance.view_*` / `reports.patient_financial_view`
 - Evolução: `clinical_evolution.*`
 - Procedimento: `performed_procedures.*`

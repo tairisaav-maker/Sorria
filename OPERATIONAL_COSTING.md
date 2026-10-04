@@ -104,6 +104,10 @@ Secretária registra despesas se autorizada; **não** vê custo/hora/margem por 
 - `src/services/operational-costs/`
 - `src/services/procedure-operational-costs/`
 
+## Relação com Subfase 9
+
+O custo operacional alimenta a análise de **preço e margem** (`PRICING_AND_MARGIN.md`): break-even, simulações e alertas “abaixo do custo operacional”, sem recomendar preço automaticamente.
+
 ## Limitações V1
 
 Sem: DRE fiscal, tributos, folha completa, depreciação, multi-cadeira, preço dinâmico, IA de precificação, recálculo histórico automático, custo/hora por profissional (arquitetura preparada).

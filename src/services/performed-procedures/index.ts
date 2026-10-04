@@ -486,6 +486,10 @@ export function getPerformedProcedure(ctx: AuthzContext, id: string) {
       )
     : [];
   const showCost = canViewProcedureCosts(ctx);
+  const showPricing =
+    can(ctx, "procedure_pricing.view").allowed ||
+    can(ctx, "procedure_pricing.manage").allowed ||
+    can(ctx, "procedure_operational_costs.view").allowed;
   const maskCost = <T extends { unit_cost_snapshot_cents: number; planned_cost_cents: number; actual_cost_cents: number | null }>(
     c: T,
   ) =>
@@ -519,6 +523,21 @@ export function getPerformedProcedure(ctx: AuthzContext, id: string) {
       actual_total_cost_cents: showCost ? row.actual_total_cost_cents : null,
       gross_result_cents: showCost ? row.gross_result_cents : null,
       gross_margin_percent: showCost ? row.gross_margin_percent : null,
+      productive_hour_cost_snapshot_cents: showPricing
+        ? row.productive_hour_cost_snapshot_cents
+        : null,
+      allocated_time_cost_cents: showPricing
+        ? row.allocated_time_cost_cents
+        : null,
+      operational_total_cost_cents: showPricing
+        ? row.operational_total_cost_cents
+        : null,
+      operational_result_cents: showPricing
+        ? row.operational_result_cents
+        : null,
+      operational_margin_percent: showPricing
+        ? row.operational_margin_percent
+        : null,
       charged_amount_cents: showCost || can(ctx, "finance.view_authorized").allowed || can(ctx, "finance.view_administrative").allowed
         ? row.charged_amount_cents
         : null,

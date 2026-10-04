@@ -103,6 +103,11 @@ export const PERMISSIONS = [
 
   "cost_reports.view",
 
+  "procedure_pricing.view",
+  "procedure_pricing.manage",
+  "procedures.update_price",
+  "reports.pricing_view",
+
   "team.view",
   "team.invite",
   "team.change_role",
@@ -224,6 +229,8 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.replenishment_view",
     "procedure_operational_costs.view",
     "cost_reports.view",
+    "procedure_pricing.view",
+    "reports.pricing_view",
   ],
   secretary: [
     "dashboard.view",

@@ -192,6 +192,16 @@ Notificações internas do Portal (sem push externo).
 `has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`
 
 
+## Subfase 9 — Preço e margem
+
+Migration: `20251022000000_reestruturacao_pricing_margin.sql`
+
+- `procedure_price_history` — preço padrão do catálogo com `valid_from` / `valid_until`
+- Trigger cross-clinic: `procedure_id` deve ser da mesma clínica
+- RLS: `procedure_pricing.view` / `procedures.update_price` / `reports.pricing_view`
+- Histórico imutável (sem UPDATE); performed usa `standard_price_snapshot`
+- Detalhes: [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md)
+
 ## Subfase 8 — Custeio operacional
 
 Migration: `20251021000000_reestruturacao_operational_costing.sql`

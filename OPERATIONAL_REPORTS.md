@@ -191,6 +191,17 @@ Sem substituir métricas de custo direto. Adiciona quando houver cobertura:
 
 Detalhes: [OPERATIONAL_COSTING.md](./OPERATIONAL_COSTING.md).
 
+## Camada Subfase 9 — preços e margens
+
+Aba **Preços e margens**:
+
+- Preço padrão atual vs padrão médio do período vs cobrado médio
+- Custo operacional médio, resultado e **margem agregada** (`sum(result)/sum(charged)`)
+- Filtro abaixo do custo operacional + cobertura da análise
+- Export dedicado (`section=pricing`) sem custos se sem permission
+
+Detalhes: [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md).
+
 ## Fora do escopo
 
 Impostos, comissão avançada, folha, lucro líquido, DRE fiscal, IA, benchmarking entre dentistas, recomendação automática de preço.

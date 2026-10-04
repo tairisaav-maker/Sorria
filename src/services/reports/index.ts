@@ -779,6 +779,58 @@ export async function exportReport(
 ) {
   assertPermission(ctx, "reports.export");
 
+  if (section === "pricing") {
+    if (
+      !can(ctx, "reports.pricing_view").allowed &&
+      !can(ctx, "procedure_pricing.view").allowed
+    ) {
+      assertPermission(ctx, "reports.pricing_view");
+    }
+    const { getPricingReport } = await import("@/services/reports/pricing");
+    const {
+      buildPricingCsv,
+      buildPricingPdf,
+      buildPricingXlsx,
+    } = await import("@/lib/reports/pricing-export");
+    const report = getPricingReport(ctx, filter);
+    const clinic = getClinic(ctx.clinicId);
+    const clinicName = clinic?.name ?? "Clínica";
+
+    appendAudit({
+      clinic_id: ctx.clinicId,
+      actor_user_id: ctx.userId,
+      action: "report.exported",
+      target_type: "report",
+      target_id: "pricing",
+      metadata: {
+        format,
+        section,
+        period_label: report.period_label,
+      },
+    });
+
+    if (format === "csv") {
+      return {
+        filename: `sorria-precos-margens.csv`,
+        contentType: "text/csv; charset=utf-8",
+        body: buildPricingCsv(report, clinicName),
+      };
+    }
+    if (format === "xlsx") {
+      return {
+        filename: `sorria-precos-margens.xlsx`,
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        body: await buildPricingXlsx(report, clinicName),
+      };
+    }
+    return {
+      filename: `sorria-precos-margens.pdf`,
+      contentType: "application/pdf",
+      body: await buildPricingPdf(report, clinicName),
+    };
+  }
+
   if (
     section === "operational" ||
     section === "procedures" ||

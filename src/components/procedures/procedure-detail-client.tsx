@@ -17,17 +17,22 @@ import {
   type ProcedureStandardCost,
 } from "@/types/inventory";
 import type { StandardOperationalEstimate } from "@/types/clinic-costs";
+import { ProcedurePricingSection } from "@/components/procedures/procedure-pricing-section";
 
 export function ProcedureDetailClient({
   procedureId,
   canEdit,
   canEditCosts,
   canSeeCosts,
+  canViewPricing = false,
+  canManagePrice = false,
 }: {
   procedureId: string;
   canEdit: boolean;
   canEditCosts: boolean;
   canSeeCosts: boolean;
+  canViewPricing?: boolean;
+  canManagePrice?: boolean;
 }) {
   const router = useRouter();
   const [procedure, setProcedure] = useState<Procedure | null>(null);
@@ -325,7 +330,14 @@ export function ProcedureDetailClient({
         </section>
       ) : null}
 
-      {canSeeCosts && opEstimate ? (
+      {canViewPricing ? (
+        <ProcedurePricingSection
+          procedureId={procedureId}
+          canManagePrice={canManagePrice}
+        />
+      ) : null}
+
+      {canSeeCosts && !canViewPricing && opEstimate ? (
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise">
           <h2 className="text-lg font-medium text-[var(--brand-ink)]">
             Custo operacional estimado

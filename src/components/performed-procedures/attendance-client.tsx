@@ -23,10 +23,14 @@ type Detail = {
     status: PerformedProcedureStatus;
     quantity: number;
     charged_amount_cents: number | null;
+    standard_price_snapshot_cents?: number | null;
     planned_total_cost_cents: number | null;
     actual_total_cost_cents: number | null;
     gross_result_cents: number | null;
     gross_margin_percent: number | null;
+    operational_total_cost_cents?: number | null;
+    operational_result_cents?: number | null;
+    operational_margin_percent?: number | null;
     consumption_confirmed: boolean;
     patient_id: string;
   };
@@ -717,7 +721,7 @@ export function AttendanceClient({
             {selected.canViewCosts ? (
               <>
                 <div>
-                  <dt className="text-[var(--text-muted)]">Custo real</dt>
+                  <dt className="text-[var(--text-muted)]">Custo direto</dt>
                   <dd className="font-medium">
                     {financeBreakdown?.actual_total_cost_cents != null
                       ? formatBRL(financeBreakdown.actual_total_cost_cents)
@@ -728,7 +732,7 @@ export function AttendanceClient({
                 </div>
                 <div>
                   <dt className="text-[var(--text-muted)]">
-                    Resultado bruto (sobre cobrado)
+                    Resultado sobre custos diretos
                   </dt>
                   <dd className="font-medium">
                     {financeBreakdown?.gross_result_charged_cents != null
@@ -739,7 +743,7 @@ export function AttendanceClient({
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[var(--text-muted)]">Margem</dt>
+                  <dt className="text-[var(--text-muted)]">Margem direta</dt>
                   <dd className="font-medium">
                     {financeBreakdown?.gross_margin_percent != null
                       ? `${financeBreakdown.gross_margin_percent}%`
@@ -748,6 +752,63 @@ export function AttendanceClient({
                         : "—"}
                   </dd>
                 </div>
+              </>
+            ) : null}
+            {selected.procedure.operational_total_cost_cents != null ||
+            selected.procedure.charged_amount_cents === null ? (
+              <>
+                {selected.procedure.charged_amount_cents == null ? (
+                  <div className="sm:col-span-2">
+                    <p className="text-sm text-[var(--text-muted)]">
+                      Valor ainda não definido
+                    </p>
+                  </div>
+                ) : null}
+                {selected.procedure.operational_total_cost_cents != null ? (
+                  <>
+                    <div>
+                      <dt className="text-[var(--text-muted)]">
+                        Custo operacional
+                      </dt>
+                      <dd className="font-medium">
+                        {formatBRL(
+                          selected.procedure.operational_total_cost_cents,
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[var(--text-muted)]">
+                        Resultado operacional
+                      </dt>
+                      <dd className="font-medium">
+                        {selected.procedure.operational_result_cents != null
+                          ? formatBRL(
+                              selected.procedure.operational_result_cents,
+                            )
+                          : "—"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[var(--text-muted)]">
+                        Margem operacional
+                      </dt>
+                      <dd className="font-medium">
+                        {selected.procedure.operational_margin_percent != null
+                          ? `${selected.procedure.operational_margin_percent}%`
+                          : "—"}
+                      </dd>
+                    </div>
+                    {selected.procedure.charged_amount_cents != null &&
+                    selected.procedure.charged_amount_cents <
+                      selected.procedure.operational_total_cost_cents ? (
+                      <div className="sm:col-span-2">
+                        <p className="text-sm">
+                          Abaixo do custo operacional
+                        </p>
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
               </>
             ) : null}
           </dl>

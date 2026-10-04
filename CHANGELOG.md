@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 — 2026-10-04
+
+### Added
+- **Subfase 9:** preço, margem e comparação padrão × cobrado × custo
+- Seção **Preço e custos** na ficha do procedimento + simuladores (preço, margem, diferença)
+- `procedure_price_history` + `procedure.price_updated` (planos/snapshots preservados)
+- Relatórios aba **Preços e margens**, cobertura, abaixo do custo, export
+- Home card **Margens** (quando houver procedimentos abaixo do custo operacional)
+- Permissions `procedure_pricing.*`, `procedures.update_price`, `reports.pricing_view`
+- [PRICING_AND_MARGIN.md](./PRICING_AND_MARGIN.md)
+
 ## 1.8.0 — 2026-10-04
 
 ### Added

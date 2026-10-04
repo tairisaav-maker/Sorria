@@ -17,7 +17,8 @@ export type ReportSection =
   | "patient_ops"
   | "treatments"
   | "schedule"
-  | "financial";
+  | "financial"
+  | "pricing";
 
 export type ReportPeriod = {
   preset: ReportPeriodPreset;

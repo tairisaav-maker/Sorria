@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ForecastHomeCard } from "@/components/home/forecast-home-card";
 import { HomeGreeting } from "@/components/home/home-greeting";
 import { InventoryHomeCard } from "@/components/home/inventory-home-card";
+import { MarginsHomeCard } from "@/components/home/margins-home-card";
 import { OperationalKpisCard } from "@/components/home/operational-kpis-card";
 import { SetupChecklist } from "@/components/home/setup-checklist";
 import { KpiRow } from "@/components/home/kpi-row";
@@ -16,6 +17,7 @@ import { getInventoryDashboard } from "@/services/inventory";
 import { forecastMaterialNeeds } from "@/services/inventory/forecast";
 import { getUpcomingReplenishmentBrief } from "@/services/inventory/replenishment";
 import { getTodayOperationalKpis } from "@/services/patient-summary";
+import { countBelowOperationalThisMonth } from "@/services/procedure-pricing";
 import { getOperationalOverview } from "@/services/reports/operational";
 import { getOnboarding } from "@/services/settings";
 
@@ -116,6 +118,12 @@ export default async function HomePage() {
         />
       ) : operationalToday ? (
         <OperationalKpisCard title="Operacional de hoje" kpis={operationalToday} />
+      ) : null}
+      {can(actor.ctx, "procedure_pricing.view").allowed ||
+      can(actor.ctx, "reports.pricing_view").allowed ? (
+        <MarginsHomeCard
+          belowCount={countBelowOperationalThisMonth(actor.ctx)}
+        />
       ) : null}
       {inventory ? (
         <InventoryHomeCard data={inventory} replenishment={replenishmentBrief} />

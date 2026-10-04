@@ -50,6 +50,7 @@ Acesso financeiro é independente do clínico.
 | Dashboard operacional / rentabilidade (Subfase 6) | ✅ |
 | Reposição inteligente / lista de compras (Subfase 7) | ✅ |
 | Custeio operacional / custo/hora (Subfase 8) | ✅ |
+| Preço, margem e simulação (Subfase 9) | ✅ |
 
 ## Novo núcleo operacional
 
@@ -59,6 +60,7 @@ Agenda → Atendimento → Procedimento → Materiais previstos
   → Agregação → Relatórios operacionais
   → Reposição (Agenda futura + mínimo + histórico) → Lista de compras
   → Despesas gerais → Horas produtivas → Custo/hora → Custo operacional do procedimento
+  → Preço padrão × cobrado × custo → Margem / simulação (sem recomendar preço)
 ```
 
 Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro · Mais  
