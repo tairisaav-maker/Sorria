@@ -22,6 +22,7 @@ export type BillingStore = {
     full_name: string;
     email_verified: boolean;
     created_at: string;
+    pending_invite_code?: string | null;
   }>;
 };
 
@@ -42,9 +43,9 @@ function seedPlans(): { plans: SubscriptionPlan[]; entitlements: PlanEntitlement
     {
       id: STARTER_ID,
       code: "starter",
-      name: "Starter",
+      name: "Individual",
       description:
-        "Núcleo operacional (placeholder interno — preço não comercial final)",
+        "Dentista autônomo ou consultório enxuto — custo de procedimento, estoque e financeiro conectados. Preço comercial pendente de decisão.",
       billing_interval: "month",
       price_amount_cents: 0,
       currency: "BRL",
@@ -60,9 +61,9 @@ function seedPlans(): { plans: SubscriptionPlan[]; entitlements: PlanEntitlement
     {
       id: PRO_ID,
       code: "pro",
-      name: "Pro",
+      name: "Clínica",
       description:
-        "Relatórios avançados, reposição e precificação (placeholder interno)",
+        "Consultório pequeno (até 5 profissionais) com reposição, relatórios e análise de margem. Preço comercial pendente de decisão.",
       billing_interval: "month",
       price_amount_cents: 0,
       currency: "BRL",
@@ -77,9 +78,11 @@ function seedPlans(): { plans: SubscriptionPlan[]; entitlements: PlanEntitlement
     },
   ];
 
+  /** Diferencial central (custo de procedimento) em ambos os planos. */
   const starterKeys: EntitlementKey[] = [
     "inventory",
     "procedure_costing",
+    "operational_costing",
     "exports",
   ];
   const proKeys: EntitlementKey[] = [

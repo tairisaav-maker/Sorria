@@ -69,6 +69,18 @@ function mapError(error: unknown) {
     WEBHOOK_INVALID: { status: 401, error: "Webhook inválido." },
     INVITATION_INVALID: { status: 400, error: "Convite inválido." },
     INVITATION_EXPIRED: { status: 400, error: "Convite expirado." },
+    INVITE_REQUIRED: {
+      status: 403,
+      error: "Beta fechado: informe um código de convite válido.",
+    },
+    INVITE_INVALID: {
+      status: 403,
+      error: "Código de convite inválido.",
+    },
+    INVITE_EXHAUSTED: {
+      status: 403,
+      error: "Este convite já atingiu o limite de usos.",
+    },
   };
   const hit = map[message];
   if (hit) return NextResponse.json({ error: hit.error, code: message }, { status: hit.status });

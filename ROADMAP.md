@@ -17,10 +17,11 @@
 9. ✅ Subfase 9 — Preço, margem e simulação  
 10. ✅ Subfase 10 — Fluxo integrado UX + fechamento V1 ([V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md))
 11. ✅ Subfase 11 — SaaS (signup, planos, assinaturas) — [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md)
+12. ✅ Subfase 12 — Beta comercial (landing, lead, demo, ativação) — [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md)
 
 ## Próximo passo
 
-Executar piloto real (PILOT_REPORT) → definir preços → provider de billing → primeiros clientes.
+Decisão de preço real (comparar concorrentes BR) → 1–2 planos com valores → provider de billing → primeiras clínicas pagantes.
 
 ## Despriorizado no V1 comercial
 

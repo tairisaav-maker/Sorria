@@ -67,6 +67,7 @@ export function ClinicSettingsClient() {
             feature_flags: {
               assistant_enabled: form.assistant_enabled,
               portal_enabled: form.portal_enabled,
+              commercial_beta: true,
             },
           },
         }),

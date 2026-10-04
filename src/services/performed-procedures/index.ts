@@ -29,6 +29,11 @@ import {
   canViewProcedureCosts,
 } from "@/services/performed-procedures/costs";
 import { applyOperationalCostOnComplete } from "@/services/procedure-operational-costs";
+import {
+  getCommercialActivation,
+  touchOperationalActivity,
+  trackCommercialEventPublic,
+} from "@/services/commercial";
 import type {
   AppointmentConsumption,
   PerformedProcedure,
@@ -412,6 +417,21 @@ export function completePerformedProcedure(
       /* transição inválida ou sem permissão efetiva */
     }
   }
+
+  // Momento de valor #2 + retenção operacional (sem PHI)
+  try {
+    touchOperationalActivity(ctx.clinicId);
+    trackCommercialEventPublic("first_real_procedure_cost_calculated", {
+      clinicId: ctx.clinicId,
+      userId: ctx.userId,
+      route: "/app/agenda/atendimento",
+      meta: { source: "attendance_complete" },
+    });
+    getCommercialActivation(ctx.clinicId);
+  } catch {
+    /* analytics nunca bloqueia conclusão */
+  }
+
   return getPerformedProcedure(ctx, id);
 }
 

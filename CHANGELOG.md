@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.11.0-beta — 2026-10-04
+
+### Added
+- **Subfase 12:** lançamento comercial beta — posicionamento, landing, lead, demo, ativação
+- Landing `/` com proposta de valor (custo real do procedimento), FAQ, SEO/OG
+- `/como-funciona`, `/conhecer` (formulário de interesse), `/planos` sincronizado com billing
+- Planos renomeados para **Individual** e **Clínica** (preços sob consulta)
+- Lead + pipeline simples · invite-only opcional · `beta_cohort` metadata
+- Banner “Ambiente de demonstração” · checklist de ativação comercial
+- Analytics: `landing_viewed`, `cta_clicked`, `first_procedure_cost_calculated`, etc. (sem PHI)
+- Cancelamento com motivo opcional estruturado
+- Painel `/internal` com saúde da cohort e métricas do funil
+- [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md) · [SALES_DEMO.md](./SALES_DEMO.md) · [PRICING_RESEARCH.md](./PRICING_RESEARCH.md) · [GO_TO_MARKET.md](./GO_TO_MARKET.md)
+
+### Notes
+- Preços comerciais definitivos **não** definidos — decisão após evidência da cohort
+- Sem depoimentos ou números inventados
+
 ## 0.10.0-beta — 2026-10-04
 
 ### Added

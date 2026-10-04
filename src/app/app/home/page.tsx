@@ -5,6 +5,7 @@ import { InventoryHomeCard } from "@/components/home/inventory-home-card";
 import { MarginsHomeCard } from "@/components/home/margins-home-card";
 import { OperationalKpisCard } from "@/components/home/operational-kpis-card";
 import { QuickActions } from "@/components/home/quick-actions";
+import { ActivationChecklist } from "@/components/home/activation-checklist";
 import { SetupChecklist } from "@/components/home/setup-checklist";
 import { KpiRow } from "@/components/home/kpi-row";
 import { RequestsList } from "@/components/home/requests-list";
@@ -20,6 +21,7 @@ import { getUpcomingReplenishmentBrief } from "@/services/inventory/replenishmen
 import { getTodayOperationalKpis } from "@/services/patient-summary";
 import { countBelowOperationalThisMonth } from "@/services/procedure-pricing";
 import { getOperationalOverview } from "@/services/reports/operational";
+import { getCommercialActivation } from "@/services/commercial";
 import { getOnboarding } from "@/services/settings";
 
 export const metadata: Metadata = {
@@ -32,6 +34,7 @@ export default async function HomePage() {
   const clinic = getClinic(actor.ctx.clinicId);
   const dashboard = buildHomeDashboard(actor.ctx);
   const onboarding = getOnboarding(actor.ctx);
+  const activation = getCommercialActivation(actor.ctx.clinicId);
   const inventory = getInventoryDashboard(actor.ctx);
   const replenishmentBrief = can(actor.ctx, "inventory.replenishment_view")
     .allowed
@@ -112,7 +115,12 @@ export default async function HomePage() {
         canPurchase={can(actor.ctx, "inventory.purchase_create").allowed}
         canPayment={can(actor.ctx, "finance.payment_create").allowed}
       />
-      {!onboarding.complete ? (
+      {!activation.activated ? (
+        <ActivationChecklist
+          milestones={activation.milestones}
+          activated={activation.activated}
+        />
+      ) : !onboarding.complete ? (
         <SetupChecklist
           items={[...onboarding.checklist]}
           dismissHref="/app/onboarding"

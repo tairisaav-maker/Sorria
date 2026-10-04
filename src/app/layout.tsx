@@ -16,11 +16,20 @@ const sans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sorria",
+    default: "Sorria | Gestão inteligente para consultórios odontológicos",
     template: "%s · Sorria",
   },
-  description: "Sorria — Gestão inteligente para consultórios",
+  description:
+    "Saiba quanto cada procedimento realmente custa. Agenda, estoque, materiais e financeiro conectados.",
   applicationName: "Sorria",
+  openGraph: {
+    title: "Sorria | Gestão inteligente para consultórios odontológicos",
+    description:
+      "O Sorria conecta cada procedimento aos materiais, estoque, custo e financeiro do consultório.",
+    locale: "pt_BR",
+    type: "website",
+    siteName: "Sorria",
+  },
 };
 
 export default function RootLayout({

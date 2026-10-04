@@ -18,6 +18,7 @@ import {
 } from "@/types/inventory";
 import type { StandardOperationalEstimate } from "@/types/clinic-costs";
 import { ProcedurePricingSection } from "@/components/procedures/procedure-pricing-section";
+import { trackCommercialEvent } from "@/lib/commercial/client";
 
 export function ProcedureDetailClient({
   procedureId,
@@ -92,7 +93,21 @@ export function ProcedureDetailClient({
           `/api/demo/clinic-costs?resource=procedure-estimate&procedureId=${procedureId}`,
         );
         if (opRes.ok) {
-          setOpEstimate(await opRes.json());
+          const estimate = await opRes.json();
+          setOpEstimate(estimate);
+          // Momento "aha": primeira visualização de custo estimado após ficha
+          if (
+            estimate &&
+            (procRes.materials?.length ?? 0) > 0 &&
+            (estimate.materials_cost_cents != null ||
+              estimate.operational_cost_cents != null ||
+              procRes.cost)
+          ) {
+            void trackCommercialEvent("first_procedure_cost_calculated", {
+              route: `/app/procedimentos/${procedureId}`,
+              meta: { source: "procedure_ficha" },
+            });
+          }
         } else {
           setOpEstimate(null);
         }

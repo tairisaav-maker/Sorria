@@ -1,6 +1,16 @@
 # Production Readiness — Sorria
 
-Checklist da Subfase 11 (SaaS). Marcar com evidência real.
+Checklist Subfase 11 (SaaS) + Subfase 12 (beta comercial). Marcar com evidência real.
+
+## Comercial / beta (Subfase 12)
+
+- [x] Landing `/` · `/como-funciona` · `/planos` · `/conhecer`
+- [x] Planos sincronizados com `listPublicPlans()` (Individual / Clínica)
+- [x] Lead form + anti duplo-clique · invite-only opcional
+- [x] `beta_cohort` metadata · banner demo · ativação comercial
+- [x] Analytics sem PHI · cancelamento simples com motivo opcional
+- [ ] Preços comerciais finais (decisão pós-cohort)
+- [ ] Provider de e-mail (boas-vindas / ativação)
 
 ## Auth & sessão
 

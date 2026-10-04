@@ -34,6 +34,11 @@ import type {
   SubscriptionStatus,
 } from "@/types/saas-billing";
 import { APP_VERSION } from "@/lib/version";
+import {
+  attachClinicCommercialMeta,
+  trackCommercialEventPublic,
+  validateBetaInvite,
+} from "@/services/commercial";
 
 function now() {
   return new Date().toISOString();
@@ -62,6 +67,7 @@ const signupSchema = z.object({
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(200),
   password: z.string().min(8).max(72),
+  invite_code: z.string().trim().max(64).optional().nullable(),
 });
 
 const clinicSchema = z.object({
@@ -71,6 +77,8 @@ const clinicSchema = z.object({
   timezone: z.string().trim().min(3).max(64).default("America/Sao_Paulo"),
   professional_name: z.string().trim().max(120).optional().nullable(),
   plan_code: z.enum(["starter", "pro"]).default("starter"),
+  invite_code: z.string().trim().max(64).optional().nullable(),
+  founder_pricing: z.boolean().optional(),
 });
 
 export function listPublicPlans() {
@@ -90,6 +98,13 @@ export function signupAccount(raw: unknown) {
   if (!parsed.success) {
     throw new Error(parsed.error.issues[0]?.message ?? "Dados inválidos");
   }
+
+  // validação invite-only (sem consumir ainda — consumo na criação da clínica)
+  const inviteCheck = validateBetaInvite(parsed.data.invite_code);
+  if (inviteCheck.required && !inviteCheck.valid) {
+    throw new Error(inviteCheck.reason ?? "INVITE_REQUIRED");
+  }
+
   const email = parsed.data.email.toLowerCase();
   const store = getBillingStore();
   if (store.accounts.some((a) => a.email === email)) {
@@ -120,10 +135,16 @@ export function signupAccount(raw: unknown) {
     full_name: parsed.data.full_name,
     email_verified: false,
     created_at: now(),
+    pending_invite_code: parsed.data.invite_code?.trim() || null,
   });
 
   // sessão sem clínica ainda
   setDemoSession(userId, "");
+
+  trackCommercialEventPublic("signup_completed", {
+    userId,
+    meta: { invite_only: inviteCheck.required },
+  });
 
   return {
     user_id: userId,
@@ -216,6 +237,16 @@ export function createClinicForOwner(userId: string, raw: unknown) {
     updated_at: stamp,
   };
   getBillingStore().subscriptions.push(subscription);
+
+  const account = getBillingStore().accounts.find((a) => a.user_id === userId);
+  const inviteCode =
+    parsed.data.invite_code?.trim() || account?.pending_invite_code || null;
+  attachClinicCommercialMeta(clinicId, {
+    invite_code: inviteCode,
+    founder_pricing: parsed.data.founder_pricing ?? false,
+    commercial_offer: parsed.data.founder_pricing ? "founder" : "trial",
+  });
+  if (account) account.pending_invite_code = null;
 
   appendAudit({
     clinic_id: clinicId,

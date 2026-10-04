@@ -4,11 +4,11 @@
 
 ## Versão
 
-**0.10.0-beta** — SaaS (signup, planos, assinaturas) · validação comercial ainda depende do piloto
+**0.11.0-beta** — Beta comercial (landing, lead, demo, ativação) · preços definitivos pendentes
 
+> Saiba quanto cada procedimento realmente custa.  
 > Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
-> Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco  
-> Piloto: [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
+> [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md) · [GO_TO_MARKET.md](./GO_TO_MARKET.md) · [SALES_DEMO.md](./SALES_DEMO.md)
 
 ## Como rodar
 
@@ -53,6 +53,7 @@ npm run build
 
 - [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
 - [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
+- [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md) · [GO_TO_MARKET.md](./GO_TO_MARKET.md) · [SALES_DEMO.md](./SALES_DEMO.md) · [PRICING_RESEARCH.md](./PRICING_RESEARCH.md)
 - [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md) · [PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)

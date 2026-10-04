@@ -55,8 +55,8 @@ beforeEach(() => {
 });
 
 describe("FASE 10 — versão e flags", () => {
-  it("versão do canal beta SaaS 0.10.0-beta", () => {
-    expect(APP_VERSION).toBe("0.10.0-beta");
+  it("versão do canal beta comercial 0.11.0-beta", () => {
+    expect(APP_VERSION).toBe("0.11.0-beta");
   });
 
   it("feature flags da clínica demo habilitadas", () => {

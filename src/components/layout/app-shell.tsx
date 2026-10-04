@@ -1,6 +1,7 @@
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
+import { DemoBanner } from "@/components/marketing/demo-banner";
 import { FeedbackButton } from "@/components/pilot/feedback-button";
 import { PilotBanner } from "@/components/pilot/pilot-banner";
 
@@ -15,6 +16,7 @@ export function AppShell({
 }) {
   return (
     <div className="min-h-dvh bg-[var(--surface)] text-[var(--text)]">
+      <DemoBanner />
       <PilotBanner />
       <div className="flex min-h-dvh">
         <Sidebar clinicName={clinicName} />

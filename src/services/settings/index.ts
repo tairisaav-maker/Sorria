@@ -291,37 +291,37 @@ function buildChecklist(ctx: AuthzContext, clinic: DemoClinic) {
   return [
     {
       key: "clinic",
-      label: "1. Clínica",
+      label: "Criar clínica",
       done: o.clinic_done,
       href: "/app/onboarding?step=clinic",
     },
     {
       key: "procedures",
-      label: "2. Procedimentos",
+      label: "Cadastrar procedimento",
       done: proceduresDone,
       href: "/app/procedimentos/novo?from=onboarding",
     },
     {
       key: "materials",
-      label: "3. Materiais",
+      label: "Adicionar materiais",
       done: materialsDone,
       href: "/app/procedimentos?from=onboarding",
     },
     {
       key: "stock",
-      label: "4. Estoque inicial",
+      label: "Registrar estoque",
       done: stockDone,
       href: "/app/estoque?from=onboarding",
     },
     {
       key: "patient",
-      label: "5. Primeiro paciente",
+      label: "Cadastrar paciente",
       done: o.first_patient_done,
       href: "/app/pacientes/novo?from=onboarding",
     },
     {
       key: "appointment",
-      label: "6. Primeira consulta",
+      label: "Concluir primeiro atendimento",
       done: o.first_appointment_done,
       href: "/app/agenda?from=onboarding",
     },
