@@ -7,25 +7,35 @@ import {
 } from "@/lib/demo/authz-store";
 import type {
   InventoryItem,
+  InventoryLot,
+  InventoryMovement,
+  InventoryPurchase,
+  InventoryPurchaseItem,
   Procedure,
   ProcedureMaterial,
 } from "@/types/inventory";
 
-type Store = {
+export type InventoryStore = {
   procedures: Procedure[];
   inventoryItems: InventoryItem[];
   procedureMaterials: ProcedureMaterial[];
+  purchases: InventoryPurchase[];
+  purchaseItems: InventoryPurchaseItem[];
+  movements: InventoryMovement[];
+  lots: InventoryLot[];
+  /** Serializa atualizações por item (concorrência demo). */
+  itemLocks: Map<string, number>;
 };
 
 declare global {
-  var __sorriaInventoryStoreV1: Store | undefined;
+  var __sorriaInventoryStoreV2: InventoryStore | undefined;
 }
 
 function stamp(h = 0) {
   return new Date(Date.now() - h * 3600_000).toISOString();
 }
 
-function seed(): Store {
+function seed(): InventoryStore {
   const gloves: InventoryItem = {
     id: "inv-a-gloves",
     clinic_id: CLINIC_A_ID,
@@ -326,22 +336,90 @@ function seed(): Store {
     },
   ];
 
+  // Histórico inicial (estoque pré-existente = initial_balance)
+  const movements: InventoryMovement[] = [
+    {
+      id: "mov-a-gloves-init",
+      clinic_id: CLINIC_A_ID,
+      inventory_item_id: gloves.id,
+      movement_type: "initial_balance",
+      quantity_delta: 240,
+      unit_cost_snapshot_cents: 40,
+      resulting_quantity: 240,
+      reference_type: null,
+      reference_id: null,
+      reason: "Carga inicial demo",
+      created_by: OWNER_A_ID,
+      created_at: stamp(48),
+    },
+    {
+      id: "mov-a-resin-init",
+      clinic_id: CLINIC_A_ID,
+      inventory_item_id: resin.id,
+      movement_type: "initial_balance",
+      quantity_delta: 12.5,
+      unit_cost_snapshot_cents: 2250,
+      resulting_quantity: 12.5,
+      reference_type: null,
+      reference_id: null,
+      reason: "Carga inicial demo",
+      created_by: OWNER_A_ID,
+      created_at: stamp(40),
+    },
+  ];
+
+  const lots: InventoryLot[] = [
+    {
+      id: "lot-a-resin-1",
+      clinic_id: CLINIC_A_ID,
+      inventory_item_id: resin.id,
+      lot_number: "RES-A2-2026",
+      expiration_date: new Date(Date.now() + 25 * 86400_000)
+        .toISOString()
+        .slice(0, 10),
+      quantity_received: 12.5,
+      quantity_remaining: 12.5,
+      unit_cost_cents: 2250,
+      source_purchase_item_id: null,
+      created_at: stamp(40),
+    },
+  ];
+
   return {
     procedures: [restoration, prophylaxis, evaluation, procB],
     inventoryItems: [gloves, mask, resin, anesthetic, needle, resinB],
     procedureMaterials: materials,
+    purchases: [],
+    purchaseItems: [],
+    movements,
+    lots,
+    itemLocks: new Map(),
   };
 }
 
-export function getInventoryStore(): Store {
-  if (!globalThis.__sorriaInventoryStoreV1) {
-    globalThis.__sorriaInventoryStoreV1 = seed();
+export function getInventoryStore(): InventoryStore {
+  if (!globalThis.__sorriaInventoryStoreV2) {
+    globalThis.__sorriaInventoryStoreV2 = seed();
   }
-  return globalThis.__sorriaInventoryStoreV1;
+  return globalThis.__sorriaInventoryStoreV2;
 }
 
 export function resetInventoryStore() {
-  globalThis.__sorriaInventoryStoreV1 = seed();
+  globalThis.__sorriaInventoryStoreV2 = seed();
+}
+
+/** Lock síncrono por item — evita corrida em atualizações de saldo/custo. */
+export function withItemLock<T>(itemId: string, fn: () => T): T {
+  const store = getInventoryStore();
+  const depth = store.itemLocks.get(itemId) ?? 0;
+  store.itemLocks.set(itemId, depth + 1);
+  try {
+    return fn();
+  } finally {
+    const next = (store.itemLocks.get(itemId) ?? 1) - 1;
+    if (next <= 0) store.itemLocks.delete(itemId);
+    else store.itemLocks.set(itemId, next);
+  }
 }
 
 export function writeInventoryAudit(input: {

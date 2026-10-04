@@ -43,6 +43,7 @@ Acesso financeiro é independente do clínico.
 | Secretária Virtual | ✅ (despriorizado na nav V1) |
 | Onboarding / configs / produção | ✅ |
 | Procedimentos + Estoque (Subfase 1) | ✅ fundação |
+| Compras / movimentos / custo médio (Subfase 2) | ✅ |
 
 ## Novo núcleo operacional
 
@@ -55,7 +56,8 @@ Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro �
 Secundário: Procedimentos · Relatórios · Configurações  
 Portal / Assistente: fora da nav principal (flags / Mais).
 
-Services: `src/services/procedures/`, `inventory/`, `procedure-consumption/`, `costs/`  
+Services: `src/services/procedures/`, `inventory/` (+ purchases/movements/costs/adjustments), `procedure-consumption/`, `costs/`  
+Rotas estoque: `/app/estoque`, `/compras`, `/movimentacoes`, `/[id]`  
 Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
 
 ## Financeiro (Fase 6)

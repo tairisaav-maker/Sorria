@@ -68,21 +68,24 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
 
 
-## Procedures / Inventory (Reestruturação Subfase 1)
+## Procedures / Inventory (Reestruturação Subfases 1–2)
 
 | Key | Uso |
 | --- | --- |
 | `procedures.view/create/update` | Catálogo |
 | `procedure_costs.view/update` | Ficha técnica e custos |
 | `procedure_consumption.view/confirm` | Consumo (confirm = subfase futura) |
-| `inventory.view/create/update` | Itens |
-| `inventory.adjust` / `purchase_create` | Ajuste/compra (Subfase 2+) |
+| `inventory.view/create/update` | Itens (cadastro; sem editar saldo/custo) |
+| `inventory.adjust` | Estoque inicial, ajuste, perda, vencimento |
+| `inventory.purchase_create` | Compra / cancelamento controlado |
+| `inventory.movements_view` | Histórico de movimentos |
+| `inventory.cost_view` | Custo médio e valor estimado |
 | `cost_reports.view` | Relatórios de custo |
 
-- Clinic A ≠ Clinic B (procedure, item, material)
-- Procedure A + Inventory B → `CROSS_CLINIC_REFERENCE` / not found
-- Custos/margens exigem `procedure_costs.view` (secretária padrão: sem)
-- Servidor é autoridade nos cálculos; frontend só preview
+- Clinic A ≠ Clinic B (procedure, item, material, compra, lote, movimento)
+- Procedure/purchase A + Inventory B → negado
+- `inventory.view` sem `cost_view` → vê quantidade, não custos
+- Servidor é autoridade; saldo só via movimentos
 
 ## Relatórios (Fase 8)
 

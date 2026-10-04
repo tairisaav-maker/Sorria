@@ -14,6 +14,21 @@
 10. `20251013000000_fase9_assistente.sql`
 11. `20251014000000_fase10_producao.sql`
 12. `20251015000000_reestruturacao_procedures_inventory.sql`
+13. `20251016000000_reestruturacao_inventory_purchases.sql`
+
+## Reestruturação Subfase 2 — Compras / Movimentos
+
+### `inventory_purchases` / `inventory_purchase_items`
+
+Compra com snapshot de conversão; cancelamento soft + movimentos compensatórios.
+
+### `inventory_movements`
+
+Histórico imutável; `quantity_delta` +/− em unidade de consumo; tipo inclui `procedure_consumption` (reservado).
+
+### `inventory_lots`
+
+Lotes/validades opcionais; ligados a purchase items quando aplicável.
 
 ## Reestruturação Subfase 1 — Procedures / Inventory
 

@@ -1,4 +1,4 @@
-import type { AuthzContext } from "@/lib/authz/can";
+import { can, type AuthzContext } from "@/lib/authz/can";
 import { assertPermission } from "@/lib/authz/guards";
 import {
   getInventoryStore,
@@ -8,12 +8,50 @@ import {
   assertCompatibleUnits,
   purchaseCostToConsumptionUnitCents,
 } from "@/lib/inventory/units";
-import { reaisToCents } from "@/lib/money";
 import {
   createInventoryItemSchema,
   updateInventoryItemSchema,
 } from "@/lib/validations/inventory";
-import type { InventoryItem } from "@/types/inventory";
+import type { InventoryItem, InventoryItemStatus } from "@/types/inventory";
+import {
+  canViewInventoryCosts,
+  getEmptyStockItems,
+  getExpiringInventoryItems,
+  getInventoryItemStatus,
+  getLowStockItems,
+  calculateInventoryValue,
+} from "@/services/inventory/costs";
+
+export {
+  calculateInventoryValue,
+  getLowStockItems,
+  getEmptyStockItems,
+  getExpiringInventoryItems,
+  getInventoryItemStatus,
+  canViewInventoryCosts,
+  recalculateAverageCost,
+} from "@/services/inventory/costs";
+
+export {
+  createInventoryPurchase,
+  cancelInventoryPurchase,
+  listInventoryPurchases,
+  getInventoryPurchase,
+} from "@/services/inventory/purchases";
+
+export {
+  getInventoryMovements,
+  applyInventoryMovement,
+} from "@/services/inventory/movements";
+
+export {
+  registerInitialStock,
+  adjustInventory,
+  registerLoss,
+  registerExpiration,
+  registerReturn,
+  registerCorrection,
+} from "@/services/inventory/adjustments";
 
 function now() {
   return new Date().toISOString();
@@ -49,6 +87,7 @@ export function getInventoryItem(
   return findItem(ctx, id);
 }
 
+/** Cadastro do item — saldo e custo médio começam em 0 (use estoque inicial/compra). */
 export function createInventoryItem(
   ctx: AuthzContext,
   input: unknown,
@@ -70,9 +109,9 @@ export function createInventoryItem(
     purchase_unit: data.purchase_unit,
     consumption_unit: data.consumption_unit,
     units_per_purchase_unit: data.units_per_purchase_unit,
-    current_quantity: data.current_quantity ?? 0,
+    current_quantity: 0,
     minimum_quantity: data.minimum_quantity ?? null,
-    average_unit_cost_cents: reaisToCents(data.average_unit_cost_reais ?? 0),
+    average_unit_cost_cents: 0,
     last_purchase_cost_cents: null,
     supplier_name: data.supplier_name ?? null,
     tracks_lot: data.tracks_lot ?? false,
@@ -95,6 +134,7 @@ export function createInventoryItem(
   return item;
 }
 
+/** Atualiza cadastro — NÃO altera saldo nem custo médio. */
 export function updateInventoryItem(
   ctx: AuthzContext,
   input: unknown,
@@ -112,14 +152,7 @@ export function updateInventoryItem(
   item.purchase_unit = data.purchase_unit;
   item.consumption_unit = data.consumption_unit;
   item.units_per_purchase_unit = data.units_per_purchase_unit;
-  if (data.current_quantity !== undefined) {
-    // Subfase 1: edição cadastral. Ajustes com motivo/movimento = Subfase 2.
-    item.current_quantity = data.current_quantity;
-  }
   item.minimum_quantity = data.minimum_quantity ?? null;
-  item.average_unit_cost_cents = reaisToCents(
-    data.average_unit_cost_reais ?? 0,
-  );
   item.supplier_name = data.supplier_name ?? null;
   item.tracks_lot = data.tracks_lot ?? false;
   item.tracks_expiration = data.tracks_expiration ?? false;
@@ -135,14 +168,6 @@ export function updateInventoryItem(
   return item;
 }
 
-export function getLowStockItems(ctx: AuthzContext): InventoryItem[] {
-  assertPermission(ctx, "inventory.view");
-  return listInventoryItems(ctx).filter(
-    (i) =>
-      i.minimum_quantity != null && i.current_quantity <= i.minimum_quantity,
-  );
-}
-
 export function calculateAvailableStock(
   ctx: AuthzContext,
   itemId: string,
@@ -151,29 +176,98 @@ export function calculateAvailableStock(
   return findItem(ctx, itemId).current_quantity;
 }
 
-/** Valor estimado do estoque (custo médio vigente × quantidade). */
-export function calculateInventoryValue(ctx: AuthzContext): {
-  total_cents: number;
-  item_count: number;
-} {
-  assertPermission(ctx, "inventory.view");
-  const items = listInventoryItems(ctx);
-  const total_cents = items.reduce(
-    (s, i) =>
-      s + Math.round(i.current_quantity * i.average_unit_cost_cents),
-    0,
-  );
-  return { total_cents, item_count: items.length };
-}
-
-/**
- * Helper conceitual Subfase 1: converte custo de compra → custo/un consumo.
- * Compras completas + custo médio ponderado = Subfase 2.
- */
 export function previewPurchaseUnitCost(input: {
   purchaseTotalReais: number;
   purchaseQuantity: number;
   unitsPerPurchaseUnit: number;
 }): number {
   return purchaseCostToConsumptionUnitCents(input);
+}
+
+export function listInventoryItemsWithStatus(ctx: AuthzContext) {
+  assertPermission(ctx, "inventory.view");
+  const showCost = canViewInventoryCosts(ctx);
+  const expiring = getExpiringInventoryItems(ctx, 30);
+  const expiringIds = new Set(expiring.map((e) => e.inventory_item_id));
+  return listInventoryItems(ctx).map((item) => {
+    const status: InventoryItemStatus = getInventoryItemStatus(
+      item,
+      expiringIds,
+    );
+    return {
+      ...item,
+      status,
+      stock_value_cents: showCost
+        ? Math.round(item.current_quantity * item.average_unit_cost_cents)
+        : null,
+      average_unit_cost_cents: showCost ? item.average_unit_cost_cents : null,
+    };
+  });
+}
+
+export function getInventoryDashboard(ctx: AuthzContext) {
+  if (!can(ctx, "inventory.view").allowed) {
+    return null;
+  }
+  const low = getLowStockItems(ctx);
+  const empty = getEmptyStockItems(ctx);
+  const expiring = getExpiringInventoryItems(ctx, 30);
+  const showCost = canViewInventoryCosts(ctx);
+  const value = showCost
+    ? calculateInventoryValue(ctx)
+    : { total_cents: null as number | null, item_count: 0 };
+  return {
+    low_count: low.length,
+    empty_count: empty.length,
+    expiring_count: expiring.length,
+    estimated_value_cents: value.total_cents,
+    low_items: low.slice(0, 5).map((i) => ({
+      id: i.id,
+      name: i.name,
+      current_quantity: i.current_quantity,
+      consumption_unit: i.consumption_unit,
+    })),
+    expiring_items: expiring.slice(0, 5).map((e) => ({
+      id: e.id,
+      item_name: e.item_name,
+      expiration_date: e.expiration_date,
+      days_until: e.days_until,
+    })),
+  };
+}
+
+export function getProceduresUsingItem(ctx: AuthzContext, itemId: string) {
+  assertPermission(ctx, "inventory.view");
+  findItem(ctx, itemId);
+  const store = getInventoryStore();
+  return store.procedureMaterials
+    .filter(
+      (m) =>
+        m.clinic_id === ctx.clinicId && m.inventory_item_id === itemId,
+    )
+    .map((m) => {
+      const proc = store.procedures.find((p) => p.id === m.procedure_id);
+      return {
+        procedure_id: m.procedure_id,
+        procedure_name: proc?.name ?? "—",
+        standard_quantity: m.standard_quantity,
+        consumption_unit: m.consumption_unit,
+        consumption_mode: m.consumption_mode,
+      };
+    });
+}
+
+export function getItemLots(ctx: AuthzContext, itemId: string) {
+  assertPermission(ctx, "inventory.view");
+  findItem(ctx, itemId);
+  return getInventoryStore()
+    .lots.filter(
+      (l) =>
+        l.clinic_id === ctx.clinicId &&
+        l.inventory_item_id === itemId &&
+        l.quantity_remaining > 0,
+    )
+    .sort((a, b) =>
+      (a.expiration_date ?? "9999").localeCompare(b.expiration_date ?? "9999"),
+    );
 }

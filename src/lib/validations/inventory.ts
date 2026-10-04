@@ -58,3 +58,71 @@ export const updateProcedureMaterialSchema = z.object({
 export const removeProcedureMaterialSchema = z.object({
   id: z.string().min(1),
 });
+
+export const purchaseLineSchema = z.object({
+  inventory_item_id: z.string().min(1),
+  purchase_quantity: z.number().positive(),
+  purchase_unit: z.enum(INVENTORY_UNITS).optional(),
+  units_per_purchase_unit: z.number().positive().optional(),
+  total_cost_reais: z.number().min(0),
+  lot_number: z.string().trim().max(80).optional().nullable(),
+  expiration_date: z.string().optional().nullable(),
+});
+
+export const createPurchaseSchema = z.object({
+  purchase_date: z.string().min(8),
+  supplier_name: z.string().trim().max(160).optional().nullable(),
+  invoice_number: z.string().trim().max(80).optional().nullable(),
+  notes: z.string().trim().max(1000).optional().nullable(),
+  items: z.array(purchaseLineSchema).min(1),
+});
+
+export const cancelPurchaseSchema = z.object({
+  id: z.string().min(1),
+  cancellation_reason: z.string().trim().min(2).max(500),
+});
+
+export const initialStockSchema = z.object({
+  inventory_item_id: z.string().min(1),
+  quantity: z.number().positive(),
+  unit_cost_reais: z.number().min(0),
+  notes: z.string().trim().max(500).optional().nullable(),
+  allow_when_nonzero: z.boolean().optional().default(false),
+});
+
+export const adjustInventorySchema = z.object({
+  inventory_item_id: z.string().min(1),
+  counted_quantity: z.number().min(0),
+  reason: z.enum([
+    "contagem_fisica",
+    "perda",
+    "quebra",
+    "vencimento",
+    "correcao",
+    "outro",
+  ]),
+  notes: z.string().trim().max(500).optional().nullable(),
+  confirm_negative: z.boolean().optional().default(false),
+});
+
+export const lossSchema = z.object({
+  inventory_item_id: z.string().min(1),
+  quantity: z.number().positive(),
+  notes: z.string().trim().max(500).optional().nullable(),
+  confirm_negative: z.boolean().optional().default(false),
+});
+
+export const registerExpirationSchema = z.object({
+  inventory_item_id: z.string().min(1),
+  quantity: z.number().positive(),
+  lot_id: z.string().optional().nullable(),
+  notes: z.string().trim().max(500).optional().nullable(),
+  confirm_negative: z.boolean().optional().default(false),
+});
+
+export const registerReturnSchema = z.object({
+  inventory_item_id: z.string().min(1),
+  quantity: z.number().positive(),
+  notes: z.string().trim().max(500).optional().nullable(),
+  confirm_negative: z.boolean().optional().default(false),
+});

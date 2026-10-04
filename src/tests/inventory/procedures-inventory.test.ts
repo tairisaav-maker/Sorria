@@ -69,16 +69,15 @@ describe("procedures CRUD", () => {
 });
 
 describe("inventory CRUD + conversão", () => {
-  it("cria item com compra caixa → consumo un", () => {
+  it("cria item com compra caixa → consumo un (saldo/custo via movimentos)", () => {
     const item = createInventoryItem(ownerA, {
       name: "Gaze estéril",
       purchase_unit: "caixa",
       consumption_unit: "un",
       units_per_purchase_unit: 100,
-      current_quantity: 200,
-      average_unit_cost_reais: 0.4,
     });
-    expect(item.average_unit_cost_cents).toBe(40);
+    expect(item.current_quantity).toBe(0);
+    expect(item.average_unit_cost_cents).toBe(0);
     expect(listInventoryItems(ownerA).some((i) => i.id === item.id)).toBe(
       true,
     );

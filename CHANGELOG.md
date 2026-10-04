@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 — 2026-10-04
+
+### Added
+- **Subfase 2:** compras, purchase items (snapshot de conversão), movimentos, lotes
+- Estoque inicial, ajuste por contagem, perda, vencimento, devolução, correção
+- Custo médio ponderado aplicado nas entradas; cancelamento de compra com reversão
+- UI `/app/estoque/compras`, `/movimentacoes`, detalhe do item; card Estoque na Home
+- Permissões `inventory.movements_view`, `inventory.cost_view`
+
+### Changed
+- Cadastro de item não altera mais saldo nem custo médio (somente movimentos)
+
 ## 1.1.0 — 2026-10-04
 
 ### Changed

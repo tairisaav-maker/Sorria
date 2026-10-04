@@ -103,3 +103,124 @@ export type ProcedureStandardCost = {
   margin_percent: number | null;
   lines: ProcedureMaterialLine[];
 };
+
+export const MOVEMENT_TYPES = [
+  "purchase",
+  "initial_balance",
+  "manual_adjustment",
+  "loss",
+  "expiration",
+  "return",
+  "correction",
+  "procedure_consumption",
+] as const;
+
+export type MovementType = (typeof MOVEMENT_TYPES)[number];
+
+export const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
+  purchase: "Compra",
+  initial_balance: "Estoque inicial",
+  manual_adjustment: "Ajuste",
+  loss: "Perda",
+  expiration: "Vencimento",
+  return: "Devolução",
+  correction: "Correção",
+  procedure_consumption: "Consumo clínico",
+};
+
+export const ADJUSTMENT_REASONS = [
+  "contagem_fisica",
+  "perda",
+  "quebra",
+  "vencimento",
+  "correcao",
+  "outro",
+] as const;
+
+export type AdjustmentReason = (typeof ADJUSTMENT_REASONS)[number];
+
+export const ADJUSTMENT_REASON_LABELS: Record<AdjustmentReason, string> = {
+  contagem_fisica: "Contagem física",
+  perda: "Perda",
+  quebra: "Quebra",
+  vencimento: "Vencimento",
+  correcao: "Correção",
+  outro: "Outro",
+};
+
+export type InventoryPurchase = {
+  id: string;
+  clinic_id: string;
+  supplier_name: string | null;
+  invoice_number: string | null;
+  purchase_date: string;
+  notes: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  cancellation_reason: string | null;
+};
+
+export type InventoryPurchaseItem = {
+  id: string;
+  clinic_id: string;
+  inventory_purchase_id: string;
+  inventory_item_id: string;
+  purchase_quantity: number;
+  purchase_unit: InventoryUnit;
+  units_per_purchase_unit_snapshot: number;
+  consumption_quantity_received: number;
+  /** Total em centavos */
+  total_cost_cents: number;
+  /** Centavos por unidade de compra */
+  cost_per_purchase_unit_cents: number;
+  /** Centavos por unidade de consumo */
+  cost_per_consumption_unit_cents: number;
+  lot_number: string | null;
+  expiration_date: string | null;
+  created_at: string;
+};
+
+export type InventoryMovement = {
+  id: string;
+  clinic_id: string;
+  inventory_item_id: string;
+  movement_type: MovementType;
+  /** +entrada / -saída em unidade de consumo */
+  quantity_delta: number;
+  unit_cost_snapshot_cents: number | null;
+  resulting_quantity: number | null;
+  reference_type: string | null;
+  reference_id: string | null;
+  reason: string | null;
+  created_by: string;
+  created_at: string;
+};
+
+export type InventoryLot = {
+  id: string;
+  clinic_id: string;
+  inventory_item_id: string;
+  lot_number: string | null;
+  expiration_date: string | null;
+  quantity_received: number;
+  quantity_remaining: number;
+  unit_cost_cents: number;
+  source_purchase_item_id: string | null;
+  created_at: string;
+};
+
+export type InventoryItemStatus =
+  | "normal"
+  | "low"
+  | "empty"
+  | "expiring";
+
+export const INVENTORY_STATUS_LABELS: Record<InventoryItemStatus, string> = {
+  normal: "Normal",
+  low: "Estoque baixo",
+  empty: "Sem estoque",
+  expiring: "Próximo do vencimento",
+};

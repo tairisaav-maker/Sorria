@@ -79,36 +79,98 @@ Fórmula custo linha: `round(qty × average_unit_cost_cents)`.
 **Margem do procedimento** = resultado bruto ÷ preço × 100.  
 Não chamar de lucro líquido.
 
-## Average cost (preparado)
+## Compras (Subfase 2)
 
-V1 preferirá **custo médio ponderado**:
+`inventory_purchases` + `inventory_purchase_items`
+
+Fluxo transacional:
 
 ```text
-(q_atual × custo_médio + q_entrada × custo_entrada) / (q_atual + q_entrada)
+compra → itens → inventory_movements → saldo → custo médio
 ```
 
-Implementação de compras/movimentos = **Subfase 2**.
+- Snapshot: `units_per_purchase_unit_snapshot` (embalagem daquela compra)
+- Servidor recalcula custo unitário; frontend só preview
+- Cancelamento: `cancelled_at` + movimento compensatório (`correction`) — nunca delete
+
+### Conversão na compra
+
+2 caixas × 100 un × R$ 80 → +200 un · R$ 0,40/un  
+2 seringas × 4 g × R$ 180 → +8 g · R$ 22,50/g
+
+## Estoque inicial
+
+`movement_type = initial_balance`  
+Quantidade + custo unitário estimado + observação. Não é compra.
+
+## Movimentações
+
+`inventory_movements` — histórico imutável.
+
+| Campo | Regra |
+| --- | --- |
+| `quantity_delta` | **+entrada / −saída** (unidade de consumo) |
+| `unit_cost_snapshot` | custo no momento do movimento |
+| `resulting_quantity` | saldo após o movimento |
+
+Tipos: `purchase`, `initial_balance`, `manual_adjustment`, `loss`, `expiration`, `return`, `correction`, `procedure_consumption` (reservado Subfase 3).
+
+**Nunca** alterar `current_quantity` / `average_unit_cost` pelo formulário de cadastro.
+
+## Ajustes / perdas / vencimentos / devoluções
+
+- Ajuste: informar quantidade contada → delta automático; motivo obrigatório
+- Perda / vencimento / devolução: saída com tipo específico
+- Correção: novo movimento; não apagar o anterior
+- Estoque negativo: exige confirmação explícita + auditoria
+
+## Lotes
+
+`inventory_lots` opcional (`tracks_lot` / `tracks_expiration`).  
+Não obrigar lote para descartáveis simples.  
+`getExpiringInventoryItems(30|60|90)`.
+
+## Custo médio ponderado (central)
+
+```text
+novo = (q_atual × médio_atual + q_entrada × custo_entrada) / (q_atual + q_entrada)
+```
+
+Única regra: `weightedAverageUnitCostCents` / `recalculateAverageCost`.  
+Atualiza **custo padrão atual** dos procedimentos.  
+**Não** altera custo histórico de consumos confirmados (snapshot — Subfase 3).
+
+## Precisão
+
+- Dinheiro: centavos inteiros (`numeric(12,2)` / cents no app)
+- Quantidade: até 4 casas (`numeric(14,4)`)
+- Custo unitário: arredondado ao centavo na apresentação (ex.: 0,25 g × 22,50 → R$ 5,63)
+
+## Concorrência
+
+Atualização de saldo/médio por item serializada (`withItemLock` no demo; `SELECT … FOR UPDATE` planejado no SQL).
+
+## Valor estimado do estoque
+
+`Σ current_quantity × average_unit_cost`  
+Nome: **Valor estimado do estoque** (não patrimônio contábil).  
+Requer `inventory.cost_view`.
 
 ## Historical cost snapshot
 
-Quando consumo for confirmado (futuro), gravar `unit_cost_snapshot`.  
+Quando consumo for confirmado (Subfase 3), gravar `unit_cost_snapshot`.  
 Não recalcular histórico com custo atual.
-
-## Stock movements (futuro)
-
-Tipos: purchase, procedure_consumption, manual_adjustment, loss, expiration, return, correction.  
-Nunca alterar `current_quantity` sem movimento.
 
 ## Forecasting (futuro)
 
-Agenda futura + procedimentos + ficha → necessidade.  
-Previsão ≠ baixa. Sem procedimento definido → não adivinhar.
+Agenda + procedimentos + ficha → necessidade. Previsão ≠ baixa.
 
 ## Permissions
 
-`procedures.*`, `procedure_costs.*`, `procedure_consumption.*`, `inventory.*`, `cost_reports.view`
+`inventory.view` · `create` · `update` · `adjust` · `purchase_create` · `movements_view` · `cost_view`  
+(+ procedures / procedure_costs / cost_reports)
 
 ## RLS / tenant
 
-Todas as tabelas com `clinic_id` + policies por permission.  
-Clinic A jamais acessa procedure/inventory/consumo/compra de Clinic B.
+Tabelas Subfase 2 com RLS + triggers cross-clinic.  
+Clinic A ≠ compra/lote/movimento Clinic B.

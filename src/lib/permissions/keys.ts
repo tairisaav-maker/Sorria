@@ -72,6 +72,8 @@ export const PERMISSIONS = [
   "inventory.update",
   "inventory.adjust",
   "inventory.purchase_create",
+  "inventory.movements_view",
+  "inventory.cost_view",
 
   "cost_reports.view",
 
@@ -179,6 +181,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "procedure_consumption.view",
     "procedure_consumption.confirm",
     "inventory.view",
+    "inventory.movements_view",
   ],
   secretary: [
     "dashboard.view",
@@ -207,7 +210,10 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.view",
     "inventory.create",
     "inventory.update",
+    "inventory.adjust",
     "inventory.purchase_create",
+    "inventory.movements_view",
+    "inventory.cost_view",
   ],
 };
 

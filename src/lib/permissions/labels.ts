@@ -81,6 +81,8 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "inventory.update", label: "Editar itens" },
       { key: "inventory.adjust", label: "Ajustar estoque" },
       { key: "inventory.purchase_create", label: "Registrar compras" },
+      { key: "inventory.movements_view", label: "Ver movimentações" },
+      { key: "inventory.cost_view", label: "Ver custos de estoque" },
     ],
   },
   {

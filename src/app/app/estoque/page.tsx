@@ -13,6 +13,8 @@ export default async function EstoquePage() {
     <InventoryClient
       canCreate={can(actor.ctx, "inventory.create").allowed}
       canUpdate={can(actor.ctx, "inventory.update").allowed}
+      canPurchase={can(actor.ctx, "inventory.purchase_create").allowed}
+      canAdjust={can(actor.ctx, "inventory.adjust").allowed}
     />
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -8,23 +9,51 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { formatBRL, centsToReais } from "@/lib/money";
-import { INVENTORY_UNITS, type InventoryItem } from "@/types/inventory";
+import { formatBRL } from "@/lib/money";
+import {
+  INVENTORY_STATUS_LABELS,
+  INVENTORY_UNITS,
+  type InventoryItemStatus,
+} from "@/types/inventory";
+
+type Row = {
+  id: string;
+  name: string;
+  current_quantity: number;
+  consumption_unit: string;
+  minimum_quantity: number | null;
+  average_unit_cost_cents: number | null;
+  stock_value_cents: number | null;
+  status: InventoryItemStatus;
+  purchase_unit: string;
+  units_per_purchase_unit: number;
+  category: string | null;
+};
+
+type Dashboard = {
+  low_count: number;
+  empty_count: number;
+  expiring_count: number;
+  estimated_value_cents: number | null;
+};
 
 export function InventoryClient({
   canCreate,
   canUpdate,
+  canPurchase,
+  canAdjust,
 }: {
   canCreate: boolean;
   canUpdate: boolean;
+  canPurchase: boolean;
+  canAdjust: boolean;
 }) {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [valueCents, setValueCents] = useState(0);
+  const [items, setItems] = useState<Row[]>([]);
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const [canViewCosts, setCanViewCosts] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<InventoryItem | null>(null);
-
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [purchaseUnit, setPurchaseUnit] =
@@ -32,20 +61,21 @@ export function InventoryClient({
   const [consumptionUnit, setConsumptionUnit] =
     useState<(typeof INVENTORY_UNITS)[number]>("un");
   const [unitsPer, setUnitsPer] = useState("100");
-  const [qty, setQty] = useState("0");
   const [minQty, setMinQty] = useState("");
-  const [unitCost, setUnitCost] = useState("0.40");
   const [saving, setSaving] = useState(false);
 
   async function load() {
     setLoading(true);
-    const [listRes, valueRes] = await Promise.all([
+    const [listRes, dashRes] = await Promise.all([
       fetch("/api/demo/inventory").then((r) => r.json()),
-      fetch("/api/demo/inventory?value=1").then((r) => r.json()),
+      fetch("/api/demo/inventory?view=dashboard").then((r) => r.json()),
     ]);
     if (listRes.error) setError(listRes.error);
-    else setItems(listRes.items ?? []);
-    setValueCents(valueRes.value?.total_cents ?? 0);
+    else {
+      setItems(listRes.items ?? []);
+      setCanViewCosts(Boolean(listRes.canViewCosts));
+    }
+    setDashboard(dashRes.dashboard ?? null);
     setLoading(false);
   }
 
@@ -53,55 +83,23 @@ export function InventoryClient({
     void load();
   }, []);
 
-  function openCreate() {
-    setEditing(null);
-    setName("");
-    setCategory("");
-    setPurchaseUnit("caixa");
-    setConsumptionUnit("un");
-    setUnitsPer("100");
-    setQty("0");
-    setMinQty("");
-    setUnitCost("0.40");
-    setShowForm(true);
-  }
-
-  function openEdit(item: InventoryItem) {
-    setEditing(item);
-    setName(item.name);
-    setCategory(item.category ?? "");
-    setPurchaseUnit(item.purchase_unit);
-    setConsumptionUnit(item.consumption_unit);
-    setUnitsPer(String(item.units_per_purchase_unit));
-    setQty(String(item.current_quantity));
-    setMinQty(
-      item.minimum_quantity != null ? String(item.minimum_quantity) : "",
-    );
-    setUnitCost(centsToReais(item.average_unit_cost_cents).toFixed(4));
-    setShowForm(true);
-  }
-
-  async function onSubmit(e: React.FormEvent) {
+  async function onCreate(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    const data = {
-      ...(editing ? { id: editing.id } : {}),
-      name,
-      category: category || null,
-      purchase_unit: purchaseUnit,
-      consumption_unit: consumptionUnit,
-      units_per_purchase_unit: Number(unitsPer.replace(",", ".")),
-      current_quantity: Number(qty.replace(",", ".")),
-      minimum_quantity: minQty ? Number(minQty.replace(",", ".")) : null,
-      average_unit_cost_reais: Number(unitCost.replace(",", ".")),
-    };
     const res = await fetch("/api/demo/inventory", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: editing ? "update" : "create",
-        data,
+        action: "create",
+        data: {
+          name,
+          category: category || null,
+          purchase_unit: purchaseUnit,
+          consumption_unit: consumptionUnit,
+          units_per_purchase_unit: Number(unitsPer.replace(",", ".")),
+          minimum_quantity: minQty ? Number(minQty.replace(",", ".")) : null,
+        },
       }),
     });
     const json = await res.json();
@@ -111,8 +109,18 @@ export function InventoryClient({
       return;
     }
     setShowForm(false);
+    setName("");
     await load();
   }
+
+  const statusTone = (
+    s: InventoryItemStatus,
+  ): "success" | "warning" | "danger" | "info" | "neutral" => {
+    if (s === "empty") return "danger";
+    if (s === "low") return "warning";
+    if (s === "expiring") return "info";
+    return "success";
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
@@ -123,23 +131,66 @@ export function InventoryClient({
               Estoque
             </h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Itens · unidade de compra ≠ consumo · valor estimado operacional
+              Itens · compras · movimentações · custo médio ponderado
             </p>
           </div>
-          {canCreate ? (
-            <Button onClick={openCreate} size="md">
-              <Plus className="size-4" />
-              Novo item
-            </Button>
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {canPurchase ? (
+              <Link href="/app/estoque/compras">
+                <Button variant="secondary" size="sm">
+                  Compras
+                </Button>
+              </Link>
+            ) : null}
+            <Link href="/app/estoque/movimentacoes">
+              <Button variant="secondary" size="sm">
+                Movimentações
+              </Button>
+            </Link>
+            {canCreate ? (
+              <Button onClick={() => setShowForm(true)} size="sm">
+                <Plus className="size-4" />
+                Novo item
+              </Button>
+            ) : null}
+          </div>
         </div>
-        <p className="mt-3 text-sm text-[var(--text-muted)]">
-          Valor estimado do estoque:{" "}
-          <span className="font-medium text-[var(--brand-ink)]">
-            {formatBRL(valueCents)}
-          </span>
-        </p>
       </section>
+
+      {dashboard ? (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-rise">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-3 py-3">
+            <p className="text-xs text-[var(--text-subtle)]">
+              Valor estimado do estoque
+            </p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-xl text-[var(--brand-ink)]">
+              {canViewCosts && dashboard.estimated_value_cents != null
+                ? formatBRL(dashboard.estimated_value_cents)
+                : "—"}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-3 py-3">
+            <p className="text-xs text-[var(--text-subtle)]">Estoque baixo</p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-xl">
+              {dashboard.low_count}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-3 py-3">
+            <p className="text-xs text-[var(--text-subtle)]">Sem estoque</p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-xl">
+              {dashboard.empty_count}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-3 py-3">
+            <p className="text-xs text-[var(--text-subtle)]">
+              Próximo do vencimento
+            </p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-xl">
+              {dashboard.expiring_count}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {error ? (
         <p className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
@@ -149,12 +200,13 @@ export function InventoryClient({
 
       {showForm ? (
         <form
-          onSubmit={onSubmit}
-          className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise"
+          onSubmit={onCreate}
+          className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4"
         >
-          <h2 className="text-base font-medium">
-            {editing ? "Editar item" : "Novo item"}
-          </h2>
+          <h2 className="text-base font-medium">Novo item</h2>
+          <p className="text-xs text-[var(--text-muted)]">
+            Saldo e custo médio começam em zero. Use Estoque inicial ou Compra.
+          </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
               <Label>Nome</Label>
@@ -172,10 +224,10 @@ export function InventoryClient({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Custo médio / un. consumo (R$)</Label>
+              <Label>Estoque mínimo</Label>
               <Input
-                value={unitCost}
-                onChange={(e) => setUnitCost(e.target.value)}
+                value={minQty}
+                onChange={(e) => setMinQty(e.target.value)}
               />
             </div>
             <div className="space-y-1.5">
@@ -220,17 +272,6 @@ export function InventoryClient({
                 required
               />
             </div>
-            <div className="space-y-1.5">
-              <Label>Qtd atual (consumo)</Label>
-              <Input value={qty} onChange={(e) => setQty(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Estoque mínimo</Label>
-              <Input
-                value={minQty}
-                onChange={(e) => setMinQty(e.target.value)}
-              />
-            </div>
           </div>
           <div className="flex gap-2">
             <Button type="submit" loading={saving}>
@@ -252,62 +293,50 @@ export function InventoryClient({
       ) : items.length === 0 ? (
         <EmptyState
           title="Estoque vazio"
-          description="Cadastre materiais com unidade de compra e de consumo."
-          action={
-            canCreate ? (
-              <Button onClick={openCreate}>Cadastrar item</Button>
-            ) : undefined
-          }
+          description="Cadastre materiais e registre estoque inicial ou compra."
         />
       ) : (
         <ul className="divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 animate-rise">
-          {items.map((item) => {
-            const low =
-              item.minimum_quantity != null &&
-              item.current_quantity <= item.minimum_quantity;
-            const empty = item.current_quantity <= 0;
-            return (
-              <li
-                key={item.id}
-                className="flex flex-wrap items-center justify-between gap-3 px-4 py-4"
+          {items.map((item) => (
+            <li key={item.id}>
+              <Link
+                href={`/app/estoque/${item.id}`}
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 transition-colors hover:bg-[var(--surface-muted)]/60"
               >
                 <div>
                   <p className="text-sm font-medium text-[var(--text)]">
                     {item.name}
                   </p>
                   <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                    Compra: {item.purchase_unit} → consumo:{" "}
-                    {item.consumption_unit} (×{item.units_per_purchase_unit})
+                    {item.current_quantity} {item.consumption_unit}
+                    {item.minimum_quantity != null
+                      ? ` · mín. ${item.minimum_quantity}`
+                      : ""}
+                    {canViewCosts && item.average_unit_cost_cents != null
+                      ? ` · ${formatBRL(item.average_unit_cost_cents)}/${item.consumption_unit}`
+                      : ""}
                   </p>
-                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                    {item.current_quantity} {item.consumption_unit} ·{" "}
-                    {formatBRL(item.average_unit_cost_cents)}/
-                    {item.consumption_unit}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {empty ? (
-                    <Badge tone="danger">Sem estoque</Badge>
-                  ) : low ? (
-                    <Badge tone="warning">Baixo</Badge>
-                  ) : (
-                    <Badge tone="success">Ok</Badge>
-                  )}
-                  {canUpdate ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEdit(item)}
-                    >
-                      Editar
-                    </Button>
+                  {canViewCosts && item.stock_value_cents != null ? (
+                    <p className="mt-0.5 text-xs text-[var(--text-subtle)]">
+                      Valor: {formatBRL(item.stock_value_cents)}
+                    </p>
                   ) : null}
                 </div>
-              </li>
-            );
-          })}
+                <Badge tone={statusTone(item.status)}>
+                  {INVENTORY_STATUS_LABELS[item.status]}
+                </Badge>
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
+
+      {canAdjust ? (
+        <p className="text-xs text-[var(--text-subtle)]">
+          Ajustes, perdas e estoque inicial ficam no detalhe de cada item.
+        </p>
+      ) : null}
+      {canUpdate ? null : null}
     </div>
   );
 }

@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.1.0** — Reestruturação Subfase 1 (Procedimentos + Estoque fundação)
+**1.2.0** — Reestruturação Subfase 2 (Compras, movimentos, custo médio)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -24,7 +24,7 @@ npm run dev
 Núcleo: Agenda · Pacientes · Estoque · Financeiro
 
 - Procedimentos: `/app/procedimentos`
-- Estoque: `/app/estoque`
+- Estoque: `/app/estoque` · Compras · Movimentações
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
 - Relatórios: `/app/relatorios`
