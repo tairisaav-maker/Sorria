@@ -173,7 +173,7 @@ export function AssistantClient() {
   const empty = messages.length === 0;
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-7.5rem)] w-full max-w-5xl flex-col gap-3 lg:h-[calc(100dvh-5rem)]">
+    <div className="mx-auto flex h-[calc(100dvh-9.5rem)] w-full max-w-5xl flex-col gap-3 sm:h-[calc(100dvh-8rem)] lg:h-[calc(100dvh-5.5rem)]">
       <header className="flex shrink-0 items-start justify-between gap-3 animate-fade-in">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-2xl tracking-tight text-[var(--brand-ink)] sm:text-3xl">

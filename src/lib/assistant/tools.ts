@@ -79,6 +79,8 @@ function statusLabel(s: string) {
   const map: Record<string, string> = {
     scheduled: "agendada",
     confirmed: "confirmada",
+    arrived: "chegou",
+    in_progress: "em atendimento",
     completed: "concluída",
     cancelled: "cancelada",
     no_show: "falta",
