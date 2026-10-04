@@ -109,8 +109,8 @@ describe("Subfase 8 — despesas e custo/hora", () => {
   it("templates alocáveis somam no mês; não alocável fica de fora", () => {
     const month = new Date().toISOString().slice(0, 7);
     const expenses = getMonthlyOperatingExpenses(ownerA, month);
-    // seed: Aluguel 3000 + Energia 800 + Software 300 + Auxiliar 2000 + Contador 500 = 6600
-    expect(expenses.allocatable_cents).toBe(660_000);
+    // seed teste V1: despesas alocáveis = R$ 12.000
+    expect(expenses.allocatable_cents).toBe(1_200_000);
     expect(expenses.non_allocatable_cents).toBeGreaterThan(0);
     expect(
       expenses.lines.some(
@@ -119,12 +119,12 @@ describe("Subfase 8 — despesas e custo/hora", () => {
     ).toBe(true);
   });
 
-  it("custo/hora com seed: 6600 / 120 = 55", () => {
+  it("custo/hora com seed: 12000 / 120 = 100", () => {
     const month = new Date().toISOString().slice(0, 7);
     const hourly = calculateHourlyOperatingCost(ownerA, month);
     expect(hourly.insufficient_data).toBe(false);
     expect(hourly.hourly_cost_cents).toBe(
-      Math.round(660_000 / 120),
+      Math.round(1_200_000 / 120),
     );
   });
 
@@ -164,7 +164,7 @@ describe("Subfase 8 — despesas e custo/hora", () => {
       reference_month: month,
       productive_hours: 100,
     });
-    expect(sim.hourly_cost_cents).toBe(Math.round(660_000 / 100));
+    expect(sim.hourly_cost_cents).toBe(Math.round(1_200_000 / 100));
     expect(getClinicCostSettings(ownerA)?.monthly_productive_hours).toBe(
       settingsBefore.monthly_productive_hours,
     );
