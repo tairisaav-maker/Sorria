@@ -41,7 +41,14 @@ export function LoginForm() {
         });
 
         if (response.ok) {
-          router.replace(next);
+          const payload = (await response.json()) as {
+            redirect?: string;
+            kind?: string;
+          };
+          const dest =
+            payload.redirect ??
+            (payload.kind === "portal" ? "/portal/inicio" : next);
+          router.replace(dest);
           router.refresh();
           return;
         }

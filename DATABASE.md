@@ -9,6 +9,7 @@
 5. `20251008000000_fase4_prontuario.sql`
 6. `20251009000000_fase5_treatments.sql`
 7. `20251010000000_fase6_financeiro.sql`
+8. `20251011000000_fase7_portal.sql`
 
 ## Fase 6 — Financeiro
 
@@ -54,3 +55,33 @@ App demo: centavos inteiros. SQL: `numeric(12,2)`.
 ## Fase 5 — Tratamentos
 
 `treatment_plans` · `treatment_items` · `treatment_item_teeth` · `treatment_plan_versions`
+
+## Fase 7 — Portal
+
+### `patient_portal_access`
+
+| Coluna | Notas |
+| --- | --- |
+| clinic_id / patient_id / auth_user_id | vínculo explícito N:N |
+| status | invited \| active \| revoked |
+| invited_at / activated_at / revoked_at | |
+
+Unique `(clinic_id, patient_id, auth_user_id)`.  
+Índices: `auth_user_id+status`, `clinic_id+patient_id+status`.
+
+### `appointment_requests` (evolução)
+
+- `request_type`: new_appointment \| reschedule \| cancellation
+- `related_appointment_id` (nullable)
+
+### `record_copy_requests`
+
+status: requested → preparing → available → delivered \| cancelled
+
+### `portal_notifications`
+
+Notificações internas do Portal (sem push externo).
+
+### Helpers RLS
+
+`has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`

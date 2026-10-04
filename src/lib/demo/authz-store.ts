@@ -55,6 +55,9 @@ type Store = {
   /** usuário da sessão demo atual */
   sessionUserId: string;
   sessionClinicId: string;
+  /** contexto Portal (paciente ativo) */
+  sessionPatientId: string | null;
+  sessionKind: "professional" | "portal";
 };
 
 declare global {
@@ -202,6 +205,8 @@ function seed(): Store {
     auditLogs: [],
     sessionUserId: OWNER_A_ID,
     sessionClinicId: CLINIC_A_ID,
+    sessionPatientId: null,
+    sessionKind: "professional" as const,
   };
 }
 
@@ -335,10 +340,19 @@ export function appendAudit(input: Omit<DemoAuditLog, "id" | "created_at">) {
   return entry;
 }
 
-export function setDemoSession(userId: string, clinicId: string) {
+export function setDemoSession(
+  userId: string,
+  clinicId: string,
+  options?: {
+    patientId?: string | null;
+    kind?: "professional" | "portal";
+  },
+) {
   const store = getAuthzStore();
   store.sessionUserId = userId;
   store.sessionClinicId = clinicId;
+  store.sessionPatientId = options?.patientId ?? null;
+  store.sessionKind = options?.kind ?? "professional";
 }
 
 export function getDemoSession() {
@@ -346,6 +360,8 @@ export function getDemoSession() {
   return {
     userId: store.sessionUserId,
     clinicId: store.sessionClinicId,
+    patientId: store.sessionPatientId,
+    kind: store.sessionKind,
   };
 }
 

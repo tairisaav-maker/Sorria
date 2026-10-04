@@ -4,10 +4,10 @@
 
 ## Fase atual
 
-**FASE 6 — Financeiro**
+**FASE 7 — Portal do Paciente**
 
-> Plano ≠ Obrigação · Parcela ≠ Pagamento · Aceite ≠ Receita  
-> Valor previsto ≠ Valor recebido · Financeiro ≠ Prontuário
+> Solicitação ≠ Consulta · Paciente ≠ profissional · E-mail igual ≠ vínculo  
+> Arquivo do paciente ≠ arquivo liberado · Conhecer UUID ≠ autorização
 
 ## Como rodar
 
@@ -17,17 +17,24 @@ npm install
 npm run dev
 ```
 
-Demo: `demo@sorria.app` / `sorria-demo`  
-(Dra. Ana = proprietária **com** `clinical_access` — também atende.)
+### Login profissional (demo)
 
-Navegação: **Agenda** · **Pacientes** · **Financeiro** · **Mais**
+`demo@sorria.app` / `sorria-demo` → `/app`
+
+### Login Portal do paciente (demo)
+
+`paciente@sorria.app` / `sorria-demo` → `/portal/inicio`
+
+(Mariana Oliveira — Clinic A; também responsável do menor João Pedro.)
+
+Outros: `paciente2@sorria.app`, `revogado@sorria.app` (acesso negado).
 
 ## Scripts
 
 ```bash
 npm run lint
 npm run typecheck
-npm test
+npm run test
 npm run build
 ```
 

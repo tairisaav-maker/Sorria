@@ -27,6 +27,7 @@ import {
 import { countPendingFollowUps } from "@/services/clinical";
 import { listPatients } from "@/services/patients";
 import { getHomeFinanceKpis } from "@/services/finance";
+import { getPortalStore } from "@/lib/demo/portal-store";
 import { countPlansByStatus } from "@/services/treatments";
 import { formatBRL } from "@/lib/money";
 
@@ -62,18 +63,27 @@ export function buildHomeDashboard(ctx: AuthzContext) {
   const inProgressPlans = canTreatments
     ? countPlansByStatus(ctx, "in_progress")
     : 0;
+  const pendingRecordCopies = canPatients
+    ? getPortalStore().copyRequests.filter(
+        (r) =>
+          r.clinic_id === ctx.clinicId &&
+          (r.status === "requested" || r.status === "preparing"),
+      ).length
+    : 0;
 
   const pendenciasHint = canClinical
     ? [
         pendingRequests > 0 ? `${pendingRequests} solicitações` : null,
         pendingFollowUps > 0 ? `${pendingFollowUps} retornos` : null,
         presentedPlans > 0 ? `${presentedPlans} planos` : null,
+        pendingRecordCopies > 0 ? `${pendingRecordCopies} cópias` : null,
       ]
         .filter(Boolean)
         .join(" · ") || "nada pendente"
     : [
         pendingRequests > 0 ? "solicitações aguardando" : null,
         presentedPlans > 0 ? `${presentedPlans} planos` : null,
+        pendingRecordCopies > 0 ? `${pendingRecordCopies} cópias` : null,
       ]
         .filter(Boolean)
         .join(" · ") || "agenda";
@@ -109,7 +119,8 @@ export function buildHomeDashboard(ctx: AuthzContext) {
       // Secretária: solicitações + planos admin (sem retorno clínico)
       value: String(
         (canClinical ? pendingRequests + pendingFollowUps : pendingRequests) +
-          presentedPlans,
+          presentedPlans +
+          pendingRecordCopies,
       ),
       hint: pendenciasHint,
     },

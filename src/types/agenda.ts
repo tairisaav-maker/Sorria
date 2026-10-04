@@ -25,10 +25,17 @@ export type AppointmentRequestReason =
   | "Continuação de tratamento"
   | "Outro";
 
+export type AppointmentRequestType =
+  | "new_appointment"
+  | "reschedule"
+  | "cancellation";
+
 export type AppointmentRequest = {
   id: string;
   clinic_id: string;
   patient_id: string;
+  request_type: AppointmentRequestType;
+  related_appointment_id: string | null;
   requested_date: string | null;
   preferred_period: PreferredPeriod;
   reason: string;

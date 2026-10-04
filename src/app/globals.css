@@ -139,6 +139,13 @@ body {
     linear-gradient(180deg, #f4faf9 0%, var(--surface) 48%, #eaf3f1 100%);
 }
 
+.portal-atmosphere {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(45, 212, 191, 0.16), transparent 36%),
+    radial-gradient(circle at 100% 12%, rgba(14, 116, 144, 0.1), transparent 34%),
+    linear-gradient(180deg, #f6fbfa 0%, #eef6f4 55%, #e8f2f0 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

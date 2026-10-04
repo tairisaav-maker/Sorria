@@ -9,23 +9,25 @@
 ### FASE 4 — Prontuário clínico
 ### FASE 5 — Planos de tratamento
 ### FASE 6 — Financeiro V1
+### FASE 7 — Portal do Paciente
 
-- Transação → parcelas → pagamentos
-- Pagamento parcial, múltiplo, estorno
-- Dashboard (recebido / a receber / vencido / despesas)
-- Condição a partir de plano aceito (sem receita automática)
-- Financeiro do paciente
-- Exportação CSV / XLSX / PDF
-- RLS + permissões; clínico independente
+- `patient_portal_access` (N:N; multi-clínica; responsável)
+- Layout próprio + bottom nav mobile
+- Solicitar horário (sem grade livre)
+- Confirmar presença / alteração / cancelamento como solicitação
+- Proposta → confirmação com revalidação atômica
+- Tratamento / documentos liberados / financeiro próprio
+- Cópia de prontuário (`record_copy_requests`)
+- RLS + Storage privado + auditoria
 
 ## Próximo
 
-Aguardando Fase 7/8 conforme roadmap do produto (Portal / Relatórios).
+**FASE 8 — Relatórios e Indicadores**
 
 ## Depois
 
-Portal do paciente · Relatórios completos · Secretária Virtual
+Secretária Virtual
 
 ## Fora da V1
 
-IA clínica, adquirente/PIX automático, boleto, NF, contabilidade, teleconsulta
+IA clínica, adquirente/PIX automático, boleto, NF, contabilidade, teleconsulta, WhatsApp

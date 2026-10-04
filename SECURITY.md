@@ -48,3 +48,21 @@ Ver Fases 4–5. Versionamento; owner ≠ clínico universal.
 ```text
 Auth → Membership → Clinic → Permission (+ clinical_access) → Tenant Check → RLS → Data
 ```
+
+## Portal do paciente (Fase 7)
+
+```text
+auth.uid() → patient_portal_access(active) → clinic_id + patient_id → resource
+```
+
+- E-mail coincidente com `patients.email` **não** concede acesso
+- UUID conhecido **não** concede acesso
+- Cross-patient / cross-clinic → NEGADO
+- Acesso `revoked` → bloqueio imediato
+- Paciente **não** recebe permissões profissionais (`clinical_record.view`, etc.)
+- Appointments: paciente só lê próprios; confirma presença (`scheduled→confirmed`); não edita horário/profissional
+- Requests: cria/responde próprias; não aprova arbitrariamente nem define proposta
+- Treatments / finance: camada `getMy*` + RLS; sem despesas da clínica
+- Attachments: `patient_visible = true` obrigatório; Storage privado + signed URL
+- Perfil: campos de contato; CPF mascarado; `clinic_id`/`patient_id`/`cpf` imutáveis pelo Portal
+- Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log

@@ -4,12 +4,25 @@
 
 Sorria é SaaS multi-clínica. A marca é independente; cada clínica é tenant (`clinic_id`).
 
-## Identidade
+## Identidade profissional
 
 ```text
 Auth → Profile → Clinic Membership → Role → Permissions (+ clinical_access)
   → Resource/Tenant Check → RLS → Data
 ```
+
+## Identidade Portal (paciente)
+
+```text
+auth.uid() → patient_portal_access (status=active)
+  → clinic_id + patient_id → resource do próprio paciente
+  → liberado ao paciente? → RLS → data
+```
+
+- Tabela `patient_portal_access` (N:N): prepara multi-clínica e responsável/dependente.
+- E-mail igual a `patients.email` **não** autoriza.
+- `patient_id` da URL **nunca** é autorização.
+- Revogação (`revoked`) bloqueia Portal e signed URLs futuras.
 
 **Owner administrativo ≠ acesso clínico universal.**  
 Acesso clínico: papel `dentist` **ou** `owner` com `membership.clinical_access = true`.  
@@ -25,7 +38,8 @@ Acesso financeiro é independente do clínico.
 | Prontuário | ✅ |
 | Planos de tratamento | ✅ |
 | Financeiro V1 | ✅ |
-| Portal / Relatórios completos / IA | ❌ |
+| Portal do paciente | ✅ |
+| Relatórios completos / IA | ❌ |
 
 ## Financeiro (Fase 6)
 
@@ -96,6 +110,34 @@ CSV (`;` + BOM UTF-8) · XLSX (exceljs) · PDF (pdfkit) — exigem `finance.expo
 Versionamento na apresentação; aceite amarra à versão.  
 Progresso clínico derivado dos itens ≠ progresso financeiro.
 
+## Portal do paciente (Fase 7)
+
+Rotas: `/portal/*` — layout próprio (header desktop / bottom nav mobile).  
+Não reutiliza sidebar profissional.
+
+### Fluxo de horário
+
+```text
+Paciente solicita preferência → appointment_request
+Clínica propõe → status proposed (ainda SEM appointment)
+Paciente confirma → revalida disponibilidade → cria appointment
+```
+
+`request_type`: `new_appointment | reschedule | cancellation` na mesma tabela.  
+Alteração/cancelamento = solicitação; agenda não muda sozinha.
+
+### Services
+
+```text
+src/services/portal/
+```
+
+`getPortalContext` · `getMy*` · confirmação de proposta atômica · cópia de prontuário
+
+### Documentos
+
+Somente `patient_visible = true` + signed URL. Bucket permanece privado.
+
 ## Fora do escopo atual
 
-Integração bancária/adquirente, boleto, NF, contabilidade, Portal completo, Relatórios Fase 8, Secretária Virtual, IA.
+Integração bancária/adquirente, boleto, NF, contabilidade, Relatórios Fase 8, Secretária Virtual, IA, WhatsApp, pagamento online no Portal.

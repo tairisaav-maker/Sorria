@@ -97,6 +97,8 @@ export function createAppointmentRequest(
     id: crypto.randomUUID(),
     clinic_id: ctx.clinicId,
     patient_id: parsed.data.patient_id,
+    request_type: "new_appointment",
+    related_appointment_id: null,
     requested_date: parsed.data.requested_date || null,
     preferred_period: parsed.data.preferred_period,
     reason: parsed.data.reason,
