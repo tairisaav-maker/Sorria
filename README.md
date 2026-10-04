@@ -18,9 +18,17 @@ npm install
 npm run dev
 ```
 
-### Login profissional (demo)
+### Login profissional (demo / teste V1)
 
-`demo@sorria.app` / `sorria-demo` → `/app`
+Senha: `DEMO_PASSWORD` em `.env.local` (padrão local `sorria-demo`).
+
+| Perfil | E-mail |
+|--------|--------|
+| Owner | `demo@sorria.app` |
+| Dentista | `carlos.a@clinicademo.sorria.app` |
+| Secretária | `mariana.a@clinicademo.sorria.app` |
+
+Clínica de teste: **Clínica Teste Sorria**. Checklist: [TEST_REPORT.md](./TEST_REPORT.md)
 
 Núcleo: Agenda · Pacientes · Estoque · Financeiro
 

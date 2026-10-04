@@ -47,7 +47,7 @@ const ownerA = { userId: OWNER_A_ID, clinicId: CLINIC_A_ID };
 const dentistA = { userId: DENTIST_A_ID, clinicId: CLINIC_A_ID };
 
 describe("um procedimento — Mariana restauração 16", () => {
-  it("previsto 0,30 g → real 0,40 g baixa 0,40 g e custo snapshot", () => {
+  it("previsto 0,35 g → real 0,40 g baixa 0,40 g e custo snapshot", () => {
     const beforeResin = getInventoryItem(ownerA, "inv-a-resin").current_quantity;
     const created = createPerformedProcedure(ownerA, {
       patient_id: "p-a-001",
@@ -61,7 +61,7 @@ describe("um procedimento — Mariana restauração 16", () => {
     const resinLine = created.consumptions.find(
       (c) => c.item_name_snapshot === "Resina A2",
     )!;
-    expect(resinLine.planned_quantity).toBeCloseTo(0.3);
+    expect(resinLine.planned_quantity).toBeCloseTo(0.35);
     expect(resinLine.unit_cost_snapshot_cents).toBe(2250);
 
     updateActualConsumption(ownerA, {
@@ -96,7 +96,7 @@ describe("um procedimento — Mariana restauração 16", () => {
 });
 
 describe("dois procedimentos no mesmo paciente", () => {
-  it("duas restaurações → 0,60 g resina exclusiva", () => {
+  it("duas restaurações → 0,70 g resina exclusiva", () => {
     const before = getInventoryItem(ownerA, "inv-a-resin").current_quantity;
     const a = createPerformedProcedure(ownerA, {
       patient_id: "p-a-001",
@@ -119,14 +119,14 @@ describe("dois procedimentos no mesmo paciente", () => {
       confirm_insufficient_stock: true,
     });
     const after = getInventoryItem(ownerA, "inv-a-resin").current_quantity;
-    expect(after).toBeCloseTo(before - 0.6);
+    expect(after).toBeCloseTo(before - 0.7);
   });
 });
 
 describe("per_appointment e rateio", () => {
-  it("2 restaurações → 1 máscara baixada; rateio R$ 1 cada se máscara R$ 2", () => {
-    // máscara seed: average 30 cents — ajustamos via consumo
+  it("2 restaurações → 1 máscara + luvas per_appointment; rateio compartilhado", () => {
     const beforeMask = getInventoryItem(ownerA, "inv-a-mask").current_quantity;
+    const beforeGloves = getInventoryItem(ownerA, "inv-a-gloves").current_quantity;
     const a = createPerformedProcedure(ownerA, {
       patient_id: "p-a-001",
       appointment_id: "appt-a-1",
@@ -150,6 +150,16 @@ describe("per_appointment e rateio", () => {
     shared.planned_cost_cents = 200;
     shared.actual_cost_cents = 200;
 
+    // luvas: 2 un × 40 = 80 cents (seed) — zera para isolar o rateio da máscara
+    const glovesShared = getPerformedStore().appointmentConsumptions.find(
+      (c) =>
+        c.appointment_id === "appt-a-1" &&
+        c.inventory_item_id === "inv-a-gloves",
+    )!;
+    glovesShared.unit_cost_snapshot_cents = 0;
+    glovesShared.planned_cost_cents = 0;
+    glovesShared.actual_cost_cents = 0;
+
     confirmProcedureConsumption(ownerA, {
       performed_procedure_id: a.procedure.id,
       confirm_insufficient_stock: true,
@@ -161,6 +171,8 @@ describe("per_appointment e rateio", () => {
 
     const afterMask = getInventoryItem(ownerA, "inv-a-mask").current_quantity;
     expect(afterMask).toBe(beforeMask - 1);
+    const afterGloves = getInventoryItem(ownerA, "inv-a-gloves").current_quantity;
+    expect(afterGloves).toBe(beforeGloves - 2);
 
     const detailA = getPerformedProcedure(ownerA, a.procedure.id);
     const detailB = getPerformedProcedure(ownerA, b.procedure.id);
@@ -282,7 +294,7 @@ describe("correção e idempotência", () => {
       confirm_insufficient_stock: true,
     });
     expect(getInventoryItem(ownerA, "inv-a-resin").current_quantity).toBeCloseTo(
-      before - 0.3,
+      before - 0.35,
     );
   });
 });

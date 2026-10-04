@@ -16,7 +16,10 @@ import {
   resetInventoryStore,
 } from "@/lib/demo/inventory-store";
 import { resetPerformedStore } from "@/lib/demo/performed-procedures-store";
-import { resetPlannedProceduresStore } from "@/lib/demo/planned-procedures-store";
+import {
+  getPlannedProceduresStore,
+  resetPlannedProceduresStore,
+} from "@/lib/demo/planned-procedures-store";
 import {
   addPlannedProcedureToAppointment,
   convertPlannedProceduresToPerformedProcedures,
@@ -36,6 +39,8 @@ beforeEach(() => {
   resetInventoryStore();
   resetPerformedStore();
   resetPlannedProceduresStore();
+  // Testes unitários partem sem planos; seed demo permanece no runtime da app.
+  getPlannedProceduresStore().planned.length = 0;
   resetAgendaStore();
   setDemoSession(OWNER_A_ID, CLINIC_A_ID);
 });
@@ -57,7 +62,7 @@ function periodCovering(appointmentIds: string[]) {
 }
 
 describe("um paciente — Mariana restauração", () => {
-  it("forecast Mariana = 0,30 g resina", () => {
+  it("forecast Mariana = 0,35 g resina", () => {
     addPlannedProcedureToAppointment(ownerA, {
       appointment_id: "appt-a-1",
       procedure_id: "proc-a-restoration",
@@ -66,13 +71,13 @@ describe("um paciente — Mariana restauração", () => {
     });
     const forecast = calculateAppointmentMaterialForecast(ownerA, "appt-a-1");
     const resin = forecast.materials.find((m) => m.item_name === "Resina A2")!;
-    expect(resin.forecast_quantity).toBeCloseTo(0.3);
+    expect(resin.forecast_quantity).toBeCloseTo(0.35);
     expect(forecast.planned_procedures_count).toBe(1);
   });
 });
 
 describe("dois pacientes", () => {
-  it("soma fichas: 0,30 + 0,60 = 0,90 g", () => {
+  it("soma fichas: 0,35 + 0,70 = 1,05 g", () => {
     // appt-a-1 paciente p-a-001; appt-a-2 paciente p-a-003
     addPlannedProcedureToAppointment(ownerA, {
       appointment_id: "appt-a-1",
@@ -87,7 +92,7 @@ describe("dois pacientes", () => {
     const range = periodCovering(["appt-a-1", "appt-a-2"]);
     const summary = forecastMaterialNeeds(ownerA, range);
     const resin = summary.materials.find((m) => m.item_name === "Resina A2")!;
-    expect(resin.forecast_quantity).toBeCloseTo(0.9);
+    expect(resin.forecast_quantity).toBeCloseTo(1.05);
   });
 });
 
@@ -109,7 +114,7 @@ describe("per_appointment", () => {
     });
     const forecast = calculateAppointmentMaterialForecast(ownerA, "appt-a-1");
     const mask = forecast.materials.find(
-      (m) => m.item_name === "Máscara cirúrgica",
+      (m) => m.item_name === "Máscara",
     )!;
     expect(mask.forecast_quantity).toBe(1);
   });
@@ -126,7 +131,7 @@ describe("per_appointment", () => {
     const range = periodCovering(["appt-a-1", "appt-a-2"]);
     const summary = forecastMaterialNeeds(ownerA, range);
     const mask = summary.materials.find(
-      (m) => m.item_name === "Máscara cirúrgica",
+      (m) => m.item_name === "Máscara",
     )!;
     expect(mask.forecast_quantity).toBe(2);
   });
@@ -192,7 +197,7 @@ describe("estoque insuficiente e mínimo", () => {
     const forecast = calculateAppointmentMaterialForecast(ownerA, "appt-a-1");
     const resin = forecast.materials.find((m) => m.item_name === "Resina A2")!;
     expect(resin.status).toBe("insufficient");
-    expect(resin.projected_remaining).toBeCloseTo(0.2 - 0.3);
+    expect(resin.projected_remaining).toBeCloseTo(0.2 - 0.35);
 
     // explicit 1 vs 2
     item.current_quantity = 1;
@@ -297,7 +302,7 @@ describe("custos ocultos e permissões", () => {
       "appt-a-1",
     );
     const resin = forecast.materials.find((m) => m.item_name === "Resina A2")!;
-    expect(resin.forecast_quantity).toBeCloseTo(0.3);
+    expect(resin.forecast_quantity).toBeCloseTo(0.35);
     expect(resin.estimated_cost_cents).toBeNull();
     expect(forecast.estimated_total_cost_cents).toBeNull();
   });

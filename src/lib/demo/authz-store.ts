@@ -154,8 +154,8 @@ function clinic(
 function seed(): Store {
   const stamp = now();
   const clinics: DemoClinic[] = [
-    clinic(CLINIC_A_ID, "Clínica Demo Sorria", {
-      trade_name: "Sorriso Demo",
+    clinic(CLINIC_A_ID, "Clínica Teste Sorria", {
+      trade_name: "Clínica Teste Sorria",
       phone: "(31) 3333-1000",
       email: "contato@clinicademo.sorria.app",
       city: "Belo Horizonte",

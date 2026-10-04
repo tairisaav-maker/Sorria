@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import {
   CLINIC_A_ID,
+  CLINIC_B_ID,
+  DENTIST_A_ID,
   OWNER_A_ID,
+  OWNER_B_ID,
+  SECRETARY_A_ID,
   getAuthzStore,
   setDemoSession,
 } from "@/lib/demo/authz-store";
@@ -93,15 +97,42 @@ export async function POST(request: Request) {
     return response;
   }
 
-  // Professional demo seed
-  if (body.email === demoEmail && body.password === demoPassword) {
-    setDemoSession(OWNER_A_ID, CLINIC_A_ID, { kind: "professional" });
+  // Contas profissionais de teste (senha via DEMO_PASSWORD / env — não hardcode em UI)
+  const demoProfessionals: Record<
+    string,
+    { userId: string; clinicId: string; cookie: string }
+  > = {
+    [demoEmail.toLowerCase()]: {
+      userId: OWNER_A_ID,
+      clinicId: CLINIC_A_ID,
+      cookie: "1",
+    },
+    "carlos.a@clinicademo.sorria.app": {
+      userId: DENTIST_A_ID,
+      clinicId: CLINIC_A_ID,
+      cookie: `pro:${DENTIST_A_ID}:${CLINIC_A_ID}`,
+    },
+    "mariana.a@clinicademo.sorria.app": {
+      userId: SECRETARY_A_ID,
+      clinicId: CLINIC_A_ID,
+      cookie: `pro:${SECRETARY_A_ID}:${CLINIC_A_ID}`,
+    },
+    "paula@odontovida.app": {
+      userId: OWNER_B_ID,
+      clinicId: CLINIC_B_ID,
+      cookie: `pro:${OWNER_B_ID}:${CLINIC_B_ID}`,
+    },
+  };
+
+  const pro = demoProfessionals[email];
+  if (pro && body.password === demoPassword) {
+    setDemoSession(pro.userId, pro.clinicId, { kind: "professional" });
     const response = NextResponse.json({
       ok: true,
       kind: "professional",
       redirect: "/app/home",
     });
-    response.cookies.set(DEMO_COOKIE, "1", {
+    response.cookies.set(DEMO_COOKIE, pro.cookie, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",

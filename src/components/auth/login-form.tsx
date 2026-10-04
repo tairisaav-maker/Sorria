@@ -154,8 +154,9 @@ export function LoginForm() {
             Entrar no Portal (paciente demo)
           </Button>
           <p className="text-center text-xs text-[var(--text-subtle)]">
-            Demo: demo@sorria.app (clínica) ou paciente@sorria.app (Portal) —
-            senha sorria-demo.
+            Teste V1 — owner: DEMO_EMAIL · dentista: carlos.a@clinicademo.sorria.app
+            · secretária: mariana.a@clinicademo.sorria.app · senha: DEMO_PASSWORD
+            (padrão em .env.local). Portal: paciente@sorria.app.
           </p>
         </div>
       ) : null}

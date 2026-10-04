@@ -4,6 +4,7 @@ export const INVENTORY_UNITS = [
   "caixa",
   "pacote",
   "seringa",
+  "frasco",
   "tubete",
   "capsula",
   "dose",

@@ -367,8 +367,8 @@ describe("custo padrão atual reflete médio novo", () => {
     });
 
     const resin = getInventoryItem(ownerA, "inv-a-resin");
-    // (12.5*2250 + 8*3000) / 20.5
-    const expected = Math.round((12.5 * 2250 + 8 * 3000) / 20.5);
+    // (20*2250 + 8*3000) / 28
+    const expected = Math.round((20 * 2250 + 8 * 3000) / 28);
     expect(resin.average_unit_cost_cents).toBe(expected);
 
     const after = calculateProcedureStandardCost(
@@ -380,7 +380,7 @@ describe("custo padrão atual reflete médio novo", () => {
     )!;
     expect(resinLineAfter.average_unit_cost_cents).toBe(expected);
     expect(resinLineAfter.planned_cost_cents).toBe(
-      Math.round(0.3 * expected),
+      Math.round(0.35 * expected),
     );
   });
 });

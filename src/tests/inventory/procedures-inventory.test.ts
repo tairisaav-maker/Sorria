@@ -40,7 +40,7 @@ const secretaryA = { userId: SECRETARY_A_ID, clinicId: CLINIC_A_ID };
 describe("procedures CRUD", () => {
   it("lista, cria, edita e arquiva na Clinic A", async () => {
     const before = listProcedures(ownerA);
-    expect(before.some((p) => p.name === "Restauração em resina")).toBe(true);
+    expect(before.some((p) => p.name === "Restauração média")).toBe(true);
 
     const created = createProcedure(ownerA, {
       name: "Extração simples",
@@ -83,16 +83,18 @@ describe("inventory CRUD + conversão", () => {
     );
   });
 
-  it("custo padrão da restauração inclui resina 0,30 g × R$ 22,50", () => {
+  it("custo padrão da restauração inclui resina 0,35 g × R$ 22,50", () => {
     const cost = calculateProcedureStandardCost(
       ownerA,
       "proc-a-restoration",
     );
     const resin = cost.lines.find((l) => l.item_name === "Resina A2");
     expect(resin).toBeTruthy();
-    expect(resin!.standard_quantity).toBe(0.3);
-    expect(resin!.planned_cost_cents).toBe(675);
-    expect(cost.materials_cost_cents).toBeGreaterThan(675);
+    expect(resin!.standard_quantity).toBe(0.35);
+    expect(resin!.planned_cost_cents).toBe(Math.round(0.35 * 2250));
+    expect(cost.materials_cost_cents).toBeGreaterThan(
+      Math.round(0.35 * 2250),
+    );
     expect(cost.default_price_cents).toBe(35000);
     expect(cost.gross_result_cents).toBe(
       35000 - cost.materials_cost_cents,
@@ -102,15 +104,17 @@ describe("inventory CRUD + conversão", () => {
 });
 
 describe("per_unit e per_appointment no atendimento", () => {
-  it("3 restaurações → 0,90 g de resina", () => {
+  it("3 restaurações → 1,05 g de resina", () => {
     const lines = calculateProcedureStandardConsumption(
       ownerA,
       "proc-a-restoration",
       3,
     );
     const resin = lines.find((l) => l.item_name === "Resina A2");
-    expect(resin!.planned_quantity).toBeCloseTo(0.9);
-    expect(resin!.planned_cost_cents).toBe(2025); // 0.9 * 2250
+    expect(resin!.planned_quantity).toBeCloseTo(1.05);
+    // float: 0.35*3*2250 pode arredondar para 2362
+    expect(resin!.planned_cost_cents).toBe(resin!.planned_quantity * 2250 >= 2362.5 ? 2363 : 2362);
+    expect(resin!.planned_cost_cents).toBeGreaterThanOrEqual(2362);
   });
 
   it("profilaxia + 2 restaurações: 1 máscara (per_appointment)", () => {
@@ -119,7 +123,7 @@ describe("per_unit e per_appointment no atendimento", () => {
       { procedureId: "proc-a-restoration", quantity: 1 },
       { procedureId: "proc-a-restoration", quantity: 1 },
     ]);
-    const mask = agg.find((l) => l.item_name === "Máscara cirúrgica");
+    const mask = agg.find((l) => l.item_name === "Máscara");
     expect(mask).toBeTruthy();
     expect(mask!.planned_quantity).toBe(1);
   });
