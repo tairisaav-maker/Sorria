@@ -26,7 +26,9 @@ import {
 } from "@/services/appointment-requests";
 import { countPendingFollowUps } from "@/services/clinical";
 import { listPatients } from "@/services/patients";
+import { getHomeFinanceKpis } from "@/services/finance";
 import { countPlansByStatus } from "@/services/treatments";
+import { formatBRL } from "@/lib/money";
 
 function mapHomeStatus(
   status: string,
@@ -127,6 +129,31 @@ export function buildHomeDashboard(ctx: AuthzContext) {
       value: String(activePatients),
       hint: "cadastro administrativo",
     };
+  }
+
+  // KPIs financeiros somente com permissão administrativa (sem vazamento)
+  const financeKpis = getHomeFinanceKpis(ctx);
+  if (financeKpis) {
+    kpis.push(
+      {
+        id: "finance-received",
+        label: "Recebido no mês",
+        value: formatBRL(financeKpis.received_cents),
+        hint: "pagamentos efetivos",
+      },
+      {
+        id: "finance-receivable",
+        label: "A receber",
+        value: formatBRL(financeKpis.receivable_cents),
+        hint: "saldo pendente",
+      },
+      {
+        id: "finance-overdue",
+        label: "Vencido",
+        value: formatBRL(financeKpis.overdue_cents),
+        hint: "parcelas em atraso",
+      },
+    );
   }
 
   const today = new Date();

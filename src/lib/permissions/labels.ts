@@ -41,7 +41,12 @@ export const ACCESS_GROUPS: AccessGroup[] = [
     items: [
       { key: "finance.view_administrative", label: "Administrativo" },
       { key: "finance.view_authorized", label: "Autorizado ao profissional" },
+      { key: "finance.transaction_create", label: "Criar lançamentos" },
+      { key: "finance.transaction_update", label: "Atualizar/cancelar lançamentos" },
       { key: "finance.payment_create", label: "Registrar pagamento" },
+      { key: "finance.payment_reverse", label: "Estornar pagamento" },
+      { key: "finance.expense_create", label: "Registrar despesa" },
+      { key: "finance.export", label: "Exportar" },
     ],
   },
   {

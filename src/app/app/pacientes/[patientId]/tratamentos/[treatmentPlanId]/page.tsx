@@ -35,6 +35,7 @@ export default async function TreatmentPlanPage({
         canPresent={can(actor.ctx, "treatments.present").allowed}
         canAcceptance={can(actor.ctx, "treatments.acceptance_manage").allowed}
         canProgress={can(actor.ctx, "treatments.progress_update").allowed}
+        canCreateFinance={can(actor.ctx, "finance.transaction_create").allowed}
       />
     );
   } catch {

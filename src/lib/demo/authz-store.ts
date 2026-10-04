@@ -68,6 +68,7 @@ export const OWNER_A_ID = "a1000000-0000-0000-0000-000000000001";
 export const DENTIST_A_ID = "a1000000-0000-0000-0000-000000000002";
 export const SECRETARY_A_ID = "a1000000-0000-0000-0000-000000000003";
 export const OWNER_ADMIN_A_ID = "a1000000-0000-0000-0000-000000000099";
+export const DENTIST_NO_FINANCE_A_ID = "a1000000-0000-0000-0000-000000000098";
 export const OWNER_B_ID = "b1000000-0000-0000-0000-000000000001";
 export const DENTIST_B_ID = "b1000000-0000-0000-0000-000000000002";
 export const SECRETARY_B_ID = "b1000000-0000-0000-0000-000000000003";
@@ -244,6 +245,35 @@ export function ensureAdminOwnerWithoutClinical() {
   return { userId: OWNER_ADMIN_A_ID, clinicId: CLINIC_A_ID };
 }
 
+/** Dentista com clínico, sem qualquer permissão financeira (teste de domínio). */
+export function ensureDentistWithoutFinance() {
+  const store = getAuthzStore();
+  if (!store.profiles.some((p) => p.id === DENTIST_NO_FINANCE_A_ID)) {
+    store.profiles.push({
+      id: DENTIST_NO_FINANCE_A_ID,
+      full_name: "Dra. Sem Financeiro",
+      email: "sem.financeiro@clinicademo.sorria.app",
+    });
+  }
+  if (!store.memberships.some((m) => m.id === "m-a-dentist-nofinance")) {
+    const stamp = now();
+    store.memberships.push({
+      id: "m-a-dentist-nofinance",
+      clinic_id: CLINIC_A_ID,
+      user_id: DENTIST_NO_FINANCE_A_ID,
+      role_key: "dentist",
+      status: "active",
+      clinical_access: true,
+      invited_at: null,
+      joined_at: stamp,
+      suspended_at: null,
+      created_at: stamp,
+      updated_at: stamp,
+    });
+  }
+  return { userId: DENTIST_NO_FINANCE_A_ID, clinicId: CLINIC_A_ID };
+}
+
 export function permissionsForRole(
   role: Exclude<RoleKey, "patient">,
 ): PermissionKey[] {
@@ -265,6 +295,9 @@ export function permissionsForMembership(
     ];
   }
   if (membership.role_key === "dentist") {
+    if (membership.user_id === DENTIST_NO_FINANCE_A_ID) {
+      return base.filter((p) => !p.startsWith("finance."));
+    }
     return base;
   }
   return base;

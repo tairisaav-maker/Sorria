@@ -10,49 +10,41 @@
 Administrativo ≠ Clínico
 Agenda ≠ Prontuário
 Plano de tratamento ≠ Prontuário completo
-Plano aceito ≠ Pagamento
-Valor apresentado ≠ Receita
-Rascunho ≠ Registro finalizado
-Correção / revisão ≠ Sobrescrita silenciosa
+Plano aceito ≠ Pagamento / Receita
+Financeiro ≠ Prontuário
+Acesso clínico ≠ Acesso financeiro
 Owner administrativo ≠ acesso clínico universal
-Arquivo privado ≠ URL pública
 Clinic A ≠ Clinic B
+Pagamento ≠ DELETE silencioso
 ```
 
-## Planos de tratamento (Fase 5)
-
-Permissões:
+## Financeiro (Fase 6)
 
 | Key | Uso |
 | --- | --- |
-| `treatments.view` | Visão clínica do plano |
-| `treatments.administrative_view` | Visão administrativa (valores/status) |
-| `treatments.create` | Criar plano |
-| `treatments.update` | Editar rascunho / revisar |
-| `treatments.present` | Apresentar |
-| `treatments.acceptance_manage` | Aceite / recusa |
-| `treatments.progress_update` | Iniciar/concluir itens |
+| `finance.view_administrative` | Dashboard e financeiro geral |
+| `finance.view_authorized` | Visão limitada (ex.: paciente) — preparada |
+| `finance.transaction_create` | Criar receitas/obrigações |
+| `finance.transaction_update` | Cancelar lançamentos |
+| `finance.payment_create` | Registrar pagamento |
+| `finance.payment_reverse` | Estornar com motivo |
+| `finance.expense_create` | Despesas |
+| `finance.export` | CSV/XLSX/PDF |
 
-- Dentista: permissões clínicas de tratamento
-- Secretária: `administrative_view` + present + acceptance — **sem** anamnese/evolução/arquivos clínicos
-- Owner: administrativo do plano por padrão; clínico de tratamento só com `clinical_access`
-- Source IDs (odontograma/evolução): mesma clínica + mesmo paciente ou negado
-- Cross-clinic: UUID conhecido → not found
-- Aceite de plano vencido: bloqueado (revisar/reapresentar)
-- Concorrência: `expected_updated_at`
-- Audit: created/updated/presented/accepted/rejected/revised/completed + item started/completed/cancelled — sem dump clínico completo
-- Versionamento: snapshot na apresentação; alteração material → nova revisão
+- Secretária: financeiro admin + pagamentos; clínico **NEGADO**
+- Dentista padrão: só `view_authorized` (sem dashboard geral / sem criar pagamento)
+- Dentista sem financeiro: clínico ok, financeiro negado (teste de domínio)
+- Owner: financeiro completo da clínica; clínico só com `clinical_access`
+- Cross-clinic / refs maliciosas (patient/treatment de outra clínica) → not found
+- Sem permissão: sem badges/KPIs financeiros na Home
+- Exportações: sem dados clínicos; sem CPF completo
 
-## Prontuário (Fase 4)
+## Planos / Prontuário
 
-Permissões: `clinical_record.*`, `anamnesis.*`, `clinical_evolution.*`, `odontogram.*`, `clinical_files.*`
-
-- Secretária: clínico **NEGADO**
-- Owner: clínico somente com `clinical_access`
-- Storage: bucket privado; signed URL temporária; path tenant-bound
+Ver Fases 4–5. Versionamento; owner ≠ clínico universal.
 
 ## Cadeia
 
 ```text
-Auth → Membership → Clinic → Permission (+ clinical_access) → Tenant Check → RLS → Data/Storage
+Auth → Membership → Clinic → Permission (+ clinical_access) → Tenant Check → RLS → Data
 ```

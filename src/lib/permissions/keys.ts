@@ -40,8 +40,13 @@ export const PERMISSIONS = [
   "treatments.progress_update",
 
   "finance.view_administrative",
-  "finance.payment_create",
   "finance.view_authorized",
+  "finance.transaction_create",
+  "finance.transaction_update",
+  "finance.payment_create",
+  "finance.payment_reverse",
+  "finance.expense_create",
+  "finance.export",
 
   "reports.view",
 
@@ -151,7 +156,11 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "treatments.present",
     "treatments.acceptance_manage",
     "finance.view_administrative",
+    "finance.transaction_create",
+    "finance.expense_create",
     "finance.payment_create",
+    "finance.payment_reverse",
+    "finance.export",
   ],
 };
 

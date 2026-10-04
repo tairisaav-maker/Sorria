@@ -8,24 +8,24 @@
 ### FASE 3 — Solicitações de horário + Agenda
 ### FASE 4 — Prontuário clínico
 ### FASE 5 — Planos de tratamento
+### FASE 6 — Financeiro V1
 
-- Planos + itens + dentes (0..N)
-- Valores propostos (centavos / numeric) — sem pagamentos
-- Apresentar / aceitar / recusar
-- Versionamento na apresentação + revisão material
-- Progresso derivado dos itens
-- Integração odontograma → plano (com confirmação)
-- Aba Tratamento no perfil + KPIs na Home
-- RLS + permissões granulares (admin ≠ clínico)
+- Transação → parcelas → pagamentos
+- Pagamento parcial, múltiplo, estorno
+- Dashboard (recebido / a receber / vencido / despesas)
+- Condição a partir de plano aceito (sem receita automática)
+- Financeiro do paciente
+- Exportação CSV / XLSX / PDF
+- RLS + permissões; clínico independente
 
 ## Próximo
 
-Aguardando Fase 6 (Financeiro: condições, parcelas, pagamentos reais, receita).
+Aguardando Fase 7/8 conforme roadmap do produto (Portal / Relatórios).
 
 ## Depois
 
-Portal do paciente · Secretária Virtual · Relatórios
+Portal do paciente · Relatórios completos · Secretária Virtual
 
 ## Fora da V1
 
-IA clínica, prescrição eletrônica, teleconsulta, marketplace
+IA clínica, adquirente/PIX automático, boleto, NF, contabilidade, teleconsulta

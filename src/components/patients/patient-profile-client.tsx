@@ -8,6 +8,7 @@ import { PatientCompletion } from "@/components/patients/patient-completion";
 import { PatientStatusBadge } from "@/components/patients/patient-status-badge";
 import { PatientTreatmentTab } from "@/components/treatments/patient-treatment-tab";
 import { Button } from "@/components/ui/button";
+// Financeiro: link dedicado (não mistura despesas da clínica)
 import { calcAge, isMinor } from "@/lib/patients/age";
 import { formatCpf, formatPhoneBR } from "@/lib/patients/normalize";
 import type { Patient } from "@/types/patient";
@@ -44,6 +45,7 @@ export function PatientProfileClient({
   canViewClinical,
   canViewTreatments,
   canCreateTreatment,
+  canViewFinance,
   nextAppointment,
   lastAppointment,
   followUp,
@@ -55,6 +57,7 @@ export function PatientProfileClient({
   canViewClinical: boolean;
   canViewTreatments: boolean;
   canCreateTreatment: boolean;
+  canViewFinance: boolean;
   nextAppointment: AppointmentWithPatient | null;
   lastAppointment: AppointmentWithPatient | null;
   followUp: { intervalDays: number | null; pending: boolean } | null;
@@ -440,7 +443,22 @@ export function PatientProfileClient({
         )
       ) : null}
       {tab === "Financeiro" ? (
-        <Placeholder text="O histórico financeiro será disponibilizado em uma próxima etapa." />
+        canViewFinance ? (
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-5 py-8 text-center">
+            <p className="text-sm text-[var(--text-muted)]">
+              Resumo, parcelas e pagamentos deste paciente — separado do
+              prontuário e das despesas gerais da clínica.
+            </p>
+            <Link
+              href={`/app/pacientes/${patient.id}/financeiro`}
+              className="mt-4 inline-flex h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
+            >
+              Abrir financeiro do paciente
+            </Link>
+          </div>
+        ) : (
+          <Placeholder text="Você não tem permissão para visualizar o financeiro deste paciente." />
+        )
       ) : null}
       {tab === "Documentos" ? (
         <Placeholder text="Os documentos do paciente serão disponibilizados em uma próxima etapa." />

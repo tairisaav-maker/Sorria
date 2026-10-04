@@ -8,57 +8,49 @@
 4. `20251007000000_fase3_agenda.sql`
 5. `20251008000000_fase4_prontuario.sql`
 6. `20251009000000_fase5_treatments.sql`
+7. `20251010000000_fase6_financeiro.sql`
 
-## Fase 5 — Planos de tratamento
+## Fase 6 — Financeiro
 
-### `treatment_plans`
+### `financial_transactions`
 
 | Coluna | Notas |
 | --- | --- |
-| clinic_id / patient_id | Tenant + paciente (mesma clínica) |
-| title, description, notes | `notes` = interno (não expor ao paciente) |
-| status | draft / presented / accepted / in_progress / completed / rejected |
-| version_number | Incrementa em revisão material |
-| subtotal_amount / total_amount | `numeric(12,2)` — nunca float |
-| discount_type / discount_value | percent \| fixed |
-| valid_until | Opcional; vencido ≠ recusado |
-| presented_by / presented_at | |
-| accepted_at / accepted_version | Aceite amarra à versão |
-| rejected_at / rejection_reason | Motivo opcional |
-| archived_at | Soft archive futuro |
+| type | income \| expense |
+| patient_id / treatment_plan_id / appointment_id | opcionais; mesma clínica |
+| gross_amount / discount_amount / net_amount | `numeric(12,2)`; net = gross − discount |
+| status | derivado: pending / partially_paid / paid / overdue / cancelled |
+| due_date | |
+| cancelled_at / cancelled_by / cancellation_reason | soft cancel |
+| notes | administrativo |
 
-### `treatment_items`
+### `payment_installments`
 
-Procedimento, quantidade, `unit_price`/`total_price` (`numeric(12,2)`), status, `sort_order`,  
-`source_odontogram_entry_id`, `source_clinical_entry_id` (validados: mesma clínica + paciente).
+`installment_number`, `amount`, `due_date`, `status` (derivado)  
+`unique (financial_transaction_id, installment_number)`
 
-### `treatment_item_teeth`
+### `payments`
 
-M:N item ↔ dentes FDI (`tooth_number` 11–48).  
-Procedimento pode ter 0, 1 ou N dentes.
-
-### `treatment_plan_versions`
-
-Snapshot imutável na apresentação: itens, valores, desconto, total, responsável, data.  
-`unique (treatment_plan_id, version_number)`.
+Dinheiro efetivo: `amount`, `paid_at`, `payment_method`  
+`client_request_id` único por clínica (idempotência)  
+`reversed_at / reversed_by / reversal_reason` — sem DELETE
 
 ### Índices
 
-- `treatment_plans (clinic_id, patient_id, created_at desc)`
-- `treatment_plans (clinic_id, status)`
-- `treatment_items (treatment_plan_id, sort_order)`
-- `treatment_items (clinic_id, patient_id)`
+- transactions: clinic+created, clinic+patient, clinic+type, clinic+due
+- installments: tx+number, clinic+due
+- payments: clinic+paid_at, installment, tx, unique parcial client_request_id
 
-### Estratégia monetária no app demo
+### Arredondamento de parcelas
 
-Demo store usa centavos inteiros (`*_cents`). SQL usa `numeric(12,2)`. Conversão na borda.
+```text
+base = floor(total_cents / n)
+parcelas[0..n-2] = base
+parcela[n-1] = total_cents - base*(n-1)
+```
 
-## Fase 4 — Prontuário
+App demo: centavos inteiros. SQL: `numeric(12,2)`.
 
-### `clinic_members.clinical_access`
+## Fase 5 — Tratamentos
 
-Opt-in de acesso clínico. Owner sem flag não acessa prontuário.
-
-### `anamneses` / `anamnesis_answers` / `clinical_entries` / `clinical_entry_versions` / `odontogram_entries` / `attachments`
-
-Ver migrations Fase 4. Storage privado `clinical-files`.
+`treatment_plans` · `treatment_items` · `treatment_item_teeth` · `treatment_plan_versions`

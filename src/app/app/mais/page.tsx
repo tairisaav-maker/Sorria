@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
-import { CalendarClock, Shield, Users } from "lucide-react";
+import { CalendarClock, FileBarChart2, Shield, Users, Wallet } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Mais",
@@ -13,8 +13,23 @@ export default async function MaisPage() {
   const canTeam = can(actor.ctx, "team.view").allowed;
   const canPermissions = can(actor.ctx, "permissions.manage").allowed;
   const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
+  const canFinance = can(actor.ctx, "finance.view_administrative").allowed;
 
   const links = [
+    canFinance
+      ? {
+          href: "/app/financeiro",
+          title: "Financeiro",
+          description: "Recebido, a receber, vencidos e despesas",
+          icon: Wallet,
+        }
+      : null,
+    {
+      href: "/app/relatorios",
+      title: "Relatórios",
+      description: "Em breve — use exportações do Financeiro",
+      icon: FileBarChart2,
+    },
     canRequests
       ? {
           href: "/app/solicitacoes",

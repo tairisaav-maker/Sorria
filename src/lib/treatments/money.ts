@@ -1,29 +1,14 @@
 /**
- * Estratégia monetária: centavos inteiros na aplicação.
- * PostgreSQL: numeric(12,2). Nunca float.
+ * Reexporta utilitários monetários + totais de plano (Fase 5).
  */
+export {
+  centsToReais,
+  formatBRL,
+  lineTotalCents,
+  reaisToCents,
+} from "@/lib/money";
 
-export function reaisToCents(value: number | string): number {
-  const n = typeof value === "string" ? Number(value.replace(",", ".")) : value;
-  if (!Number.isFinite(n)) return 0;
-  return Math.round(n * 100);
-}
-
-export function centsToReais(cents: number): number {
-  return cents / 100;
-}
-
-export function formatBRL(cents: number): string {
-  return centsToReais(cents).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
-
-export function lineTotalCents(quantity: number, unitPriceCents: number): number {
-  if (quantity <= 0 || unitPriceCents < 0) return 0;
-  return quantity * unitPriceCents;
-}
+import { lineTotalCents } from "@/lib/money";
 
 export function calculatePlanTotals(input: {
   items: Array<{ quantity: number; unit_price_cents: number; status?: string }>;

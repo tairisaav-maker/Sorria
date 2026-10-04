@@ -4,10 +4,10 @@
 
 ## Fase atual
 
-**FASE 5 — Planos de tratamento**
+**FASE 6 — Financeiro**
 
-> Plano ≠ Pagamento · Odontograma ≠ Orçamento · Aceite ≠ Receita  
-> Progresso clínico ≠ Progresso financeiro · Alteração após apresentação ≠ sobrescrita
+> Plano ≠ Obrigação · Parcela ≠ Pagamento · Aceite ≠ Receita  
+> Valor previsto ≠ Valor recebido · Financeiro ≠ Prontuário
 
 ## Como rodar
 
@@ -20,7 +20,7 @@ npm run dev
 Demo: `demo@sorria.app` / `sorria-demo`  
 (Dra. Ana = proprietária **com** `clinical_access` — também atende.)
 
-Navegação: **Agenda** · **Pacientes → Tratamento / Prontuário** · **Solicitações** · **Equipe**
+Navegação: **Agenda** · **Pacientes** · **Financeiro** · **Mais**
 
 ## Scripts
 

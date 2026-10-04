@@ -24,6 +24,7 @@ export function TreatmentPlanClient({
   canPresent,
   canAcceptance,
   canProgress,
+  canCreateFinance = false,
 }: {
   patientId: string;
   planId: string;
@@ -31,6 +32,7 @@ export function TreatmentPlanClient({
   canPresent: boolean;
   canAcceptance: boolean;
   canProgress: boolean;
+  canCreateFinance?: boolean;
 }) {
   const router = useRouter();
   const [plan, setPlan] = useState<TreatmentPlanWithItems | null>(null);
@@ -249,6 +251,56 @@ export function TreatmentPlanClient({
             }}
           >
             Duplicar como novo plano
+          </Button>
+        ) : null}
+        {canCreateFinance &&
+        (plan.status === "accepted" ||
+          plan.status === "in_progress" ||
+          plan.status === "completed") ? (
+          <Button
+            type="button"
+            variant="secondary"
+            loading={busy}
+            onClick={async () => {
+              const choice = window.prompt(
+                "Criar condição de pagamento?\n\nDigite o número de parcelas (1–4) ou deixe 1 para à vista:",
+                "3",
+              );
+              if (choice === null) return;
+              const count = Math.min(48, Math.max(1, Number(choice) || 1));
+              const discountStr = window.prompt(
+                "Desconto financeiro adicional (R$), opcional:",
+                "0",
+              );
+              setBusy(true);
+              setError(null);
+              const res = await fetch("/api/demo/finance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "create-from-treatment",
+                  treatment_plan_id: planId,
+                  installments_count: count,
+                  discount_amount_reais: Number(discountStr) || 0,
+                  first_due_date: new Date().toISOString().slice(0, 10),
+                }),
+              });
+              const data = await res.json();
+              setBusy(false);
+              if (!res.ok) {
+                setError(
+                  data.error ??
+                    "Não foi possível concluir esta ação. Tente novamente.",
+                );
+                return;
+              }
+              setMessage(
+                "Condição de pagamento criada. Plano aceito ≠ receita recebida.",
+              );
+              router.push(`/app/pacientes/${patientId}/financeiro`);
+            }}
+          >
+            Criar condição de pagamento
           </Button>
         ) : null}
       </div>

@@ -30,6 +30,9 @@ export default async function PacientePerfilPage({
       can(actor.ctx, "treatments.view").allowed ||
       can(actor.ctx, "treatments.administrative_view").allowed;
     const canCreateTreatment = can(actor.ctx, "treatments.create").allowed;
+    const canViewFinance =
+      can(actor.ctx, "finance.view_administrative").allowed ||
+      can(actor.ctx, "finance.view_authorized").allowed;
     const nextAppointment = canViewAgenda
       ? getPatientNextAppointment(actor.ctx, patientId)
       : null;
@@ -62,6 +65,7 @@ export default async function PacientePerfilPage({
         canViewClinical={canViewClinical}
         canViewTreatments={canViewTreatments}
         canCreateTreatment={canCreateTreatment}
+        canViewFinance={canViewFinance}
         nextAppointment={nextAppointment}
         lastAppointment={lastAppointment}
         followUp={followUp}

@@ -12,7 +12,8 @@ Auth → Profile → Clinic Membership → Role → Permissions (+ clinical_acce
 ```
 
 **Owner administrativo ≠ acesso clínico universal.**  
-Acesso clínico: papel `dentist` **ou** `owner` com `membership.clinical_access = true`.
+Acesso clínico: papel `dentist` **ou** `owner` com `membership.clinical_access = true`.  
+Acesso financeiro é independente do clínico.
 
 ## Domínios
 
@@ -21,94 +22,80 @@ Acesso clínico: papel `dentist` **ou** `owner` com `membership.clinical_access 
 | Equipe / permissões | ✅ |
 | Pacientes administrativos | ✅ |
 | Agenda / solicitações | ✅ |
-| Prontuário (anamnese, evoluções, odontograma, arquivos) | ✅ |
+| Prontuário | ✅ |
 | Planos de tratamento | ✅ |
-| Financeiro / Portal / IA | ❌ |
+| Financeiro V1 | ✅ |
+| Portal / Relatórios completos / IA | ❌ |
 
-## Planos de tratamento (Fase 5)
+## Financeiro (Fase 6)
 
 Rotas:
 
 ```text
-/app/pacientes/[patientId]/tratamentos
-/app/pacientes/[patientId]/tratamentos/novo
-/app/pacientes/[patientId]/tratamentos/[treatmentPlanId]
+/app/financeiro
+/app/pacientes/[patientId]/financeiro
+/app/relatorios   # stub — Fase 8
 ```
 
-Fluxo:
+### Modelo
 
 ```text
-Criar plano → adicionar procedimentos → apresentar → aceite/recusa → execução → conclusão
+FINANCIAL TRANSACTION (obrigação)
+        ↓
+PAYMENT INSTALLMENTS (parcelas)
+        ↓
+PAYMENTS (dinheiro real; estorno rastreável)
 ```
 
 ### Separações
 
 ```text
-Necessidade clínica → Plano → Aceite → Execução
-Plano de tratamento ≠ Pagamento
-Odontograma ≠ Orçamento
-Valor apresentado ≠ Receita
-Progresso clínico ≠ Progresso financeiro
+Plano aceito ≠ Receita
+Parcela criada ≠ Pagamento recebido
+Procedimento concluído ≠ Pagamento
+Financeiro ≠ Prontuário
 ```
 
 ### Services
 
 ```text
-src/services/treatments/
+src/services/finance/
 ```
 
-Funções: list/get/create/update, itens (add/update/remove/reorder), present/accept/reject, start/complete/cancel item, complete plan, revision, duplicate, totals.
-
-### State machines
-
-**Plano:** `draft → presented → accepted → in_progress → completed`  
-Alternativa: `presented → rejected`  
-Revisão material: status volta a `draft` com `version_number++` (aceite anterior limpo).
-
-**Item:** `planned → accepted → in_progress → completed` (ou `cancelled`).
+Dashboard · list/get · create income/expense · cancel · installment plan from treatment · register/reverse payment · patient summary/history · export
 
 ### Dinheiro
 
-- App: **centavos inteiros** (`*_cents`)
+- App: centavos inteiros (`src/lib/money.ts`)
 - PostgreSQL: `numeric(12,2)`
-- Servidor recalcula `item.total`, `subtotal`, desconto e `total`
-- Frontend só estima
+- Parcelamento: residual na **última** parcela (`10000/3 → 3333+3333+3334`)
+- Status `paid|partially_paid|overdue|pending|cancelled` **derivados**
 
-### Desconto
+### Regime de caixa (V1)
 
-`percent` (0–100) ou `fixed` (≥ 0). Total nunca negativo.
+- **Recebido**: soma de pagamentos válidos (não estornados) de receitas no período
+- **Despesas**: soma de pagamentos válidos de despesas no período
+- **A receber / Vencido**: saldo de parcelas de receita em aberto (vencido se `due_date < hoje`)
 
-### Versionamento
+### Tratamento → Financeiro
 
-Ao apresentar: snapshot em `treatment_plan_versions`.  
-Alteração material após apresentação → nova revisão + reapresentação + novo aceite.  
-Aceite referencia `accepted_version`.
+Plano aceito oferece `Criar condição de pagamento` (confirmação).  
+Não altera `treatment_plan.total`. Desconto financeiro adicional é explícito na transação.
 
-### Integrações
+### Exportações
 
-- Odontograma: “Adicionar ao plano” com confirmação (pré-preenche; não cria sozinho)
-- Evolução: “Adicionar ao plano” a partir de próximo passo (confirmação)
-- Perfil do paciente: aba Tratamento com plano atual + progresso derivado
-- Home: planos aguardando decisão · tratamentos em andamento
+CSV (`;` + BOM UTF-8) · XLSX (exceljs) · PDF (pdfkit) — exigem `finance.export`.
 
-### Ativos (UI)
+### Concorrência / idempotência
 
-Filtro “Ativos” = `draft | presented | accepted | in_progress` (não é status de banco).
+- Pagamento > saldo → erro
+- `client_request_id` único por clínica evita duplo clique
 
-## Prontuário (Fase 4)
+## Planos de tratamento (Fase 5)
 
-Rota: `/app/pacientes/[patientId]/prontuario`
-
-Subtabs: Resumo clínico · Anamnese · Evoluções · Odontograma · Arquivos
-
-### Integridade da evolução
-
-```text
-draft → editar livremente
-     → finalizar (signed_at + versão 1)
-     → correção = nova versão + motivo (versão anterior intacta)
-```
+Versionamento na apresentação; aceite amarra à versão.  
+Progresso clínico derivado dos itens ≠ progresso financeiro.
 
 ## Fora do escopo atual
 
-Financeiro (parcelas, pagamentos, caixa), Portal completo, Secretária Virtual, IA clínica, prescrição, interpretação de exames, relatórios completos.
+Integração bancária/adquirente, boleto, NF, contabilidade, Portal completo, Relatórios Fase 8, Secretária Virtual, IA.
