@@ -14,6 +14,7 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "appointments.create", label: "Criar" },
       { key: "appointments.update", label: "Reagendar" },
       { key: "appointments.cancel", label: "Cancelar" },
+      { key: "appointment_requests.view", label: "Ver solicitações" },
       { key: "appointment_requests.manage", label: "Gerenciar solicitações" },
     ],
   },

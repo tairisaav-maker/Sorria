@@ -19,33 +19,41 @@ export function TodayList({ items }: { items: HomeAppointment[] }) {
             Hoje
           </h2>
           <p className="text-sm text-[var(--text-muted)]">
-            Próximos atendimentos (mock)
+            Atendimentos da agenda de hoje
           </p>
         </div>
       </div>
 
-      <ul className="divide-y divide-[var(--border)]">
-        {items.map((item) => {
-          const status = statusMap[item.status];
-          return (
-            <li
-              key={item.id}
-              className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0"
-            >
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-[var(--brand-primary)]">
-                  {item.time}
-                </p>
-                <p className="truncate text-sm font-medium text-[var(--text)]">
-                  {item.patientName}
-                </p>
-                <p className="text-xs text-[var(--text-muted)]">{item.procedure}</p>
-              </div>
-              <Badge tone={status.tone}>{status.label}</Badge>
-            </li>
-          );
-        })}
-      </ul>
+      {items.length === 0 ? (
+        <p className="rounded-xl bg-[var(--surface-muted)]/70 px-3 py-4 text-sm text-[var(--text-muted)]">
+          Agenda livre neste dia
+        </p>
+      ) : (
+        <ul className="divide-y divide-[var(--border)]">
+          {items.map((item) => {
+            const status = statusMap[item.status];
+            return (
+              <li
+                key={item.id}
+                className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[var(--brand-primary)]">
+                    {item.time}
+                  </p>
+                  <p className="truncate text-sm font-medium text-[var(--text)]">
+                    {item.patientName}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {item.procedure}
+                  </p>
+                </div>
+                <Badge tone={status.tone}>{status.label}</Badge>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

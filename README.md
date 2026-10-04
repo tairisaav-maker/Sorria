@@ -4,9 +4,9 @@
 
 ## Fase atual
 
-**FASE 2 — Pacientes** (cadastro administrativo)
+**FASE 3 — Solicitações de horário + Agenda**
 
-> Cadastro administrativo do paciente ≠ prontuário clínico
+> Solicitação ≠ Consulta · Agenda administrativa ≠ Prontuário clínico
 
 ## Como rodar
 
@@ -18,7 +18,7 @@ npm run dev
 
 Demo: `demo@sorria.app` / `sorria-demo`
 
-Navegação: **Pacientes** (lista, novo, perfil, editar) · **Mais → Equipe**
+Navegação: **Agenda** · **Pacientes** · **Solicitações** (Mais / indicador na Agenda) · **Equipe**
 
 ## Scripts
 

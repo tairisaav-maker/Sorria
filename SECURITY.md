@@ -8,22 +8,27 @@
 
 **Administrative Patient Data ≠ Clinical Record Access**
 
-Secretária: dados cadastrais/contato/administrativo ✅  
+Secretária: dados cadastrais + agenda administrativa ✅  
 Prontuário/anamnese/evolução/odontograma/arquivos clínicos ❌
 
-## Pacientes (Fase 2)
+## Agenda (Fase 3)
 
-- Toda operação valida membership + clinic_id + permission
-- UUID não autoriza cross-tenant
-- `clinic_id` / `created_by` no payload são ignorados ou negados se forjados
-- Duplicidade **nunca** consulta outro tenant
-- Sem DELETE destrutivo — arquivar preserva histórico
-- Audit: `patient.created|updated|status_changed|archived|reactivated`
+- `appointments.view|create|update|cancel`
+- `appointment_requests.view|manage`
+- Checks via `can()` / `requirePermission` — não espalhar role checks na UI
+- `patient_id` e `professional_id` validados no tenant (membership ativo + papel adequado)
+- Cross-clinic: UUID conhecido de outra clínica → not found / denied (sem revelar existência)
+- Usuário suspenso: membership inativo → negado
+- Conflitos de horário validados no servidor (não só na UI)
+- Aprovação de solicitação revalida disponibilidade (race condition)
+- Audit (sem dados excessivamente sensíveis):
+  - `appointment.created|rescheduled|status_changed|cancelled`
+  - `appointment_request.created|reviewed|proposed|approved|rejected|cancelled`
 
 ## Cadeia
 
 ```text
-Auth → Membership → Clinic → Permission → Patient Tenant Check → RLS → Data
+Auth → Membership → Clinic → Permission → Tenant Check → RLS → Data
 ```
 
 ## Service role

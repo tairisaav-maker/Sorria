@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { professionalNav } from "@/lib/navigation";
 
 describe("professionalNav", () => {
-  it("habilita Início, Pacientes e Mais na Fase 2", () => {
+  it("habilita Início, Agenda, Pacientes e Mais na Fase 3", () => {
     const enabled = professionalNav
       .filter((item) => item.enabled)
       .map((i) => i.href);
     expect(enabled).toContain("/app/home");
+    expect(enabled).toContain("/app/agenda");
     expect(enabled).toContain("/app/pacientes");
     expect(enabled).toContain("/app/mais");
-    expect(enabled).not.toContain("/app/agenda");
   });
 });

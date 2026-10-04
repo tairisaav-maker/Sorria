@@ -13,45 +13,77 @@ Auth → Profile → Clinic Membership → Role → Permissions
 
 ## Pacientes (Fase 2)
 
+Cadastro administrativo do paciente ≠ prontuário clínico.
+
+Services em `src/services/patients/`. UI não consulta Supabase diretamente.
+
+## Agenda + Solicitações (Fase 3)
+
+### Regra fundamental
+
 ```text
-PACIENTES → Buscar/Filtrar → Perfil → Resumo administrativo
-                ↓
-         Editar / Arquivar / Ação rápida
+SOLICITAÇÃO DE HORÁRIO  ≠  CONSULTA
 ```
 
-Cadastro:
+O paciente **nunca** agenda um slot disponível. Ele envia uma solicitação.
+Profissionais autorizados podem criar consulta diretamente na agenda (sem `appointment_request`).
+
+### Fluxos
 
 ```text
-+ Novo paciente → Dados essenciais → Duplicidade → Salvar → Perfil
+AGENDA → Dia/Semana/Mês → Horário livre → Nova consulta
+  → Paciente → Data+duração → Validar disponibilidade → Consulta
+
+PACIENTE → Solicita horário → Clínica analisa → Propõe horário
+  → Paciente confirma → Revalidar disponibilidade → Criar CONSULTA
 ```
 
 ### Domínios
 
 | Domínio | Nesta fase |
 | --- | --- |
-| Administrativo (demographics/contact/administrative) | ✅ |
-| Clínico (prontuário, anamnese, odontograma…) | ❌ só placeholders |
-
-**Administrative Patient Data ≠ Clinical Record Access**
+| Agenda administrativa | ✅ |
+| Solicitações de horário | ✅ |
+| Prontuário / anamnese / odontograma | ❌ placeholders |
+| Financeiro real / WhatsApp / Portal / IA | ❌ |
 
 ### Services
 
 ```text
-src/services/patients/
-  queries.ts      # list/search/get + paginação 25
-  mutations.ts    # create/update/archive/reactivate
-  duplicates.ts   # CPF > telefone > e-mail > nome+nascimento
+src/services/appointments/
+  availability.ts   # overlap half-open; cancelled não bloqueia
+  queries.ts        # list/get/next/last/today
+  mutations.ts      # create/reschedule/status/cancel
+
+src/services/appointment-requests/
+  index.ts          # list/review/propose/reject/approve/cancel
 ```
 
-UI não consulta Supabase diretamente.
+### State machines
+
+**Consulta:** `scheduled → confirmed → arrived → in_progress → completed`  
+Alternativas: `cancelled`, `no_show` nos estados iniciais. Terminais: `completed`, `no_show`, `cancelled`.
+
+**Solicitação:** `new → under_review → proposed → approved`  
+Alternativas: `rejected`, `cancelled`. Proposta **não** cria appointment.
+
+### Conflitos
+
+Intervalos half-open `[start, end)`. Validação no servidor via `checkAvailability`.
+Ao aprovar solicitação, disponibilidade é **revalidada** (race condition).
+
+### Timezone
+
+Timestamps em UTC no banco. UI apresenta no timezone da clínica (`clinics.timezone`, default `America/Sao_Paulo`).
+Horário de funcionamento default 08–18 em `src/lib/agenda/hours.ts` — preparado para configuração futura.
 
 ### Rotas
 
-- `/app/pacientes`
-- `/app/pacientes/novo`
-- `/app/pacientes/[patientId]`
-- `/app/pacientes/[patientId]/editar`
+- `/app/agenda` — Dia / Semana / Mês
+- `/app/solicitacoes`
+- `/app/pacientes/[patientId]` — Nova consulta, próxima/última consulta
+- `/app/home` — KPIs reais de agenda/solicitações
 
 ## Fora do escopo atual
 
-Agenda, prontuário, tratamento, financeiro, portal, IA, WhatsApp oficial.
+Prontuário, anamnese, evoluções, odontograma, tratamentos, financeiro, portal completo, Secretária Virtual, IA, WhatsApp automático.

@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/button";
 import { calcAge, isMinor } from "@/lib/patients/age";
 import { formatCpf, formatPhoneBR } from "@/lib/patients/normalize";
 import type { Patient } from "@/types/patient";
+import {
+  APPOINTMENT_STATUS_LABELS,
+  type AppointmentWithPatient,
+} from "@/types/agenda";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -35,10 +39,16 @@ export function PatientProfileClient({
   patient,
   canEdit,
   canArchive,
+  canCreateAppointment,
+  nextAppointment,
+  lastAppointment,
 }: {
   patient: Patient;
   canEdit: boolean;
   canArchive: boolean;
+  canCreateAppointment: boolean;
+  nextAppointment: AppointmentWithPatient | null;
+  lastAppointment: AppointmentWithPatient | null;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Resumo");
@@ -117,10 +127,14 @@ export function PatientProfileClient({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="secondary" disabled title="Disponível na próxima etapa">
-              Nova consulta
-              <span className="sr-only">Disponível na próxima etapa</span>
-            </Button>
+            {canCreateAppointment ? (
+              <Link
+                href={`/app/agenda?patientId=${patient.id}`}
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
+              >
+                Nova consulta
+              </Link>
+            ) : null}
             {patient.phone ? (
               <Button type="button" variant="secondary" onClick={copyPhone}>
                 <Phone className="size-4" />
@@ -138,9 +152,6 @@ export function PatientProfileClient({
             ) : null}
           </div>
         </div>
-        <p className="mt-3 text-xs text-[var(--text-subtle)]">
-          Nova consulta: disponível na próxima etapa.
-        </p>
       </section>
 
       {message ? (
@@ -176,6 +187,66 @@ export function PatientProfileClient({
       {tab === "Resumo" ? (
         <div className="grid gap-4 md:grid-cols-2">
           <PatientCompletion patient={patient} />
+
+          <SummaryCard title="Próxima consulta">
+            {nextAppointment ? (
+              <>
+                <Row
+                  label="Data"
+                  value={format(new Date(nextAppointment.start_at), "dd/MM/yyyy", {
+                    locale: ptBR,
+                  })}
+                />
+                <Row
+                  label="Horário"
+                  value={format(new Date(nextAppointment.start_at), "HH:mm", {
+                    locale: ptBR,
+                  })}
+                />
+                <Row
+                  label="Status"
+                  value={APPOINTMENT_STATUS_LABELS[nextAppointment.status]}
+                />
+                {nextAppointment.reason ? (
+                  <Row label="Motivo" value={nextAppointment.reason} />
+                ) : null}
+              </>
+            ) : (
+              <p className="text-sm text-[var(--text-muted)]">
+                Nenhuma consulta futura agendada.
+              </p>
+            )}
+          </SummaryCard>
+
+          <SummaryCard title="Última consulta">
+            {lastAppointment ? (
+              <>
+                <Row
+                  label="Data"
+                  value={format(new Date(lastAppointment.start_at), "dd/MM/yyyy", {
+                    locale: ptBR,
+                  })}
+                />
+                <Row
+                  label="Horário"
+                  value={format(new Date(lastAppointment.start_at), "HH:mm", {
+                    locale: ptBR,
+                  })}
+                />
+                <Row
+                  label="Status"
+                  value={APPOINTMENT_STATUS_LABELS[lastAppointment.status]}
+                />
+                {lastAppointment.reason ? (
+                  <Row label="Motivo" value={lastAppointment.reason} />
+                ) : null}
+              </>
+            ) : (
+              <p className="text-sm text-[var(--text-muted)]">
+                Ainda não há consultas anteriores.
+              </p>
+            )}
+          </SummaryCard>
 
           <SummaryCard title="Contato">
             <Row label="Telefone" value={formatPhoneBR(patient.phone) || "—"} />

@@ -5,61 +5,74 @@
 1. `20251004000000_fase0_foundation.sql`
 2. `20251005000000_fase1_authz_equipe.sql`
 3. `20251006000000_fase2_patients.sql`
+4. `20251007000000_fase3_agenda.sql`
 
-## Tabela `patients` (Fase 2)
+## Fase 3 — Agenda
 
-Cadastro **administrativo** apenas. Sem alergias, diagnósticos, evoluções ou odontograma.
+### `appointment_requests`
+
+Solicitação de horário. Nunca vira consulta automaticamente.
 
 | Coluna | Tipo | Notas |
 | --- | --- | --- |
 | id | uuid | PK |
 | clinic_id | uuid | tenant |
-| full_name | text | obrigatório |
-| preferred_name | text | opcional |
-| cpf / cpf_normalized | text | opcional; normalizado só dígitos |
-| birth_date | date | idade calculada na app |
-| phone / phone_normalized | text | opcional |
-| secondary_phone / secondary_phone_normalized | text | opcional |
-| email / email_normalized | text | opcional; lower(trim) |
-| endereço (postal_code…state) | text | opcional; CEP manual nesta fase |
-| guardian_* | text | responsável |
-| emergency_contact_* | text | emergência |
-| referral_source | text | origem |
-| administrative_notes | text | **não clínico** |
-| status | patient_status | `active` \| `inactive` \| `archived` |
+| patient_id | uuid | FK patients |
+| requested_date | date | opcional |
+| preferred_period | enum | morning / afternoon / evening |
+| reason / custom_reason / notes | text | motivo ≠ diagnóstico |
+| status | enum | new…cancelled |
+| proposed_start_at / proposed_end_at | timestamptz | preenchidos na proposta |
+| proposed_professional_id | uuid | |
+| reviewed_by / reviewed_at | | |
+| rejection_reason | text | |
+| created_at / updated_at / cancelled_at | | |
+
+### `appointments`
+
+Consulta definitiva da agenda.
+
+| Coluna | Tipo | Notas |
+| --- | --- | --- |
+| id | uuid | PK |
+| clinic_id / patient_id / professional_id | uuid | tenant + FKs |
+| appointment_request_id | uuid | nullable — vínculo opcional |
+| start_at / end_at | timestamptz | `end_at > start_at` |
+| reason / status / notes | | |
+| estimated_value | numeric | opcional |
 | created_by | uuid | |
-| created_at / updated_at / archived_at | timestamptz | |
+| cancelled_at / cancellation_reason / cancelled_by | | |
 
-### Decisão: colunas normalizadas
+**Canceladas não bloqueiam horário** (exclusão de overlap ignora `cancelled`).
 
-Mantidas `cpf_normalized`, `phone_normalized`, `secondary_phone_normalized`, `email_normalized` porque:
+### `appointment_status_history`
 
-- busca aceita valor mascarado ou cru;
-- duplicidade precisa de comparação estável;
-- índices parciais ficam simples.
+| Coluna | Tipo |
+| --- | --- |
+| id | uuid |
+| appointment_id / clinic_id | uuid |
+| from_status / to_status | enum |
+| changed_by / reason | |
+| created_at | timestamptz |
 
-Formatação ocorre só na UI.
-
-### Status
-
-Somente cadastrais: **Ativo / Inativo / Arquivado**.
-
-Estados derivados (em tratamento, inadimplente…) virão de outros módulos — não são status manuais.
+Alterações de horário/profissional também vão para `audit_logs` (`appointment.rescheduled`).
 
 ### Constraints / índices
 
-- Unique parcial `(clinic_id, cpf_normalized)` onde CPF preenchido e status ≠ archived
-- `(clinic_id, status)`, `(clinic_id, updated_at desc)`, `(clinic_id, full_name)`
-- `(clinic_id, phone_normalized)`, `(clinic_id, email_normalized)` parciais
-- GIN trigram em `full_name` e `preferred_name` (extensão `pg_trgm`)
+- Check `end_at > start_at`
+- Exclusion gist (quando disponível) para overlap por `(clinic_id, professional_id)` em status ≠ cancelled
+- Índices: `(clinic_id, start_at)`, `(clinic_id, professional_id, start_at)`, `(clinic_id, patient_id)`, `(clinic_id, status)`
+- Requests: `(clinic_id, status, created_at desc)`, `(patient_id)`
 
 ### RLS
 
-- SELECT: membership ativo + `patients.demographics.view`
-- INSERT: `patients.demographics.create`
-- UPDATE: demographics/contact/administrative update
-- DELETE: negado (arquivar via status)
+Todas as três tabelas:
 
-## Tabelas Fase 0/1
+- auth obrigatório
+- membership ativo na clínica
+- permission apropriada (`appointments.*` / `appointment_requests.*`)
+- isolamento por `clinic_id`
 
-Ver migrations anteriores: `clinics`, `profiles`, `clinic_members`, `roles`, `permissions`, `role_permissions`, `audit_logs`.
+## Tabelas anteriores
+
+Ver migrations Fase 0–2: `clinics`, `profiles`, `clinic_members`, `roles`, `permissions`, `patients`, `audit_logs`.

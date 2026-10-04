@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
-import { Shield, Users } from "lucide-react";
+import { CalendarClock, Shield, Users } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Mais",
@@ -12,8 +12,17 @@ export default async function MaisPage() {
   const actor = await requireClinic();
   const canTeam = can(actor.ctx, "team.view").allowed;
   const canPermissions = can(actor.ctx, "permissions.manage").allowed;
+  const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
 
   const links = [
+    canRequests
+      ? {
+          href: "/app/solicitacoes",
+          title: "Solicitações de horário",
+          description: "Analisar, propor e recusar pedidos do paciente",
+          icon: CalendarClock,
+        }
+      : null,
     canTeam
       ? {
           href: "/app/configuracoes/equipe",
@@ -44,14 +53,13 @@ export default async function MaisPage() {
           Mais
         </h1>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Configurações da clínica no Sorria.
+          Configurações e atalhos da clínica no Sorria.
         </p>
       </section>
 
       {links.length === 0 ? (
         <p className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-4 py-5 text-sm text-[var(--text-muted)]">
-          Você não tem permissão para acessar configurações de equipe nesta
-          clínica.
+          Você não tem permissão para acessar configurações nesta clínica.
         </p>
       ) : (
         <ul className="space-y-3 animate-rise">
