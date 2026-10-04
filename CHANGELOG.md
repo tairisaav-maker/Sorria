@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0 — 2026-10-04
+
+### Added
+- **Subfase 4:** `appointment_planned_procedures` + previsão dinâmica de materiais
+- `forecastMaterialNeeds`, `calculateAppointmentMaterialForecast`, conversão planned→performed
+- UI `/app/estoque/previsao`, procedimentos previstos na Agenda, card Home (7 dias)
+- Status: suficiente / ficará abaixo do mínimo / insuficiente; sem reserva de estoque
+- Permissions `appointment_planned_procedures.*`, `inventory.forecast_view`, `inventory.forecast_cost_view`
+
 ## 1.3.0 — 2026-10-04
 
 ### Added

@@ -196,16 +196,68 @@ Valor cobrado ≠ pagamento; plano já faturado não gera cobrança duplicada.
 
 Material → Procedimento realizado → Consulta → Paciente → Período
 
-## Forecasting (agenda futura completa = próxima subfase)
+## Procedimentos previstos (Subfase 4)
 
-Previsão do atendimento atual: materiais planejados vs estoque (alerta, sem bloquear).
+`appointment_planned_procedures` ≠ catálogo (`procedures`) ≠ realizado (`performed_procedures`).
+
+- Pertence ao mesmo `patient_id` da consulta
+- Múltiplos por appointment
+- `cancelled_at` remove da previsão (soft)
+- Motivo da consulta sozinho **não** gera materiais
+
+## Previsão de materiais (Subfase 4)
+
+Serviço central: `forecastMaterialNeeds(clinicId, start, end, professionalId?)`
+
+Fluxo:
+
+```text
+appointment elegível (scheduled|confirmed|arrived)
+  → planned procedures ativos
+  → calculateProcedureMaterialRequirements (ficha atual)
+  → consolidar por item
+  → projected_remaining = current − forecast
+  → status: sufficient | low_after_forecast | insufficient | unknown
+```
+
+### Agregação por modo
+
+| Modo | Regra na previsão |
+| --- | --- |
+| `per_appointment` | 1× por consulta (mesmo com N procedimentos) |
+| `per_procedure` | 1× por planned procedure |
+| `per_unit` | × `quantity` |
+| `manual` | usa padrão como **Estimativa** (`unknown` se só houver manuais) |
+
+### Estoque projetado / risco
+
+- Previsão **não** reserva e **não** baixa `current_quantity`
+- Cancelada / concluída / no_show → fora da previsão futura
+- `arrived` com consumo já confirmado → fora (já é Subfase 3)
+- Ficha atualizada afeta só consultas futuras (dinâmico)
+- Ao iniciar atendimento: snapshot real via conversão → Subfase 3
+
+### Conversão planned → performed
+
+`convertPlannedProceduresToPerformedProcedures` — idempotente via `appointment_planned_procedure_id`.
+
+### UI
+
+`/app/estoque/previsao` · indicador na Agenda · card Home (7 dias) · drill-down por paciente
+
+### Custo estimado
+
+Requer `inventory.forecast_cost_view` ou `procedure_costs.view`.  
+Sempre rotulado **Estimado** (≠ custo real confirmado).
 
 ## Permissions
 
+`appointment_planned_procedures.view|create|update`  
+`inventory.forecast_view` · `inventory.forecast_cost_view`  
 `performed_procedures.*` · `procedure_consumption.*` · `procedure_costs.view`  
 `inventory.*` (view/create/update/adjust/purchase/movements/cost)
 
 ## RLS / tenant
 
-Clinic A ≠ performed/consumo/compra/lote B.  
+Clinic A ≠ planned/performed/consumo/compra/lote/forecast B.  
 Patient/appointment/procedure/item devem ser da mesma clínica.

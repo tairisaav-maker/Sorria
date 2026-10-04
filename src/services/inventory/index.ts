@@ -40,6 +40,17 @@ export {
 } from "@/services/inventory/purchases";
 
 export {
+  forecastMaterialNeeds,
+  getAppointmentMaterialForecast,
+  calculateAppointmentMaterialForecast,
+  getUpcomingStockRisks,
+  getPatientUpcomingMaterialNeeds,
+  getAppointmentForecastIndicator,
+  listAppointmentForecastIndicators,
+  FORECAST_ELIGIBLE_STATUSES,
+} from "@/services/inventory/forecast";
+
+export {
   getInventoryMovements,
   applyInventoryMovement,
 } from "@/services/inventory/movements";

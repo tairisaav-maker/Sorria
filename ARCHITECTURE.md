@@ -45,6 +45,7 @@ Acesso financeiro é independente do clínico.
 | Procedimentos + Estoque (Subfase 1) | ✅ fundação |
 | Compras / movimentos / custo médio (Subfase 2) | ✅ |
 | Procedimento do paciente / consumo real (Subfase 3) | ✅ |
+| Previsão Agenda → materiais → estoque (Subfase 4) | ✅ |
 
 ## Novo núcleo operacional
 
@@ -57,8 +58,8 @@ Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro �
 Secundário: Procedimentos · Relatórios · Configurações  
 Portal / Assistente: fora da nav principal (flags / Mais).
 
-Services: `procedures/`, `inventory/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`  
-Rotas: `/app/estoque/*` · `/app/agenda/atendimento/[id]` · paciente → Procedimentos  
+Services: `procedures/`, `inventory/` (+ `forecast`), `appointment-planned-procedures/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`  
+Rotas: `/app/estoque/*` · `/app/estoque/previsao` · `/app/agenda/atendimento/[id]` · paciente → Procedimentos  
 Fluxo: Agenda → Atendimento → Procedimento → Consumo confirmado → Baixa → Custo → Evolução → Financeiro  
 Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
 

@@ -6,6 +6,7 @@ export const createPerformedProcedureSchema = z.object({
   appointment_id: z.string().optional().nullable(),
   procedure_id: z.string().min(1),
   treatment_item_id: z.string().optional().nullable(),
+  appointment_planned_procedure_id: z.string().optional().nullable(),
   professional_id: z.string().optional(),
   tooth_number: z.number().int().optional().nullable(),
   region: z.string().trim().max(80).optional().nullable(),

@@ -99,17 +99,23 @@ export function AttendanceClient({
   const [extraItem, setExtraItem] = useState("");
   const [extraQty, setExtraQty] = useState("1");
   const [confirmNeg, setConfirmNeg] = useState(false);
+  const [plannedCount, setPlannedCount] = useState(0);
+  const [converting, setConverting] = useState(false);
 
   async function loadList() {
-    const [apptRes, procRes, invRes] = await Promise.all([
+    const [apptRes, procRes, invRes, plannedRes] = await Promise.all([
       fetch(
         `/api/demo/performed-procedures?view=appointment&appointmentId=${appointmentId}`,
       ).then((r) => r.json()),
       fetch("/api/demo/procedures").then((r) => r.json()),
       fetch("/api/demo/inventory").then((r) => r.json()),
+      fetch(
+        `/api/demo/planned-procedures?appointmentId=${appointmentId}`,
+      ).then((r) => r.json()),
     ]);
     setList(apptRes.items ?? []);
     setForecast(apptRes.forecast?.materials ?? []);
+    setPlannedCount((plannedRes.items ?? []).length);
     const cats = (procRes.items ?? []) as CatalogProc[];
     setCatalog(cats);
     if (!procId && cats[0]) setProcId(cats[0].id);
@@ -120,6 +126,26 @@ export function AttendanceClient({
       })),
     );
     if (!extraItem && invRes.items?.[0]) setExtraItem(invRes.items[0].id);
+  }
+
+  async function convertPlanned() {
+    setConverting(true);
+    setError(null);
+    const res = await fetch("/api/demo/planned-procedures", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "convert",
+        data: { appointment_id: appointmentId },
+      }),
+    });
+    const json = await res.json();
+    setConverting(false);
+    if (!res.ok) {
+      setError(json.error ?? "Não foi possível converter procedimentos.");
+      return;
+    }
+    await loadList();
   }
 
   async function openDetail(id: string) {
@@ -340,6 +366,27 @@ export function AttendanceClient({
         <p className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
           {error}
         </p>
+      ) : null}
+
+      {canCreate && plannedCount > 0 ? (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4">
+          <h2 className="font-medium text-[var(--brand-ink)]">
+            Procedimentos previstos na Agenda
+          </h2>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
+            {plannedCount} procedimento(s) previsto(s). Use-os para criar os
+            procedimentos realizados sem duplicar.
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            className="mt-3"
+            loading={converting}
+            onClick={() => void convertPlanned()}
+          >
+            Usar procedimentos previstos
+          </Button>
+        </section>
       ) : null}
 
       {forecast.length > 0 ? (

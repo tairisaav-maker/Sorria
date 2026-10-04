@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { PlannedProceduresSection } from "@/components/agenda/planned-procedures-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,8 @@ export function AppointmentDetail({
   canUpdate,
   canCancel,
   canOpenClinical,
+  canManagePlanned,
+  canViewForecast,
   onClose,
   onChanged,
 }: {
@@ -66,6 +69,8 @@ export function AppointmentDetail({
   canUpdate: boolean;
   canCancel: boolean;
   canOpenClinical?: boolean;
+  canManagePlanned?: boolean;
+  canViewForecast?: boolean;
   onClose: () => void;
   onChanged: () => void;
 }) {
@@ -110,6 +115,34 @@ export function AppointmentDetail({
       return;
     }
     if (status === "in_progress") {
+      // Oferece converter procedimentos previstos → realizados (idempotente)
+      try {
+        const plannedRes = await fetch(
+          `/api/demo/planned-procedures?appointmentId=${appointment.id}`,
+        );
+        if (plannedRes.ok) {
+          const plannedData = (await plannedRes.json()) as {
+            items?: unknown[];
+          };
+          if ((plannedData.items?.length ?? 0) > 0) {
+            const usePlanned = window.confirm(
+              "Usar procedimentos previstos para iniciar o atendimento?",
+            );
+            if (usePlanned) {
+              await fetch("/api/demo/planned-procedures", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "convert",
+                  data: { appointment_id: appointment.id },
+                }),
+              });
+            }
+          }
+        }
+      } catch {
+        // segue para a tela de atendimento mesmo se a conversão falhar
+      }
       window.location.href = `/app/agenda/atendimento/${appointment.id}`;
       return;
     }
@@ -223,6 +256,13 @@ export function AppointmentDetail({
             }
           />
         </dl>
+
+        <PlannedProceduresSection
+          appointmentId={appointment.id}
+          canCreate={Boolean(canManagePlanned)}
+          canUpdate={Boolean(canManagePlanned)}
+          canViewForecast={Boolean(canViewForecast)}
+        />
 
         {error ? (
           <p className="mt-3 rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">

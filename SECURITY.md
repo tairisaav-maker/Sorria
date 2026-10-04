@@ -68,18 +68,22 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
 
 
-## Procedures / Inventory (Reestruturação Subfases 1–3)
+## Procedures / Inventory (Reestruturação Subfases 1–4)
 
 | Key | Uso |
 | --- | --- |
 | `procedures.*` / `procedure_costs.*` | Catálogo e custos padrão |
+| `appointment_planned_procedures.view/create/update` | Procedimentos previstos na Agenda |
 | `performed_procedures.view/create/update/complete` | Execução no paciente |
 | `procedure_consumption.view/update/confirm/correct` | Previsto × real / baixa / correção |
 | `inventory.*` | Itens, compras, movimentos, custos de estoque |
+| `inventory.forecast_view` | Previsão de materiais pela Agenda |
+| `inventory.forecast_cost_view` | Custo estimado da previsão |
 
-- Clinic A ≠ Clinic B (performed, consumo, compra, lote, movimento)
-- Custos monetários exigem `procedure_costs.view` / `inventory.cost_view`
-- Baixa só após confirmação; idempotente; correção sem delete
+- Clinic A ≠ Clinic B (planned, performed, consumo, compra, lote, movimento, forecast)
+- Custos monetários exigem `procedure_costs.view` / `inventory.cost_view` / `inventory.forecast_cost_view`
+- Previsão não baixa estoque; baixa só após confirmação de consumo (Subfase 3)
+- Conversão planned→performed idempotente
 - Servidor é autoridade nos cálculos
 
 ## Relatórios (Fase 8)

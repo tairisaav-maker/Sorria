@@ -16,6 +16,19 @@
 12. `20251015000000_reestruturacao_procedures_inventory.sql`
 13. `20251016000000_reestruturacao_inventory_purchases.sql`
 14. `20251017000000_reestruturacao_performed_procedures.sql`
+15. `20251018000000_reestruturacao_appointment_planned_procedures.sql`
+
+## Reestruturação Subfase 4 — Procedimentos previstos / previsão
+
+### `appointment_planned_procedures`
+
+Procedimento previsto na Agenda (≠ performed). Índices em `appointment_id`, `procedure_id`, `(clinic_id, patient_id)`. Trigger `enforce_planned_procedure_tenant` bloqueia cross-clinic e paciente diferente da consulta.
+
+### `performed_procedures.appointment_planned_procedure_id`
+
+Link opcional planned → performed (conversão idempotente).
+
+Previsão de materiais é **dinâmica** (sem tabela de snapshot de forecast); saldo físico não é reservado.
 
 ## Reestruturação Subfase 3 — Procedimento do paciente
 

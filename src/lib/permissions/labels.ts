@@ -16,6 +16,9 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "appointments.cancel", label: "Cancelar" },
       { key: "appointment_requests.view", label: "Ver solicitações" },
       { key: "appointment_requests.manage", label: "Gerenciar solicitações" },
+      { key: "appointment_planned_procedures.view", label: "Ver procedimentos previstos" },
+      { key: "appointment_planned_procedures.create", label: "Adicionar procedimento previsto" },
+      { key: "appointment_planned_procedures.update", label: "Editar procedimento previsto" },
     ],
   },
   {
@@ -89,6 +92,8 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "inventory.purchase_create", label: "Registrar compras" },
       { key: "inventory.movements_view", label: "Ver movimentações" },
       { key: "inventory.cost_view", label: "Ver custos de estoque" },
+      { key: "inventory.forecast_view", label: "Ver previsão de materiais" },
+      { key: "inventory.forecast_cost_view", label: "Ver custo estimado da previsão" },
     ],
   },
   {

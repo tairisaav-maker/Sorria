@@ -8,6 +8,7 @@ import {
   getPerformedStore,
   writePerformedAudit,
 } from "@/lib/demo/performed-procedures-store";
+import { getPlannedProceduresStore } from "@/lib/demo/planned-procedures-store";
 import { getFinanceStore } from "@/lib/demo/finance-store";
 import { getTreatmentsStore } from "@/lib/demo/treatments-store";
 import {
@@ -257,6 +258,29 @@ export function createPerformedProcedure(ctx: AuthzContext, input: unknown) {
     // permitido com motivo opcional em V1
   }
 
+  if (data.appointment_planned_procedure_id) {
+    const planned = getPlannedProceduresStore().planned.find(
+      (p) => p.id === data.appointment_planned_procedure_id,
+    );
+    if (
+      !planned ||
+      planned.clinic_id !== ctx.clinicId ||
+      planned.patient_id !== data.patient_id ||
+      (data.appointment_id && planned.appointment_id !== data.appointment_id)
+    ) {
+      throw new Error("PLANNED_PROCEDURE_NOT_FOUND");
+    }
+    const dup = getPerformedStore().performedProcedures.find(
+      (p) =>
+        p.appointment_planned_procedure_id ===
+          data.appointment_planned_procedure_id &&
+        p.status !== "cancelled",
+    );
+    if (dup) {
+      return getPerformedProcedure(ctx, dup.id);
+    }
+  }
+
   const performed: PerformedProcedure = {
     id: `pp-${crypto.randomUUID()}`,
     clinic_id: ctx.clinicId,
@@ -265,6 +289,8 @@ export function createPerformedProcedure(ctx: AuthzContext, input: unknown) {
     procedure_id: procedure.id,
     procedure_name_snapshot: procedure.name,
     treatment_item_id: data.treatment_item_id ?? null,
+    appointment_planned_procedure_id:
+      data.appointment_planned_procedure_id ?? null,
     professional_id: professionalId,
     tooth_number: data.tooth_number ?? null,
     region: data.region ?? null,

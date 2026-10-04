@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.3.0** — Reestruturação Subfase 3 (Consumo real por paciente)
+**1.4.0** — Reestruturação Subfase 4 (Previsão de materiais pela Agenda)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -25,7 +25,7 @@ Núcleo: Agenda · Pacientes · Estoque · Financeiro
 
 - Procedimentos (catálogo): `/app/procedimentos`
 - Atendimento / consumo: `/app/agenda/atendimento/[id]`
-- Estoque: `/app/estoque` · Compras · Movimentações
+- Estoque: `/app/estoque` · Previsão · Compras · Movimentações
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
 - Relatórios: `/app/relatorios`

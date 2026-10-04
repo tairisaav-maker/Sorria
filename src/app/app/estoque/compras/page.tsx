@@ -7,12 +7,18 @@ export const metadata: Metadata = {
   title: "Compras de estoque",
 };
 
-export default async function ComprasEstoquePage() {
+export default async function ComprasEstoquePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ itemId?: string }>;
+}) {
+  const params = await searchParams;
   const actor = await requirePermission("inventory.view");
   return (
     <PurchasesClient
       canPurchase={can(actor.ctx, "inventory.purchase_create").allowed}
       canViewCosts={can(actor.ctx, "inventory.cost_view").allowed}
+      presetItemId={params.itemId}
     />
   );
 }

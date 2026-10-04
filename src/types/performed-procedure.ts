@@ -28,6 +28,7 @@ export type PerformedProcedure = {
   procedure_id: string;
   procedure_name_snapshot: string;
   treatment_item_id: string | null;
+  appointment_planned_procedure_id: string | null;
   professional_id: string;
   tooth_number: number | null;
   region: string | null;

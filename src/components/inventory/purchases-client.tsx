@@ -38,13 +38,15 @@ type Line = {
 export function PurchasesClient({
   canPurchase,
   canViewCosts,
+  presetItemId,
 }: {
   canPurchase: boolean;
   canViewCosts: boolean;
+  presetItemId?: string;
 }) {
   const [purchases, setPurchases] = useState<PurchaseRow[]>([]);
   const [items, setItems] = useState<ItemOpt[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(Boolean(presetItemId));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -83,14 +85,19 @@ export function PurchasesClient({
       }),
     );
     setItems(opts);
-    if (opts[0] && !lines[0].inventory_item_id) {
+    const preferred =
+      (presetItemId && opts.find((o: ItemOpt) => o.id === presetItemId)) ||
+      opts[0];
+    if (preferred && !lines[0].inventory_item_id) {
       setLines((prev) =>
         prev.map((l, idx) =>
           idx === 0
             ? {
                 ...l,
-                inventory_item_id: opts[0].id,
-                units_per_purchase_unit: String(opts[0].units_per_purchase_unit),
+                inventory_item_id: preferred.id,
+                units_per_purchase_unit: String(
+                  preferred.units_per_purchase_unit,
+                ),
               }
             : l,
         ),

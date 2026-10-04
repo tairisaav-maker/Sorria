@@ -45,6 +45,8 @@ export function AgendaPageClient({
   canUpdate,
   canCancel,
   canOpenClinical,
+  canManagePlanned,
+  canViewForecast,
   pendingRequests,
   professionals,
   defaultProfessionalId,
@@ -54,6 +56,8 @@ export function AgendaPageClient({
   canUpdate: boolean;
   canCancel: boolean;
   canOpenClinical?: boolean;
+  canManagePlanned?: boolean;
+  canViewForecast?: boolean;
   pendingRequests: number;
   professionals: Professional[];
   defaultProfessionalId: string;
@@ -67,6 +71,9 @@ export function AgendaPageClient({
   const [selected, setSelected] = useState<AppointmentWithPatient | null>(null);
   const [createOpen, setCreateOpen] = useState(Boolean(initialPatientId));
   const [createStart, setCreateStart] = useState<Date | undefined>();
+  const [indicators, setIndicators] = useState<
+    Record<string, "calculated" | "undefined" | "insufficient" | "ineligible">
+  >({});
 
   useEffect(() => {
     setView(detectDefaultView());
@@ -102,7 +109,19 @@ export function AgendaPageClient({
     });
     const response = await fetch(`/api/demo/appointments?${params}`);
     const data = (await response.json()) as { items?: AppointmentWithPatient[] };
-    setItems(data.items ?? []);
+    const list = data.items ?? [];
+    setItems(list);
+    if (list.length > 0 && canViewForecast) {
+      const ids = list.map((a) => a.id).join(",");
+      const indRes = await fetch(
+        `/api/demo/forecast?view=indicators&ids=${encodeURIComponent(ids)}`,
+      )
+        .then((r) => r.json())
+        .catch(() => null);
+      setIndicators(indRes?.indicators ?? {});
+    } else {
+      setIndicators({});
+    }
     setLoading(false);
   }
 
@@ -229,6 +248,7 @@ export function AgendaPageClient({
         <DayView
           day={anchor}
           items={items}
+          indicators={indicators}
           onSlot={openCreate}
           onSelect={setSelected}
           canCreate={canCreate}
@@ -239,6 +259,7 @@ export function AgendaPageClient({
         <WeekView
           days={weekDays}
           items={items}
+          indicators={indicators}
           onSlot={openCreate}
           onSelect={setSelected}
         />
@@ -262,6 +283,8 @@ export function AgendaPageClient({
           canUpdate={canUpdate}
           canCancel={canCancel}
           canOpenClinical={canOpenClinical}
+          canManagePlanned={canManagePlanned}
+          canViewForecast={canViewForecast}
           onClose={() => setSelected(null)}
           onChanged={async () => {
             setSelected(null);
@@ -286,15 +309,23 @@ export function AgendaPageClient({
   );
 }
 
+type ForecastIndicator =
+  | "calculated"
+  | "undefined"
+  | "insufficient"
+  | "ineligible";
+
 function DayView({
   day,
   items,
+  indicators,
   onSlot,
   onSelect,
   canCreate,
 }: {
   day: Date;
   items: AppointmentWithPatient[];
+  indicators: Record<string, ForecastIndicator>;
   onSlot: (d: Date) => void;
   onSelect: (a: AppointmentWithPatient) => void;
   canCreate: boolean;
@@ -346,7 +377,12 @@ function DayView({
                 </button>
               ) : (
                 slotItems.map((item) => (
-                  <AppointmentChip key={item.id} item={item} onClick={() => onSelect(item)} />
+                  <AppointmentChip
+                    key={item.id}
+                    item={item}
+                    indicator={indicators[item.id]}
+                    onClick={() => onSelect(item)}
+                  />
                 ))
               )}
             </div>
@@ -360,11 +396,13 @@ function DayView({
 function WeekView({
   days,
   items,
+  indicators,
   onSlot,
   onSelect,
 }: {
   days: Date[];
   items: AppointmentWithPatient[];
+  indicators: Record<string, ForecastIndicator>;
   onSlot: (d: Date) => void;
   onSelect: (a: AppointmentWithPatient) => void;
 }) {
@@ -409,7 +447,12 @@ function WeekView({
                   }}
                 >
                   {cellItems.map((item) => (
-                    <AppointmentChip key={item.id} item={item} compact />
+                    <AppointmentChip
+                      key={item.id}
+                      item={item}
+                      indicator={indicators[item.id]}
+                      compact
+                    />
                   ))}
                 </button>
               );
@@ -466,15 +509,25 @@ function MonthView({
   );
 }
 
+function forecastIndicatorLabel(indicator?: ForecastIndicator) {
+  if (indicator === "calculated") return "Materiais calculados";
+  if (indicator === "insufficient") return "Estoque insuficiente";
+  if (indicator === "undefined") return "Procedimento não definido";
+  return null;
+}
+
 function AppointmentChip({
   item,
   onClick,
   compact,
+  indicator,
 }: {
   item: AppointmentWithPatient;
   onClick?: () => void;
   compact?: boolean;
+  indicator?: ForecastIndicator;
 }) {
+  const forecastLabel = forecastIndicatorLabel(indicator);
   const content = (
     <>
       <span className={cn("mt-0.5 size-2 shrink-0 rounded-full", appointmentStatusDotClass[item.status])} />
@@ -485,6 +538,11 @@ function AppointmentChip({
         {!compact ? (
           <span className="block truncate text-[11px] text-[var(--text-muted)]">
             {item.reason || "Consulta"} · {APPOINTMENT_STATUS_LABELS[item.status]}
+            {forecastLabel ? ` · ${forecastLabel}` : ""}
+          </span>
+        ) : forecastLabel ? (
+          <span className="block truncate text-[10px] text-[var(--text-muted)]">
+            {forecastLabel}
           </span>
         ) : null}
       </span>

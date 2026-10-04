@@ -74,6 +74,10 @@ export const PERMISSIONS = [
   "performed_procedures.update",
   "performed_procedures.complete",
 
+  "appointment_planned_procedures.view",
+  "appointment_planned_procedures.create",
+  "appointment_planned_procedures.update",
+
   "inventory.view",
   "inventory.create",
   "inventory.update",
@@ -81,6 +85,8 @@ export const PERMISSIONS = [
   "inventory.purchase_create",
   "inventory.movements_view",
   "inventory.cost_view",
+  "inventory.forecast_view",
+  "inventory.forecast_cost_view",
 
   "cost_reports.view",
 
@@ -193,8 +199,13 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "performed_procedures.create",
     "performed_procedures.update",
     "performed_procedures.complete",
+    "appointment_planned_procedures.view",
+    "appointment_planned_procedures.create",
+    "appointment_planned_procedures.update",
     "inventory.view",
     "inventory.movements_view",
+    "inventory.forecast_view",
+    "inventory.forecast_cost_view",
   ],
   secretary: [
     "dashboard.view",
@@ -221,6 +232,9 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "assistant.use",
     "procedures.view",
     "performed_procedures.view",
+    "appointment_planned_procedures.view",
+    "appointment_planned_procedures.create",
+    "appointment_planned_procedures.update",
     "inventory.view",
     "inventory.create",
     "inventory.update",
@@ -228,6 +242,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "inventory.purchase_create",
     "inventory.movements_view",
     "inventory.cost_view",
+    "inventory.forecast_view",
   ],
 };
 
