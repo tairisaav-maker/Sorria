@@ -47,22 +47,24 @@ Acesso financeiro é independente do clínico.
 | Procedimento do paciente / consumo real (Subfase 3) | ✅ |
 | Previsão Agenda → materiais → estoque (Subfase 4) | ✅ |
 | Procedimento + evolução + cobrado + financeiro (Subfase 5) | ✅ |
+| Dashboard operacional / rentabilidade (Subfase 6) | ✅ |
 
 ## Novo núcleo operacional
 
 ```text
 Agenda → Atendimento → Procedimento → Materiais previstos
   → Consumo real → Estoque → Custo → Evolução → Financeiro
+  → Agregação → Relatórios operacionais
 ```
 
 Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro · Mais  
 Secundário: Procedimentos · Relatórios · Configurações  
 Portal / Assistente: fora da nav principal (flags / Mais).
 
-Services: `procedures/`, `inventory/` (+ `forecast`), `appointment-planned-procedures/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`, `patient-procedure-finance/`, `patient-summary/`  
-Rotas: `/app/estoque/*` · `/app/estoque/previsao` · `/app/agenda/atendimento/[id]` · paciente → Procedimentos  
-Fluxo: Agenda → Atendimento → Procedimento → Consumo confirmado → Baixa → Custo → Evolução → Financeiro  
-Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
+Services: `procedures/`, `inventory/` (+ `forecast`), `appointment-planned-procedures/`, `performed-procedures/`, `procedure-consumption/`, `procedure-costs/`, `patient-procedure-finance/`, `patient-summary/`, `reports/operational/`  
+Rotas: `/app/estoque/*` · `/app/estoque/previsao` · `/app/agenda/atendimento/[id]` · `/app/relatorios` · paciente → Procedimentos  
+Fluxo: Agenda → Atendimento → Procedimento → Consumo confirmado → Baixa → Custo → Evolução → Financeiro → Relatórios  
+Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md) · [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
 
 ## Financeiro (Fase 6)
 
@@ -166,15 +168,15 @@ src/services/portal/
 
 Somente `patient_visible = true` + signed URL. Bucket permanece privado.
 
-## Relatórios (Fase 8)
+## Relatórios (Fase 8 + Subfase 6)
 
-Rota: `/app/relatorios` (atalho em **Mais**).
+Rota: `/app/relatorios` (atalho em **Mais**). Default: dashboard operacional (tabs Visão geral / Procedimentos / Materiais / Pacientes / Financeiro). Clássico: `?classic=1`.
 
-Serviços: `src/services/reports/` — agregação server-side, permissões por seção (`reports.view_*`), drill-downs acionáveis, exportação PDF/XLSX/CSV.
+Serviços: `src/services/reports/` + `reports/operational/` — agregação server-side, permissões por seção (`reports.view_*`, `reports.procedure_costs_view`, …), drill-downs, exportação PDF/XLSX/CSV.
 
-Ocupação da agenda **não** é inventada sem horários de atendimento.
+Resultado bruto ≠ lucro líquido. Cobertura de custos informa confiabilidade. Ocupação da agenda **não** é inventada sem horários de atendimento.
 
-Definições: [REPORTS.md](./REPORTS.md).
+Definições: [REPORTS.md](./REPORTS.md) · [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md).
 
 ## Secretária Virtual (Fase 9)
 
@@ -197,4 +199,4 @@ Onboarding retomável · configurações de clínica/agenda/perfil/segurança ·
 
 ## Fora do escopo V1
 
-Integração bancária/adquirente, boleto, NF, contabilidade, WhatsApp automático, cobrança SaaS do Sorria, IA clínica, pagamento online no Portal, BI externo, estoque, convênios.
+Integração bancária/adquirente, boleto, NF, contabilidade completa/DRE, WhatsApp automático, cobrança SaaS do Sorria, IA clínica, pagamento online no Portal, BI externo, reposição inteligente (Subfase 7), convênios.

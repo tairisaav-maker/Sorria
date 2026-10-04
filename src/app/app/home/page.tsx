@@ -15,6 +15,7 @@ import { buildHomeDashboard } from "@/lib/home/dashboard";
 import { getInventoryDashboard } from "@/services/inventory";
 import { forecastMaterialNeeds } from "@/services/inventory/forecast";
 import { getTodayOperationalKpis } from "@/services/patient-summary";
+import { getOperationalOverview } from "@/services/reports/operational";
 import { getOnboarding } from "@/services/settings";
 
 export const metadata: Metadata = {
@@ -29,10 +30,33 @@ export default async function HomePage() {
   const onboarding = getOnboarding(actor.ctx);
   const inventory = getInventoryDashboard(actor.ctx);
   const canForecast = can(actor.ctx, "inventory.forecast_view").allowed;
-  const operational =
+  const operationalToday =
     can(actor.ctx, "performed_procedures.view").allowed
       ? getTodayOperationalKpis(actor.ctx)
       : null;
+  let monthOps: {
+    procedures_completed: number;
+    materials_cost_cents: number | null;
+    charged_cents: number | null;
+    received_cents: number | null;
+    planned_vs_actual_percent: number | null;
+    planned_vs_actual_label: string | null;
+  } | null = null;
+  if (can(actor.ctx, "reports.view").allowed) {
+    try {
+      const overview = getOperationalOverview(actor.ctx, { preset: "month" });
+      monthOps = {
+        procedures_completed: overview.procedures_completed,
+        materials_cost_cents: overview.materials_cost_cents,
+        charged_cents: overview.charged_cents,
+        received_cents: overview.received_cents,
+        planned_vs_actual_percent: overview.planned_vs_actual_percent,
+        planned_vs_actual_label: overview.planned_vs_actual_label,
+      };
+    } catch {
+      monthOps = null;
+    }
+  }
   let weekForecast: {
     materials_at_risk: number;
     procedures_planned: number;
@@ -76,7 +100,18 @@ export default async function HomePage() {
         />
       ) : null}
       <KpiRow items={dashboard.kpis} />
-      {operational ? <OperationalKpisCard kpis={operational} /> : null}
+      {monthOps ? (
+        <OperationalKpisCard
+          title="Operação do mês"
+          kpis={monthOps}
+          plannedVsActual={{
+            percent: monthOps.planned_vs_actual_percent,
+            label: monthOps.planned_vs_actual_label,
+          }}
+        />
+      ) : operationalToday ? (
+        <OperationalKpisCard title="Operacional de hoje" kpis={operationalToday} />
+      ) : null}
       {inventory ? <InventoryHomeCard data={inventory} /> : null}
       {weekForecast && tomorrowForecast ? (
         <ForecastHomeCard week={weekForecast} tomorrow={tomorrowForecast} />

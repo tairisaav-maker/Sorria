@@ -68,7 +68,7 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
 
 
-## Procedures / Inventory / Patient finance (Reestruturação Subfases 1–5)
+## Procedures / Inventory / Patient finance (Reestruturação Subfases 1–6)
 
 | Key | Uso |
 | --- | --- |
@@ -79,25 +79,32 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 | `inventory.*` | Itens, compras, movimentos, custos de estoque |
 | `inventory.forecast_view` | Previsão de materiais pela Agenda |
 | `inventory.forecast_cost_view` | Custo estimado da previsão |
+| `reports.procedure_costs_view` | Custos / resultado bruto / margem nos relatórios |
+| `reports.materials_view` | Consumo de materiais nos relatórios |
+| `reports.patient_financial_view` | Financeiro por paciente nos relatórios |
+| `reports.financial_view` | Aba financeiro operacional |
 
-- Clinic A ≠ Clinic B (planned, performed, consumo, compra, lote, movimento, forecast, links financeiros)
+- Clinic A ≠ Clinic B (planned, performed, consumo, compra, lote, movimento, forecast, links financeiros, **agregados de relatório**)
 - Cross-patient: procedimento ≠ transação/evolução de outro paciente
-- Custos monetários exigem `procedure_costs.view` / `inventory.cost_view` / `inventory.forecast_cost_view`
-- Recebido/saldo exigem `finance.view_*`
+- Custos monetários exigem `procedure_costs.view` / `inventory.cost_view` / `inventory.forecast_cost_view` / `reports.procedure_costs_view`
+- Recebido/saldo exigem `finance.view_*` / `reports.patient_financial_view`
+- Payload de relatório **omite** custos/margem sem permissão (não só esconde no UI)
+- Drill-down de materiais: nome de paciente só com `patients.demographics.view`
 - Previsão não baixa estoque; baixa só após confirmação de consumo (Subfase 3)
 - Cobrança ≠ pagamento; antiduplicidade com plano já faturado
 - Conversão planned→performed idempotente
 - Servidor é autoridade nos cálculos e no rateio
 
-## Relatórios (Fase 8)
+## Relatórios (Fase 8 + Subfase 6)
 
-- Acesso por seção: `reports.view_*` — API não retorna dados de seções negadas
-- Secretária: agenda + pacientes; **sem** `reports.view_financial` (mesmo com financeiro operacional)
-- Dentista: agenda + pacientes + tratamentos; sem financeiro de relatório
+- Acesso por seção: `reports.view_*` / `reports.*_view` — API não retorna dados de seções negadas
+- Secretária: agenda + materiais + financeiro operacional permitido; **sem** margem/resultado bruto sem `reports.procedure_costs_view`
+- Dentista: procedimentos/consumo; custos/financeiro conforme permission
 - Owner admin: todas as seções + export
 - Portal paciente: sem acesso a `/app/relatorios`
 - Exportação audita `report.exported` sem armazenar o arquivo
-- Cross-clinic: membership obrigatória
+- Cross-clinic: membership obrigatória; sem contagem agregada entre clínicas
+- Detalhes: [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
 
 ## Secretária Virtual (Fase 9)
 

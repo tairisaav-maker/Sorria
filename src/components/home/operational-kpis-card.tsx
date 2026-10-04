@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { formatBRL } from "@/lib/money";
 
 export function OperationalKpisCard({
   kpis,
+  title = "Operação do mês",
+  plannedVsActual,
 }: {
   kpis: {
     procedures_completed: number;
@@ -9,15 +12,28 @@ export function OperationalKpisCard({
     charged_cents: number | null;
     received_cents: number | null;
   };
+  title?: string;
+  plannedVsActual?: {
+    percent: number | null;
+    label: string | null;
+  } | null;
 }) {
   return (
     <section
-      aria-label="Operacional de hoje"
+      aria-label={title}
       className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise"
     >
-      <h2 className="font-[family-name:var(--font-display)] text-lg text-[var(--brand-ink)]">
-        Operacional de hoje
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-[family-name:var(--font-display)] text-lg text-[var(--brand-ink)]">
+          {title}
+        </h2>
+        <Link
+          href="/app/relatorios"
+          className="text-sm text-[var(--brand-primary)] hover:underline"
+        >
+          Ver relatórios
+        </Link>
+      </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Metric
           label="Procedimentos realizados"
@@ -25,7 +41,7 @@ export function OperationalKpisCard({
         />
         {kpis.materials_cost_cents != null ? (
           <Metric
-            label="Custo de materiais"
+            label="Custo direto"
             value={formatBRL(kpis.materials_cost_cents)}
           />
         ) : null}
@@ -40,10 +56,29 @@ export function OperationalKpisCard({
           <Metric
             label="Valor recebido"
             value={formatBRL(kpis.received_cents)}
-            hint="Pagamentos do dia"
           />
         ) : null}
       </div>
+
+      {plannedVsActual ? (
+        <div className="mt-4 rounded-xl border border-[var(--border)] px-3 py-2 text-sm">
+          {plannedVsActual.label ? (
+            <>
+              <span>{plannedVsActual.label}</span>{" "}
+              <Link
+                href="/app/relatorios"
+                className="text-[var(--brand-primary)] hover:underline"
+              >
+                Ver materiais
+              </Link>
+            </>
+          ) : (
+            <span className="text-[var(--text-muted)]">
+              Dados insuficientes para comparar consumo previsto e real.
+            </span>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 }

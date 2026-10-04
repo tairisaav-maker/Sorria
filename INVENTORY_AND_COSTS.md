@@ -204,6 +204,16 @@ Material → Procedimento realizado → Consulta → Paciente → Período
 - Evolução: `clinical_entries.performed_procedure_id`
 - Ver [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
 
+## Relatórios operacionais (Subfase 6)
+
+Agrega consumo real → custo real → cobrado → recebido.
+
+- Resultado bruto = cobrado − custo direto (≠ lucro líquido)
+- Previsto × real por material/procedimento; linguagem “acima do previsto”, não “desperdício”
+- Cobertura de custos = % concluídos com custo completo
+- Material sem custo unitário válido → `custo incompleto` (não R$ 0)
+- Ver [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
+
 ## Procedimentos previstos (Subfase 4)
 
 `appointment_planned_procedures` ≠ catálogo (`procedures`) ≠ realizado (`performed_procedures`).

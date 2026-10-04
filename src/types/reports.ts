@@ -1,16 +1,22 @@
 export type ReportPeriodPreset =
+  | "today"
   | "7d"
   | "30d"
   | "month"
+  | "3m"
   | "6m"
   | "year"
   | "custom";
 
 export type ReportSection =
   | "overview"
-  | "schedule"
+  | "operational"
+  | "procedures"
+  | "materials"
   | "patients"
+  | "patient_ops"
   | "treatments"
+  | "schedule"
   | "financial";
 
 export type ReportPeriod = {
@@ -144,9 +150,11 @@ export type PendingDecisionRow = {
 };
 
 export const PERIOD_PRESET_LABELS: Record<ReportPeriodPreset, string> = {
+  today: "Hoje",
   "7d": "7 dias",
   "30d": "30 dias",
   month: "Este mês",
+  "3m": "3 meses",
   "6m": "6 meses",
   year: "Este ano",
   custom: "Personalizado",

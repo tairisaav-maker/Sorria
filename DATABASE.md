@@ -192,15 +192,25 @@ Notificações internas do Portal (sem push externo).
 `has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`
 
 
-## Fase 8 — Relatórios
+## Fase 8 / Subfase 6 — Relatórios
 
-Sem novas tabelas de fatos. Permissões:
+Sem novas tabelas de fatos nem materialized views. Permissões:
 
 - `reports.view`
 - `reports.view_schedule`
 - `reports.view_patients`
 - `reports.view_treatments`
 - `reports.view_financial`
+- `reports.procedure_costs_view`
+- `reports.materials_view`
+- `reports.patient_financial_view`
+- `reports.financial_view`
 - `reports.export`
 
-Agregações no serviço da aplicação (demo) / SQL futuro; sem materialized views nesta fase.
+Agregações no serviço da aplicação (demo) / SQL futuro sobre:
+
+- `performed_procedures` (`clinic_id`, `procedure_id`, `patient_id`, `completed_at`)
+- `procedure_consumptions` (`inventory_item_id`, `confirmed_at`)
+- `payments` (`paid_at`, exclui `reversed_at`)
+
+Índices: criar somente após medição de performance.

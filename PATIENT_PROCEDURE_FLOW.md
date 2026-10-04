@@ -49,12 +49,15 @@ Draft → finalized; correções versionadas.
 ## Resumo do paciente
 
 - Custo direto = Σ `actual_total_cost` (concluídos)
-- Cobrado = Σ `charged_amount`
+- Cobrado = Σ `charged_amount` (sem duplicar plano)
 - Recebido / saldo / vencido = módulo Financeiro real do paciente
+- Resultado bruto associado = cobrado − custo direto (não “lucro do paciente”)
+
+Relatórios: `/app/relatorios` → aba Pacientes (Subfase 6). Ver [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md).
 
 ## Permissões
 
-- Custos: `procedure_costs.view`
-- Financeiro (recebido/saldo): `finance.view_*`
+- Custos: `procedure_costs.view` / `reports.procedure_costs_view`
+- Financeiro (recebido/saldo): `finance.view_*` / `reports.patient_financial_view`
 - Evolução: `clinical_evolution.*`
 - Procedimento: `performed_procedures.*`

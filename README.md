@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.5.0** — Reestruturação Subfase 5 (Procedimento + evolução + cobrado + financeiro)
+**1.6.0** — Reestruturação Subfase 6 (Dashboard operacional e rentabilidade)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -29,7 +29,7 @@ Núcleo: Agenda · Pacientes · Estoque · Financeiro
 - Estoque: `/app/estoque` · Previsão · Compras · Movimentações
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
-- Relatórios: `/app/relatorios`
+- Relatórios operacionais: `/app/relatorios` (visão geral · procedimentos · materiais · pacientes · financeiro)
 - Secretária Virtual (secundário): `/app/assistente`
 
 ### Login Portal (demo)
@@ -55,6 +55,7 @@ npm run build
 - [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
 - [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
 - [REPORTS.md](./REPORTS.md)
+- [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
 - [ASSISTANT.md](./ASSISTANT.md)
 - [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md)
 - [DEPLOYMENT.md](./DEPLOYMENT.md)

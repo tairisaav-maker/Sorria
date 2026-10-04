@@ -12,6 +12,11 @@ import {
   getPendingTreatmentDecisions,
   getReportBundle,
 } from "@/services/reports";
+import {
+  getMaterialConsumptionDetail,
+  getOperationalBundle,
+  getProcedurePerformanceDetail,
+} from "@/services/reports/operational";
 import type { ReportPeriodPreset, ReportSection } from "@/types/reports";
 
 async function ctx() {
@@ -53,6 +58,21 @@ export async function GET(request: Request) {
 
     if (resource === "bundle") {
       return NextResponse.json(getReportBundle(auth, filter));
+    }
+    if (resource === "operational") {
+      return NextResponse.json(getOperationalBundle(auth, filter));
+    }
+    if (resource === "procedure-detail") {
+      const procedureId = url.searchParams.get("procedureId") ?? "";
+      return NextResponse.json(
+        getProcedurePerformanceDetail(auth, filter, procedureId),
+      );
+    }
+    if (resource === "material-detail") {
+      const itemId = url.searchParams.get("itemId") ?? "";
+      return NextResponse.json(
+        getMaterialConsumptionDetail(auth, filter, itemId),
+      );
     }
     if (resource === "pending-returns") {
       return NextResponse.json({ items: getPendingReturns(auth) });

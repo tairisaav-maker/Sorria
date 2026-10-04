@@ -2,6 +2,9 @@
 
 Intervalo padrão: **`[start, end)`** no timezone da clínica (`America/Sao_Paulo` no demo).
 
+> Relatórios operacionais de rentabilidade (Subfase 6): ver [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md).  
+> UI padrão em `/app/relatorios`; indicadores clássicos em `?classic=1`.
+
 ## Visão geral
 
 | Nome | Fonte | Fórmula / timestamp | Permissão |

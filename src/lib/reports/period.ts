@@ -119,6 +119,11 @@ export function resolveReportPeriod(input: {
   let label: string;
 
   switch (input.preset) {
+    case "today":
+      startYmd = today;
+      endInclusiveYmd = today;
+      label = PERIOD_PRESET_LABELS.today;
+      break;
     case "7d":
       startYmd = ymdAddDays(today, -6);
       endInclusiveYmd = today;
@@ -133,6 +138,11 @@ export function resolveReportPeriod(input: {
       startYmd = startOfMonthYmd(today);
       endInclusiveYmd = endOfMonthYmd(today);
       label = PERIOD_PRESET_LABELS.month;
+      break;
+    case "3m":
+      startYmd = startOfMonthYmd(ymdAddMonths(today, -2));
+      endInclusiveYmd = today;
+      label = PERIOD_PRESET_LABELS["3m"];
       break;
     case "6m":
       startYmd = startOfMonthYmd(ymdAddMonths(today, -5));

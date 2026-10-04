@@ -46,8 +46,7 @@ export type ReportFilter = {
 };
 
 function clinicTz(clinicId: string) {
-  void clinicId;
-  return DEFAULT_CLINIC_TZ;
+  return getClinic(clinicId)?.timezone ?? DEFAULT_CLINIC_TZ;
 }
 
 function periodOf(ctx: AuthzContext, filter: ReportFilter): ReportPeriod {
@@ -779,6 +778,60 @@ export async function exportReport(
   section: ReportSection | "all" = "all",
 ) {
   assertPermission(ctx, "reports.export");
+
+  if (
+    section === "operational" ||
+    section === "procedures" ||
+    section === "materials" ||
+    section === "patient_ops"
+  ) {
+    const { getOperationalBundle } = await import(
+      "@/services/reports/operational"
+    );
+    const {
+      buildOperationalCsv,
+      buildOperationalPdf,
+      buildOperationalXlsx,
+    } = await import("@/lib/reports/operational-export");
+    const op = getOperationalBundle(ctx, filter);
+
+    appendAudit({
+      clinic_id: ctx.clinicId,
+      actor_user_id: ctx.userId,
+      action: "report.exported",
+      target_type: "report",
+      target_id: section,
+      metadata: {
+        format,
+        section,
+        period_start: op.period.start,
+        period_end: op.period.end,
+        period_label: op.period.label,
+      },
+    });
+
+    if (format === "csv") {
+      return {
+        filename: `sorria-relatorio-operacional.csv`,
+        contentType: "text/csv; charset=utf-8",
+        body: buildOperationalCsv(op),
+      };
+    }
+    if (format === "xlsx") {
+      return {
+        filename: `sorria-relatorio-operacional.xlsx`,
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        body: await buildOperationalXlsx(op),
+      };
+    }
+    return {
+      filename: `sorria-relatorio-operacional.pdf`,
+      contentType: "application/pdf",
+      body: await buildOperationalPdf(op),
+    };
+  }
+
   const bundle = getReportBundle(ctx, filter);
   const { buildReportCsv, buildReportPdf, buildReportXlsx } = await import(
     "@/lib/reports/export"

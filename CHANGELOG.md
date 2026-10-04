@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0 — 2026-10-04
+
+### Added
+- **Subfase 6:** dashboard operacional e rentabilidade em `/app/relatorios`
+- Tabs: Visão geral · Procedimentos · Materiais · Pacientes · Financeiro
+- Fórmulas centralizadas (resultado bruto, margem, previsto×real, cobertura de custos)
+- Services `reports/operational/*`, export PDF/XLSX/CSV operacional, Home “Operação do mês”
+- Permissions `reports.procedure_costs_view`, `reports.materials_view`, `reports.patient_financial_view`, `reports.financial_view`
+- [OPERATIONAL_REPORTS.md](./OPERATIONAL_REPORTS.md)
+
 ## 1.5.0 — 2026-10-04
 
 ### Added
