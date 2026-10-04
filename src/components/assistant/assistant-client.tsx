@@ -316,7 +316,11 @@ function EmptyWelcome({
           Olá! Como posso ajudar na organização do consultório?
         </p>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Assistente administrativa do Sorria — consultas e ações controladas, sem diagnóstico clínico.
+          A Secretária Virtual consulta informações administrativas do Sorria e pode
+          preparar algumas ações. Ações importantes precisam da sua confirmação.
+        </p>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">
+          Ela não realiza diagnóstico ou decisões clínicas.
         </p>
       </div>
       <ul className="flex w-full flex-col gap-2 sm:max-w-md">

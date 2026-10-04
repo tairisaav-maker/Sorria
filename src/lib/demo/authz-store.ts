@@ -6,16 +6,44 @@ import {
   type PermissionKey,
   type RoleKey,
 } from "@/lib/permissions/keys";
+import type { FeatureFlags } from "@/lib/feature-flags";
+import { DEFAULT_FEATURE_FLAGS } from "@/lib/feature-flags";
+import {
+  defaultClinicHours,
+  defaultOnboarding,
+  type ClinicHoursConfig,
+  type ClinicStatus,
+  type OnboardingProgress,
+} from "@/types/clinic-settings";
 
 export type DemoClinic = {
   id: string;
   name: string;
+  trade_name: string | null;
+  timezone: string;
+  phone: string | null;
+  email: string | null;
+  address_line: string | null;
+  city: string | null;
+  state: string | null;
+  status: ClinicStatus;
+  hours: ClinicHoursConfig;
+  slot_minutes: number;
+  logo_url: string | null;
+  onboarding: OnboardingProgress;
+  feature_flags: FeatureFlags;
 };
 
 export type DemoProfile = {
   id: string;
   full_name: string;
   email: string;
+  phone: string | null;
+  professional_name: string | null;
+  cro: string | null;
+  cro_uf: string | null;
+  specialty: string | null;
+  avatar_url: string | null;
 };
 
 export type DemoMembership = {
@@ -80,40 +108,88 @@ function now() {
   return new Date().toISOString();
 }
 
+function profile(
+  id: string,
+  full_name: string,
+  email: string,
+  extras: Partial<DemoProfile> = {},
+): DemoProfile {
+  return {
+    id,
+    full_name,
+    email,
+    phone: extras.phone ?? null,
+    professional_name: extras.professional_name ?? full_name,
+    cro: extras.cro ?? null,
+    cro_uf: extras.cro_uf ?? null,
+    specialty: extras.specialty ?? null,
+    avatar_url: extras.avatar_url ?? null,
+  };
+}
+
+function clinic(
+  id: string,
+  name: string,
+  extras: Partial<DemoClinic> = {},
+): DemoClinic {
+  return {
+    id,
+    name,
+    trade_name: extras.trade_name ?? null,
+    timezone: extras.timezone ?? "America/Sao_Paulo",
+    phone: extras.phone ?? null,
+    email: extras.email ?? null,
+    address_line: extras.address_line ?? null,
+    city: extras.city ?? "Belo Horizonte",
+    state: extras.state ?? "MG",
+    status: extras.status ?? "active",
+    hours: extras.hours ?? defaultClinicHours(),
+    slot_minutes: extras.slot_minutes ?? 30,
+    logo_url: extras.logo_url ?? null,
+    onboarding: extras.onboarding ?? defaultOnboarding(true),
+    feature_flags: extras.feature_flags ?? { ...DEFAULT_FEATURE_FLAGS },
+  };
+}
+
 function seed(): Store {
   const stamp = now();
   const clinics: DemoClinic[] = [
-    { id: CLINIC_A_ID, name: "Clínica Demo Sorria" },
-    { id: CLINIC_B_ID, name: "Odonto Vida" },
+    clinic(CLINIC_A_ID, "Clínica Demo Sorria", {
+      trade_name: "Sorriso Demo",
+      phone: "(31) 3333-1000",
+      email: "contato@clinicademo.sorria.app",
+      city: "Belo Horizonte",
+      state: "MG",
+      onboarding: defaultOnboarding(true),
+    }),
+    clinic(CLINIC_B_ID, "Odonto Vida", {
+      city: "São Paulo",
+      state: "SP",
+      phone: "(11) 4000-2000",
+    }),
   ];
 
   const profiles: DemoProfile[] = [
-    { id: OWNER_A_ID, full_name: "Dra. Ana Ribeiro", email: "demo@sorria.app" },
-    {
-      id: DENTIST_A_ID,
-      full_name: "Dr. Carlos Menezes",
-      email: "carlos.a@clinicademo.sorria.app",
-    },
-    {
-      id: SECRETARY_A_ID,
-      full_name: "Mariana Souza",
-      email: "mariana.a@clinicademo.sorria.app",
-    },
-    {
-      id: OWNER_B_ID,
-      full_name: "Dra. Paula Vieira",
-      email: "paula@odontovida.app",
-    },
-    {
-      id: DENTIST_B_ID,
-      full_name: "Dr. Renato Alves",
-      email: "renato@odontovida.app",
-    },
-    {
-      id: SECRETARY_B_ID,
-      full_name: "Fernanda Lopes",
-      email: "fernanda@odontovida.app",
-    },
+    profile(OWNER_A_ID, "Dra. Ana Ribeiro", "demo@sorria.app", {
+      professional_name: "Dra. Ana Ribeiro",
+      cro: "12345",
+      cro_uf: "MG",
+      phone: "(31) 98888-0001",
+      specialty: "Clínica Geral",
+    }),
+    profile(DENTIST_A_ID, "Dr. Carlos Menezes", "carlos.a@clinicademo.sorria.app", {
+      cro: "23456",
+      cro_uf: "MG",
+    }),
+    profile(SECRETARY_A_ID, "Mariana Souza", "mariana.a@clinicademo.sorria.app", {
+      phone: "(31) 98888-0003",
+    }),
+    profile(OWNER_B_ID, "Dra. Paula Vieira", "paula@odontovida.app", {
+      cro: "34567",
+      cro_uf: "SP",
+    }),
+    profile(DENTIST_B_ID, "Dr. Renato Alves", "renato@odontovida.app"),
+    profile(SECRETARY_B_ID, "Fernanda Lopes", "fernanda@odontovida.app"),
   ];
 
   const memberships: DemoMembership[] = [
@@ -225,11 +301,9 @@ export function resetAuthzStore() {
 export function ensureAdminOwnerWithoutClinical() {
   const store = getAuthzStore();
   if (!store.profiles.some((p) => p.id === OWNER_ADMIN_A_ID)) {
-    store.profiles.push({
-      id: OWNER_ADMIN_A_ID,
-      full_name: "Gestor Admin Demo",
-      email: "gestor.admin@clinicademo.sorria.app",
-    });
+    store.profiles.push(
+      profile(OWNER_ADMIN_A_ID, "Gestor Admin Demo", "gestor.admin@clinicademo.sorria.app"),
+    );
   }
   if (!store.memberships.some((m) => m.id === "m-a-owner-admin")) {
     const stamp = now();
@@ -254,11 +328,13 @@ export function ensureAdminOwnerWithoutClinical() {
 export function ensureDentistWithoutFinance() {
   const store = getAuthzStore();
   if (!store.profiles.some((p) => p.id === DENTIST_NO_FINANCE_A_ID)) {
-    store.profiles.push({
-      id: DENTIST_NO_FINANCE_A_ID,
-      full_name: "Dra. Sem Financeiro",
-      email: "sem.financeiro@clinicademo.sorria.app",
-    });
+    store.profiles.push(
+      profile(
+        DENTIST_NO_FINANCE_A_ID,
+        "Dra. Sem Financeiro",
+        "sem.financeiro@clinicademo.sorria.app",
+      ),
+    );
   }
   if (!store.memberships.some((m) => m.id === "m-a-dentist-nofinance")) {
     const stamp = now();
@@ -388,6 +464,12 @@ export function inviteMember(input: {
       id: crypto.randomUUID(),
       full_name: input.fullName.trim(),
       email,
+      phone: null,
+      professional_name: input.fullName.trim(),
+      cro: null,
+      cro_uf: null,
+      specialty: null,
+      avatar_url: null,
     };
     store.profiles.push(profile);
   }

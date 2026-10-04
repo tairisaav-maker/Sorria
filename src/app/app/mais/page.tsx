@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
-import { CalendarClock, FileBarChart2, Shield, Sparkles, Users, Wallet } from "lucide-react";
+import {
+  CalendarClock,
+  FileBarChart2,
+  Settings,
+  Shield,
+  Sparkles,
+  Users,
+  Wallet,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Mais",
@@ -18,6 +26,12 @@ export default async function MaisPage() {
   const canAssistant = can(actor.ctx, "assistant.use").allowed;
 
   const links = [
+    {
+      href: "/app/configuracoes",
+      title: "Configurações",
+      description: "Clínica, agenda, perfil, equipe e segurança",
+      icon: Settings,
+    },
     canAssistant
       ? {
           href: "/app/assistente",

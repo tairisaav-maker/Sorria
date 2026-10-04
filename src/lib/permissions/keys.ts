@@ -57,6 +57,8 @@ export const PERMISSIONS = [
 
   "assistant.use",
 
+  "clinic.settings",
+
   "team.view",
   "team.invite",
   "team.change_role",

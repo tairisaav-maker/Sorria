@@ -56,7 +56,7 @@ export function Sidebar({ clinicName }: { clinicName: string }) {
         </nav>
 
         <p className="text-xs text-[var(--text-subtle)]">
-          Sorria — Fase 4
+          Sorria 1.0.0
         </p>
       </div>
     </aside>

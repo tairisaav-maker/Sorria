@@ -11,6 +11,8 @@ import {
   listActiveAccessesForUser,
 } from "@/lib/demo/portal-store";
 import { DEMO_COOKIE_NAME as DEMO_COOKIE } from "@/lib/demo/session";
+import { checkLoginRateLimit } from "@/lib/auth/rate-limit";
+import { logEvent } from "@/lib/observability";
 
 export async function POST(request: Request) {
   if (process.env.NEXT_PUBLIC_DEMO_MODE !== "true") {
@@ -27,6 +29,23 @@ export async function POST(request: Request) {
 
   const demoEmail = process.env.DEMO_EMAIL ?? "demo@sorria.app";
   const demoPassword = process.env.DEMO_PASSWORD ?? "sorria-demo";
+  const email = (body.email ?? "").trim().toLowerCase();
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "local";
+
+  if (!checkLoginRateLimit(ip, email || "unknown")) {
+    logEvent({
+      level: "warn",
+      message: "login_rate_limited",
+      meta: { ip },
+    });
+    return NextResponse.json(
+      { error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." },
+      { status: 429 },
+    );
+  }
 
   // Portal patient login
   const portalUser = PORTAL_DEMO_USERS.find(
@@ -46,6 +65,12 @@ export async function POST(request: Request) {
         id: portalUser.id,
         full_name: portalUser.full_name,
         email: portalUser.email,
+        phone: null,
+        professional_name: null,
+        cro: null,
+        cro_uf: null,
+        specialty: null,
+        avatar_url: null,
       });
     }
     const primary = accesses[0]!;

@@ -12,6 +12,7 @@
 8. `20251011000000_fase7_portal.sql`
 9. `20251012000000_fase8_relatorios.sql`
 10. `20251013000000_fase9_assistente.sql`
+11. `20251014000000_fase10_producao.sql`
 
 ## Fase 9 — Secretária Virtual
 
@@ -19,6 +20,21 @@
 
 - Tenant (`clinic_id`) + dono (`user_id`); RLS com `assistant.use`
 - Action plans: status + `expires_at` (TTL); confirmação explícita antes de mutar
+
+## Fase 10 — Produção
+
+### `clinics` (extensão)
+
+- `trade_name`, `logo_url`, `status`, `slot_minutes`, `hours_json`, `feature_flags`, `onboarding_json`
+
+### `profiles` (extensão)
+
+- `professional_name`, `cro`, `cro_uf`, `specialty`
+
+### Índices
+
+- `patients (clinic_id, created_at desc)`
+- `appointments (clinic_id, start_at)`
 
 ## Fase 6 — Financeiro
 

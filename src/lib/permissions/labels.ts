@@ -67,6 +67,12 @@ export const ACCESS_GROUPS: AccessGroup[] = [
     ],
   },
   {
+    title: "Clínica",
+    items: [
+      { key: "clinic.settings", label: "Configurar clínica e horários" },
+    ],
+  },
+  {
     title: "Equipe",
     items: [
       { key: "team.view", label: "Ver equipe" },

@@ -2,12 +2,11 @@
 
 **Gestão inteligente para consultórios**
 
-## Fase atual
+## Versão
 
-**FASE 9 — Secretária Virtual**
+**1.0.0** — FASE 10 (produção / onboarding / polimento)
 
-> Assistente administrativa permissionada  
-> IA ≠ banco · Tool ≠ permissão · Prévia ≠ execução · Sem IA clínica
+> Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
 
 ## Como rodar
 
@@ -21,8 +20,10 @@ npm run dev
 
 `demo@sorria.app` / `sorria-demo` → `/app`
 
-Secretária Virtual: `/app/assistente`  
-Relatórios: **Mais → Relatórios** ou `/app/relatorios`
+- Onboarding: `/app/onboarding`
+- Configurações: `/app/configuracoes`
+- Secretária Virtual: `/app/assistente`
+- Relatórios: `/app/relatorios`
 
 ### Login Portal (demo)
 
@@ -42,6 +43,12 @@ npm run build
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)
-- [REPORTS.md](./REPORTS.md) — definições de métricas
-- [ASSISTANT.md](./ASSISTANT.md) — Secretária Virtual
+- [SECURITY_MATRIX.md](./SECURITY_MATRIX.md)
+- [REPORTS.md](./REPORTS.md)
+- [ASSISTANT.md](./ASSISTANT.md)
+- [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md)
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [OPERATIONS.md](./OPERATIONS.md)
+- [CHANGELOG.md](./CHANGELOG.md)
+- [docs/produto](./docs/produto/README.md)
 - [ROADMAP.md](./ROADMAP.md)

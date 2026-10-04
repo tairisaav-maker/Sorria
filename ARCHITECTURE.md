@@ -41,6 +41,7 @@ Acesso financeiro é independente do clínico.
 | Portal do paciente | ✅ |
 | Relatórios e indicadores | ✅ |
 | Secretária Virtual | ✅ |
+| Onboarding / configs / produção | ✅ |
 
 ## Financeiro (Fase 6)
 
@@ -49,7 +50,10 @@ Rotas:
 ```text
 /app/financeiro
 /app/pacientes/[patientId]/financeiro
-/app/relatorios   # stub — Fase 8
+/app/relatorios
+/app/assistente
+/app/onboarding
+/app/configuracoes/*
 ```
 
 ### Modelo
@@ -164,6 +168,10 @@ UI → Orquestrador → Authz → Tool Registry → Services Sorria → RLS
 
 Detalhes: [ASSISTANT.md](./ASSISTANT.md).
 
-## Fora do escopo atual
+## Produção (Fase 10)
 
-Integração bancária/adquirente, boleto, NF, contabilidade, WhatsApp automático, cobrança automática, IA clínica, pagamento online no Portal, BI externo.
+Onboarding retomável · configurações de clínica/agenda/perfil/segurança · headers/CSP · health `/api/health` · feature flags · observabilidade abstrata · docs operacionais.
+
+## Fora do escopo V1
+
+Integração bancária/adquirente, boleto, NF, contabilidade, WhatsApp automático, cobrança SaaS do Sorria, IA clínica, pagamento online no Portal, BI externo, estoque, convênios.

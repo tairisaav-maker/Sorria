@@ -18,7 +18,7 @@ export function HomeGreeting({
         Bom te ver, {firstName}
       </h1>
       <p className="mt-2 max-w-xl text-sm text-[var(--text-muted)] sm:text-base">
-        Resumo do dia na {clinicName} com dados reais da agenda e solicitações.
+        O que precisa da minha atenção hoje na {clinicName}?
       </p>
     </section>
   );

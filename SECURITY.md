@@ -89,3 +89,14 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Dentista com prontuário ≠ Secretária como IA clínica
 - Auditoria: `assistant.*` sem chain-of-thought; rate limit por usuário/tenant
 - Detalhes: [ASSISTANT.md](./ASSISTANT.md)
+
+## Produção (Fase 10)
+
+- Headers: CSP, frame deny, nosniff, referrer, permissions-policy; HSTS em production
+- Rate limit de login; rate limit da Secretária
+- Health: `/api/health` sem secrets; AI down ≠ app down
+- `clinic.settings`; status `active|suspended|closed`
+- Service role apenas server-side (não usado no client)
+- Matriz: [SECURITY_MATRIX.md](./SECURITY_MATRIX.md)
+- Termos/Privacidade: placeholders — revisão jurídica antes do comercial
+- Controles técnicos ≠ declaração automática de “100% LGPD”
