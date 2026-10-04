@@ -1,6 +1,11 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getDemoSession } from "@/lib/demo/authz-store";
 import { getClinicalStore } from "@/lib/demo/clinical-store";
+import {
+  DEMO_COOKIE_NAME,
+  hydrateDemoSessionFromCookie,
+} from "@/lib/demo/session";
 import {
   confirmMyAppointment,
   confirmProposedAppointment,
@@ -32,12 +37,14 @@ function ensureDemo() {
   return null;
 }
 
-function session() {
+async function session() {
+  const jar = await cookies();
+  hydrateDemoSessionFromCookie(jar.get(DEMO_COOKIE_NAME)?.value);
   const s = getDemoSession();
   return {
     authUserId: s.userId,
     clinicId: s.clinicId,
-    patientId: (s as { patientId?: string }).patientId ?? null,
+    patientId: s.patientId ?? null,
   };
 }
 
@@ -78,7 +85,7 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const resource = url.searchParams.get("resource") ?? "home";
-    const s = session();
+    const s = await session();
 
     if (resource === "home") {
       return NextResponse.json(getPortalHome(s));
@@ -142,7 +149,7 @@ export async function POST(request: Request) {
   if (blocked) return blocked;
   try {
     const body = await request.json();
-    const s = session();
+    const s = await session();
     const action = body.action as string;
 
     if (action === "confirm-appointment") {

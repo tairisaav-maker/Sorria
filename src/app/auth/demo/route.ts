@@ -10,7 +10,7 @@ import {
   PORTAL_DEMO_USERS,
   listActiveAccessesForUser,
 } from "@/lib/demo/portal-store";
-import { DEMO_COOKIE } from "@/lib/supabase/middleware";
+import { DEMO_COOKIE_NAME as DEMO_COOKIE } from "@/lib/demo/session";
 
 export async function POST(request: Request) {
   if (process.env.NEXT_PUBLIC_DEMO_MODE !== "true") {

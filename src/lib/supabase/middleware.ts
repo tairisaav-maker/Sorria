@@ -1,16 +1,24 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
+import {
+  DEMO_COOKIE_NAME,
+  isDemoCookiePresent,
+  isPortalDemoCookie,
+} from "@/lib/demo/session";
 
-const DEMO_COOKIE = "sorria_demo_session";
+const DEMO_COOKIE = DEMO_COOKIE_NAME;
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  const hasDemoSession = request.cookies.get(DEMO_COOKIE)?.value === "1";
+  const demoCookie = request.cookies.get(DEMO_COOKIE)?.value;
+  const hasDemoSession = isDemoMode && isDemoCookiePresent(demoCookie);
+  const isPortalSession = isPortalDemoCookie(demoCookie);
   const path = request.nextUrl.pathname;
   const isAppRoute = path.startsWith("/app");
+  const isPortalRoute = path.startsWith("/portal");
   const isLoginRoute = path === "/login";
   const isAuthCallback = path.startsWith("/auth");
   const isForbiddenRoute = path === "/forbidden";
@@ -46,24 +54,35 @@ export async function updateSession(request: NextRequest) {
     hasSupabaseUser = Boolean(user);
   }
 
-  const isAuthenticated = hasSupabaseUser || (isDemoMode && hasDemoSession);
+  const isAuthenticated = hasSupabaseUser || hasDemoSession;
 
-  if ((isAppRoute || isForbiddenRoute) && !isAuthenticated) {
+  if ((isAppRoute || isForbiddenRoute || isPortalRoute) && !isAuthenticated) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", path);
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Portal session must not use professional shell
+  if (isAuthenticated && isDemoMode && isPortalSession && isAppRoute) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/portal/inicio";
+    return NextResponse.redirect(redirectUrl);
+  }
+
   if (isLoginRoute && isAuthenticated) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/app/home";
+    redirectUrl.pathname = isPortalSession ? "/portal/inicio" : "/app/home";
     return NextResponse.redirect(redirectUrl);
   }
 
   if (path === "/" && !isAuthCallback) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = isAuthenticated ? "/app/home" : "/login";
+    if (!isAuthenticated) {
+      redirectUrl.pathname = "/login";
+    } else {
+      redirectUrl.pathname = isPortalSession ? "/portal/inicio" : "/app/home";
+    }
     return NextResponse.redirect(redirectUrl);
   }
 
