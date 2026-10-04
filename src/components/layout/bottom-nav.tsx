@@ -14,7 +14,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border)] bg-[var(--surface-elevated)]/95 backdrop-blur-md lg:hidden"
       aria-label="Navegação móvel"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pb-[env(safe-area-inset-bottom)]">
+      <ul className="mx-auto grid max-w-lg grid-cols-6 px-1 pb-[env(safe-area-inset-bottom)]">
         {professionalNav.map((item) => {
           const active = pathname.startsWith(item.href);
           const content = (

@@ -61,6 +61,29 @@ export const ACCESS_GROUPS: AccessGroup[] = [
     ],
   },
   {
+    title: "Procedimentos e custos",
+    items: [
+      { key: "procedures.view", label: "Ver procedimentos" },
+      { key: "procedures.create", label: "Criar procedimentos" },
+      { key: "procedures.update", label: "Editar procedimentos" },
+      { key: "procedure_costs.view", label: "Ver custos de procedimento" },
+      { key: "procedure_costs.update", label: "Editar ficha técnica / custos" },
+      { key: "procedure_consumption.view", label: "Ver consumo" },
+      { key: "procedure_consumption.confirm", label: "Confirmar consumo" },
+      { key: "cost_reports.view", label: "Relatórios de custo" },
+    ],
+  },
+  {
+    title: "Estoque",
+    items: [
+      { key: "inventory.view", label: "Ver estoque" },
+      { key: "inventory.create", label: "Criar itens" },
+      { key: "inventory.update", label: "Editar itens" },
+      { key: "inventory.adjust", label: "Ajustar estoque" },
+      { key: "inventory.purchase_create", label: "Registrar compras" },
+    ],
+  },
+  {
     title: "Secretária Virtual",
     items: [
       { key: "assistant.use", label: "Usar Secretária Virtual" },

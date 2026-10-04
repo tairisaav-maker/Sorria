@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.0 — 2026-10-04
+
+### Changed
+- **Reestruturação do produto (Subfase 1):** núcleo Agenda → Procedimento → Materiais → Estoque → Custo
+- Navegação principal: Início, Agenda, Pacientes, Estoque, Financeiro; Portal/Assistente despriorizados
+
+### Added
+- Catálogo `procedures` + ficha `procedure_materials` + `inventory_items`
+- Permissions/RLS; services; UI `/app/procedimentos`, `/app/estoque`
+- Cálculo de consumo/custo padrão (centavos); modos per_appointment/per_procedure/per_unit/manual
+- [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
+
+### Not yet (próximas subfases)
+- Compras, movimentos, custo médio ponderado aplicado
+- Baixa automática / consumo real / previsão da agenda
+
 ## 1.0.0 — 2026-10-04
 
 ### Added
@@ -16,4 +32,4 @@
 
 ### Notes
 - Cobrança SaaS do Sorria **não** implementada
-- IA clínica / WhatsApp / estoque / convênios fora do V1
+- IA clínica / WhatsApp / convênios fora do núcleo imediato

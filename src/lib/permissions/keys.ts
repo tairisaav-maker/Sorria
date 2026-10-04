@@ -59,6 +59,22 @@ export const PERMISSIONS = [
 
   "clinic.settings",
 
+  "procedures.view",
+  "procedures.create",
+  "procedures.update",
+  "procedure_costs.view",
+  "procedure_costs.update",
+  "procedure_consumption.view",
+  "procedure_consumption.confirm",
+
+  "inventory.view",
+  "inventory.create",
+  "inventory.update",
+  "inventory.adjust",
+  "inventory.purchase_create",
+
+  "cost_reports.view",
+
   "team.view",
   "team.invite",
   "team.change_role",
@@ -156,6 +172,13 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "reports.view_treatments",
     "reports.export",
     "assistant.use",
+    "procedures.view",
+    "procedures.create",
+    "procedures.update",
+    "procedure_costs.view",
+    "procedure_consumption.view",
+    "procedure_consumption.confirm",
+    "inventory.view",
   ],
   secretary: [
     "dashboard.view",
@@ -180,6 +203,11 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "reports.view_patients",
     "reports.export",
     "assistant.use",
+    "procedures.view",
+    "inventory.view",
+    "inventory.create",
+    "inventory.update",
+    "inventory.purchase_create",
   ],
 };
 

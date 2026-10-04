@@ -1,7 +1,9 @@
 import {
   CalendarDays,
   CircleEllipsis,
+  ClipboardList,
   Home,
+  Package,
   Sparkles,
   Users,
   Wallet,
@@ -14,6 +16,8 @@ const icons: Record<NavItem["icon"], LucideIcon> = {
   calendar: CalendarDays,
   users: Users,
   wallet: Wallet,
+  package: Package,
+  procedure: ClipboardList,
   assistant: Sparkles,
   more: CircleEllipsis,
 };

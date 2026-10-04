@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { can } from "@/lib/authz/can";
-import { requireClinic } from "@/lib/authz/guards";
 import {
   CalendarClock,
+  ClipboardList,
   FileBarChart2,
   Settings,
   Shield,
@@ -11,6 +10,10 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { can } from "@/lib/authz/can";
+import { requireClinic } from "@/lib/authz/guards";
+import { getClinic } from "@/lib/demo/authz-store";
+import { isAssistantEnabled } from "@/lib/feature-flags";
 
 export const metadata: Metadata = {
   title: "Mais",
@@ -18,26 +21,37 @@ export const metadata: Metadata = {
 
 export default async function MaisPage() {
   const actor = await requireClinic();
+  const clinic = getClinic(actor.ctx.clinicId);
   const canTeam = can(actor.ctx, "team.view").allowed;
   const canPermissions = can(actor.ctx, "permissions.manage").allowed;
   const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
   const canFinance = can(actor.ctx, "finance.view_administrative").allowed;
   const canReports = can(actor.ctx, "reports.view").allowed;
-  const canAssistant = can(actor.ctx, "assistant.use").allowed;
+  const canProcedures = can(actor.ctx, "procedures.view").allowed;
+  const canAssistant =
+    can(actor.ctx, "assistant.use").allowed && isAssistantEnabled(clinic);
 
   const links = [
+    canProcedures
+      ? {
+          href: "/app/procedimentos",
+          title: "Procedimentos",
+          description: "Catálogo, ficha técnica e custo padrão",
+          icon: ClipboardList,
+        }
+      : null,
     {
       href: "/app/configuracoes",
       title: "Configurações",
       description: "Clínica, agenda, perfil, equipe e segurança",
       icon: Settings,
     },
-    canAssistant
+    canReports
       ? {
-          href: "/app/assistente",
-          title: "Secretária Virtual",
-          description: "Consulte informações e organize tarefas administrativas",
-          icon: Sparkles,
+          href: "/app/relatorios",
+          title: "Relatórios",
+          description: "Indicadores essenciais de operação",
+          icon: FileBarChart2,
         }
       : null,
     canFinance
@@ -48,20 +62,20 @@ export default async function MaisPage() {
           icon: Wallet,
         }
       : null,
-    canReports
-      ? {
-          href: "/app/relatorios",
-          title: "Relatórios",
-          description: "Indicadores de agenda, pacientes, tratamentos e financeiro",
-          icon: FileBarChart2,
-        }
-      : null,
     canRequests
       ? {
           href: "/app/solicitacoes",
           title: "Solicitações de horário",
-          description: "Analisar, propor e recusar pedidos do paciente",
+          description: "Pedidos do paciente (área futura / secundária)",
           icon: CalendarClock,
+        }
+      : null,
+    canAssistant
+      ? {
+          href: "/app/assistente",
+          title: "Secretária Virtual",
+          description: "Área futura — não faz parte do núcleo V1",
+          icon: Sparkles,
         }
       : null,
     canTeam
@@ -94,13 +108,14 @@ export default async function MaisPage() {
           Mais
         </h1>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Configurações e atalhos da clínica no Sorria.
+          Áreas secundárias. O núcleo do Sorria é Agenda, Pacientes, Estoque e
+          Financeiro.
         </p>
       </section>
 
       {links.length === 0 ? (
         <p className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-4 py-5 text-sm text-[var(--text-muted)]">
-          Você não tem permissão para acessar configurações nesta clínica.
+          Você não tem permissão para acessar atalhos extras nesta clínica.
         </p>
       ) : (
         <ul className="space-y-3 animate-rise">

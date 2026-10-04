@@ -38,10 +38,25 @@ Acesso financeiro é independente do clínico.
 | Prontuário | ✅ |
 | Planos de tratamento | ✅ |
 | Financeiro V1 | ✅ |
-| Portal do paciente | ✅ |
+| Portal do paciente | ✅ (despriorizado na nav V1) |
 | Relatórios e indicadores | ✅ |
-| Secretária Virtual | ✅ |
+| Secretária Virtual | ✅ (despriorizado na nav V1) |
 | Onboarding / configs / produção | ✅ |
+| Procedimentos + Estoque (Subfase 1) | ✅ fundação |
+
+## Novo núcleo operacional
+
+```text
+Agenda → Atendimento → Procedimento → Materiais previstos
+  → Consumo real → Estoque → Custo → Evolução → Financeiro
+```
+
+Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro · Mais  
+Secundário: Procedimentos · Relatórios · Configurações  
+Portal / Assistente: fora da nav principal (flags / Mais).
+
+Services: `src/services/procedures/`, `inventory/`, `procedure-consumption/`, `costs/`  
+Detalhes: [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
 
 ## Financeiro (Fase 6)
 
@@ -50,6 +65,8 @@ Rotas:
 ```text
 /app/financeiro
 /app/pacientes/[patientId]/financeiro
+/app/estoque
+/app/procedimentos
 /app/relatorios
 /app/assistente
 /app/onboarding

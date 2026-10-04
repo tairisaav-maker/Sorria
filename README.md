@@ -4,8 +4,9 @@
 
 ## Versão
 
-**1.0.0** — FASE 10 (produção / onboarding / polimento)
+**1.1.0** — Reestruturação Subfase 1 (Procedimentos + Estoque fundação)
 
+> Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
 
 ## Como rodar
@@ -20,14 +21,19 @@ npm run dev
 
 `demo@sorria.app` / `sorria-demo` → `/app`
 
+Núcleo: Agenda · Pacientes · Estoque · Financeiro
+
+- Procedimentos: `/app/procedimentos`
+- Estoque: `/app/estoque`
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
-- Secretária Virtual: `/app/assistente`
 - Relatórios: `/app/relatorios`
+- Secretária Virtual (secundário): `/app/assistente`
 
 ### Login Portal (demo)
 
-`paciente@sorria.app` / `sorria-demo` → `/portal/inicio`
+`paciente@sorria.app` / `sorria-demo` → `/portal/inicio`  
+(Portal despriorizado no V1 comercial — código preservado.)
 
 ## Scripts
 
@@ -44,6 +50,7 @@ npm run build
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)
 - [SECURITY_MATRIX.md](./SECURITY_MATRIX.md)
+- [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
 - [REPORTS.md](./REPORTS.md)
 - [ASSISTANT.md](./ASSISTANT.md)
 - [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md)

@@ -18,6 +18,9 @@ Patient = Portal. Owner administrativo ≠ clínico automático.
 | Financeiro admin | V/C/U/X | — / autorizado | V/C/U/X | próprio resumo |
 | Relatórios | por seção | agenda/pacientes/trat. | agenda/pacientes | — |
 | Secretária Virtual | V (+ domínio) | V (+ domínio) | V (+ domínio) | — |
+| Procedimentos (catálogo) | V/C/U | V/C/U | V | — |
+| Custos de procedimento | V/U | V | — | — |
+| Estoque (itens) | V/C/U + adjust/purchase | V | V/C/U + purchase | — |
 | Auditoria | V | — | — | — |
 | Storage clínico | policies + perms | policies + perms | — | patient_visible + signed URL |
 

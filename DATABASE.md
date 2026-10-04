@@ -13,6 +13,27 @@
 9. `20251012000000_fase8_relatorios.sql`
 10. `20251013000000_fase9_assistente.sql`
 11. `20251014000000_fase10_producao.sql`
+12. `20251015000000_reestruturacao_procedures_inventory.sql`
+
+## Reestruturação Subfase 1 — Procedures / Inventory
+
+### `procedures`
+
+Catálogo da clínica (≠ `treatment_items`). Preço `numeric(12,2)`; app usa centavos.
+
+### `inventory_items`
+
+Compra ≠ consumo: `purchase_unit`, `consumption_unit`, `units_per_purchase_unit`.  
+`current_quantity` e `average_unit_cost` na unidade de consumo.
+
+### `procedure_materials`
+
+Ficha técnica: `standard_quantity`, `consumption_mode` (`per_appointment` | `per_procedure` | `per_unit` | `manual`).  
+Trigger `enforce_procedure_material_tenant` bloqueia refs cross-clinic.
+
+### RLS
+
+Policies por `has_permission` (`procedures.*`, `inventory.*`, `procedure_costs.*`).
 
 ## Fase 9 — Secretária Virtual
 

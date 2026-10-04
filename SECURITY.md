@@ -68,6 +68,22 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
 
 
+## Procedures / Inventory (Reestruturação Subfase 1)
+
+| Key | Uso |
+| --- | --- |
+| `procedures.view/create/update` | Catálogo |
+| `procedure_costs.view/update` | Ficha técnica e custos |
+| `procedure_consumption.view/confirm` | Consumo (confirm = subfase futura) |
+| `inventory.view/create/update` | Itens |
+| `inventory.adjust` / `purchase_create` | Ajuste/compra (Subfase 2+) |
+| `cost_reports.view` | Relatórios de custo |
+
+- Clinic A ≠ Clinic B (procedure, item, material)
+- Procedure A + Inventory B → `CROSS_CLINIC_REFERENCE` / not found
+- Custos/margens exigem `procedure_costs.view` (secretária padrão: sem)
+- Servidor é autoridade nos cálculos; frontend só preview
+
 ## Relatórios (Fase 8)
 
 - Acesso por seção: `reports.view_*` — API não retorna dados de seções negadas
