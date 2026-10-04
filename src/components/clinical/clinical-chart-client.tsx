@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ChevronDown, Plus } from "lucide-react";
 import { format } from "date-fns";
@@ -481,6 +482,7 @@ function EntriesTab({
   canUpdate: boolean;
   onChanged: () => void;
 }) {
+  const router = useRouter();
   const [items, setItems] = useState<Array<ClinicalEntry & { professional_name?: string }>>([]);
   const [editing, setEditing] = useState<ClinicalEntry | null>(null);
   const [creating, setCreating] = useState(Boolean(appointmentId));
@@ -851,6 +853,31 @@ function EntriesTab({
                     Histórico de alterações
                   </Button>
                 ) : null}
+                {item.status === "finalized" && item.next_step ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      const ok = window.confirm(
+                        `Adicionar o próximo passo “${item.next_step}” a um novo plano de tratamento?\n\nVocê revisará antes de apresentar. Nada é criado sem confirmação.`,
+                      );
+                      if (!ok) return;
+                      const qs = new URLSearchParams({
+                        procedure: item.next_step ?? "Procedimento",
+                        clinicalEntryId: item.id,
+                      });
+                      if (item.related_teeth[0]) {
+                        qs.set("tooth", String(item.related_teeth[0]));
+                      }
+                      router.push(
+                        `/app/pacientes/${patientId}/tratamentos/novo?${qs.toString()}`,
+                      );
+                    }}
+                  >
+                    Adicionar ao plano
+                  </Button>
+                ) : null}
               </div>
               {versionsFor === item.id ? (
                 <ul className="mt-3 space-y-2 rounded-xl bg-[var(--surface-muted)]/70 p-3 text-xs">
@@ -882,6 +909,7 @@ function OdontogramTab({
   canUpdate: boolean;
   onChanged: () => void;
 }) {
+  const router = useRouter();
   const [teeth, setTeeth] = useState<OdontogramEntry[]>([]);
   const [selected, setSelected] = useState<OdontogramEntry | null>(null);
   const [condition, setCondition] = useState<ToothCondition>("healthy");
@@ -1026,13 +1054,35 @@ function OdontogramTab({
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button type="button" variant="secondary" onClick={() => setSelected(null)}>
                 Fechar
               </Button>
               {canUpdate ? (
                 <Button type="button" loading={busy} onClick={save}>
                   Salvar
+                </Button>
+              ) : null}
+              {planned.trim() ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    const ok = window.confirm(
+                      `Adicionar “${planned.trim()}” (dente ${selected.tooth_number}) a um novo plano de tratamento?\n\nVocê revisará valores antes de apresentar. Nenhum item é criado sem esta confirmação.`,
+                    );
+                    if (!ok) return;
+                    const qs = new URLSearchParams({
+                      procedure: planned.trim(),
+                      tooth: String(selected.tooth_number),
+                      odontogramEntryId: selected.id,
+                    });
+                    router.push(
+                      `/app/pacientes/${patientId}/tratamentos/novo?${qs.toString()}`,
+                    );
+                  }}
+                >
+                  Adicionar ao plano de tratamento
                 </Button>
               ) : null}
             </div>

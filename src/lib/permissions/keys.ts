@@ -35,6 +35,9 @@ export const PERMISSIONS = [
   "treatments.view",
   "treatments.create",
   "treatments.update",
+  "treatments.present",
+  "treatments.acceptance_manage",
+  "treatments.progress_update",
 
   "finance.view_administrative",
   "finance.payment_create",
@@ -97,12 +100,20 @@ export const PATIENT_ADMIN_PERMISSIONS: PermissionKey[] = [
  * NÃO implica acesso clínico universal (gestor ≠ profissional clínico).
  * Acesso clínico exige papel dentist ou membership.clinical_access.
  */
+/** Tratamento clínico (elaboração/execução) — separado do administrativo. */
+export const TREATMENT_CLINICAL_PERMISSIONS: PermissionKey[] = [
+  "treatments.view",
+  "treatments.create",
+  "treatments.update",
+  "treatments.present",
+  "treatments.acceptance_manage",
+  "treatments.progress_update",
+];
+
 export const OWNER_ADMIN_PERMISSIONS: PermissionKey[] = PERMISSIONS.filter(
   (key) =>
     !CLINICAL_PERMISSIONS.includes(key) &&
-    key !== "treatments.view" &&
-    key !== "treatments.create" &&
-    key !== "treatments.update",
+    !TREATMENT_CLINICAL_PERMISSIONS.includes(key),
 );
 
 export const ROLE_PERMISSION_MATRIX: Record<
@@ -123,9 +134,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "patients.contact.view",
     "patients.administrative.view",
     ...CLINICAL_PERMISSIONS,
-    "treatments.view",
-    "treatments.create",
-    "treatments.update",
+    ...TREATMENT_CLINICAL_PERMISSIONS,
     "finance.view_authorized",
     "reports.view",
   ],
@@ -139,6 +148,8 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "appointment_requests.manage",
     ...PATIENT_ADMIN_PERMISSIONS,
     "treatments.administrative_view",
+    "treatments.present",
+    "treatments.acceptance_manage",
     "finance.view_administrative",
     "finance.payment_create",
   ],

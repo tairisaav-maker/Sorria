@@ -7,22 +7,24 @@
 ### FASE 2 — Pacientes (cadastro administrativo)
 ### FASE 3 — Solicitações de horário + Agenda
 ### FASE 4 — Prontuário clínico
+### FASE 5 — Planos de tratamento
 
-- Anamnese versionada (template_version)
-- Evoluções com draft/finalize/correção + versões imutáveis
-- Odontograma FDI V1
-- Arquivos clínicos (storage privado / demo signed URL)
-- Alertas derivados da anamnese
-- Retorno estruturado → retorno pendente derivado
-- Owner sem clínico por padrão (`clinical_access` opt-in)
+- Planos + itens + dentes (0..N)
+- Valores propostos (centavos / numeric) — sem pagamentos
+- Apresentar / aceitar / recusar
+- Versionamento na apresentação + revisão material
+- Progresso derivado dos itens
+- Integração odontograma → plano (com confirmação)
+- Aba Tratamento no perfil + KPIs na Home
+- RLS + permissões granulares (admin ≠ clínico)
 
 ## Próximo
 
-Aguardando Fase 5 (provável Plano de Tratamento).
+Aguardando Fase 6 (Financeiro: condições, parcelas, pagamentos reais, receita).
 
 ## Depois
 
-Financeiro · Portal · Secretária Virtual
+Portal do paciente · Secretária Virtual · Relatórios
 
 ## Fora da V1
 

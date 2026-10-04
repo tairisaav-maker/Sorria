@@ -1,6 +1,7 @@
 import {
   CLINICAL_PERMISSIONS,
   ROLE_PERMISSION_MATRIX,
+  TREATMENT_CLINICAL_PERMISSIONS,
   type MembershipStatus,
   type PermissionKey,
   type RoleKey,
@@ -259,9 +260,7 @@ export function permissionsForMembership(
       ...new Set([
         ...base,
         ...CLINICAL_PERMISSIONS,
-        "treatments.view" as PermissionKey,
-        "treatments.create" as PermissionKey,
-        "treatments.update" as PermissionKey,
+        ...TREATMENT_CLINICAL_PERMISSIONS,
       ]),
     ];
   }

@@ -1,9 +1,11 @@
 export function EmptyState({
   title,
   description,
+  action,
 }: {
   title: string;
   description?: string;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col items-start gap-1 py-6">
@@ -13,6 +15,7 @@ export function EmptyState({
       {description ? (
         <p className="max-w-md text-sm text-[var(--text-muted)]">{description}</p>
       ) : null}
+      {action ? <div className="mt-3">{action}</div> : null}
     </div>
   );
 }

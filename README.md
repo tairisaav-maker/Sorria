@@ -4,10 +4,10 @@
 
 ## Fase atual
 
-**FASE 4 — Prontuário clínico**
+**FASE 5 — Planos de tratamento**
 
-> Administrativo ≠ Clínico · Rascunho ≠ Finalizado · Correção ≠ Sobrescrita  
-> Owner administrativo ≠ acesso clínico universal
+> Plano ≠ Pagamento · Odontograma ≠ Orçamento · Aceite ≠ Receita  
+> Progresso clínico ≠ Progresso financeiro · Alteração após apresentação ≠ sobrescrita
 
 ## Como rodar
 
@@ -20,7 +20,7 @@ npm run dev
 Demo: `demo@sorria.app` / `sorria-demo`  
 (Dra. Ana = proprietária **com** `clinical_access` — também atende.)
 
-Navegação: **Agenda** · **Pacientes → Prontuário** · **Solicitações** · **Equipe**
+Navegação: **Agenda** · **Pacientes → Tratamento / Prontuário** · **Solicitações** · **Equipe**
 
 ## Scripts
 

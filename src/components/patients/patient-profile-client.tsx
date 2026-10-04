@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Copy, Pencil, Phone } from "lucide-react";
 import { PatientCompletion } from "@/components/patients/patient-completion";
 import { PatientStatusBadge } from "@/components/patients/patient-status-badge";
+import { PatientTreatmentTab } from "@/components/treatments/patient-treatment-tab";
 import { Button } from "@/components/ui/button";
 import { calcAge, isMinor } from "@/lib/patients/age";
 import { formatCpf, formatPhoneBR } from "@/lib/patients/normalize";
@@ -41,6 +42,8 @@ export function PatientProfileClient({
   canArchive,
   canCreateAppointment,
   canViewClinical,
+  canViewTreatments,
+  canCreateTreatment,
   nextAppointment,
   lastAppointment,
   followUp,
@@ -50,6 +53,8 @@ export function PatientProfileClient({
   canArchive: boolean;
   canCreateAppointment: boolean;
   canViewClinical: boolean;
+  canViewTreatments: boolean;
+  canCreateTreatment: boolean;
   nextAppointment: AppointmentWithPatient | null;
   lastAppointment: AppointmentWithPatient | null;
   followUp: { intervalDays: number | null; pending: boolean } | null;
@@ -425,7 +430,14 @@ export function PatientProfileClient({
         )
       ) : null}
       {tab === "Tratamento" ? (
-        <Placeholder text="Os planos de tratamento serão disponibilizados em uma próxima etapa." />
+        canViewTreatments ? (
+          <PatientTreatmentTab
+            patientId={patient.id}
+            canCreate={canCreateTreatment}
+          />
+        ) : (
+          <Placeholder text="Você não tem permissão para visualizar planos de tratamento." />
+        )
       ) : null}
       {tab === "Financeiro" ? (
         <Placeholder text="O histórico financeiro será disponibilizado em uma próxima etapa." />
