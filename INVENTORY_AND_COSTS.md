@@ -13,7 +13,7 @@ O estoque não é um ERP. O procedimento não é só um nome no plano de tratame
 | Procedimento (catálogo) | O quê |
 | Ficha técnica | Quanto vou usar |
 | Estoque | Quanto tenho |
-| Consumo real | Quanto usei *(subfase futura)* |
+| Consumo real | Quanto usei (confirmado no atendimento) |
 | Custos | Quanto gastei |
 | Financeiro | Quanto cobrei / recebi |
 | Evolução | O que aconteceu com o paciente |

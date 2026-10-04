@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SorriaMark } from "@/components/brand/sorria-mark";
+import { GlobalSearch } from "@/components/layout/global-search";
 import { Button } from "@/components/ui/button";
 import { hasSupabaseConfig } from "@/lib/supabase/client";
 import { isDemoMode } from "@/lib/utils";
@@ -52,6 +53,9 @@ export function Topbar({
             Clínica: {clinicName}
           </p>
         </div>
+        <div className="mx-2 hidden flex-1 justify-center sm:flex md:mx-4">
+          <GlobalSearch />
+        </div>
         <div className="ml-auto flex items-center gap-2">
           <div className="hidden text-right sm:block lg:hidden">
             <p className="text-sm font-medium text-[var(--text)]">{userName}</p>
@@ -69,6 +73,9 @@ export function Topbar({
             <span className="hidden sm:inline">Sair</span>
           </Button>
         </div>
+      </div>
+      <div className="px-4 pb-3 sm:hidden">
+        <GlobalSearch />
       </div>
     </header>
   );

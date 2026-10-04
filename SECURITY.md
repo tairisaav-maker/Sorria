@@ -1,5 +1,8 @@
 # Security — Sorria
 
+> Fluxo de produto V1: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md).  
+> Separação clínico × financeiro × custos permanece obrigatória no atendimento.
+
 ## Princípios
 
 **Deny by default · Least privilege · Defense in depth · Tenant isolation**

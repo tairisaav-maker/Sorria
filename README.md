@@ -4,9 +4,9 @@
 
 ## Versão
 
-**1.9.0** — Reestruturação Subfase 9 (Preço, margem e simulação por procedimento)
+**1.10.0** — Reestruturação Subfase 10 (Fluxo integrado V1)
 
-> Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
+> Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
 
 ## Como rodar
@@ -50,6 +50,7 @@ npm run build
 
 ## Docs
 
+- [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.10.0 — 2026-10-04
+
+### Added
+- **Subfase 10:** fluxo integrado V1 (Agenda → Atendimento → Consumo → Evolução → Custo → Financeiro)
+- Home: quick actions, CTAs Iniciar/Continuar/Ver atendimento, consultas sem procedimento
+- Tela de atendimento consolidada com blocos Procedimentos · Materiais · Evolução · Financeiro
+- Onboarding V1 em 6 etapas (clínica → procedimentos → materiais → estoque → paciente → consulta)
+- Busca global simples (paciente, procedimento, estoque)
+- [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md)
+- Suite E2E `src/tests/v1/fluxo-integrado-e2e.test.ts`
+
+### Changed
+- Perfil do paciente prioriza Resumo · Evolução · Procedimentos · Financeiro · Documentos
+- Menu principal estável: Início · Agenda · Pacientes · Estoque · Financeiro
+
 ## 1.9.0 — 2026-10-04
 
 ### Added

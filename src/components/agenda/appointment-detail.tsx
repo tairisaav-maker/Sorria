@@ -23,18 +23,23 @@ function durationMin(start: string, end: string) {
 
 const actionsFor = (
   status: AppointmentStatus,
-): Array<{ label: string; status?: AppointmentStatus; kind?: "reschedule" | "cancel" | "clinical" }> => {
+): Array<{
+  label: string;
+  status?: AppointmentStatus;
+  kind?: "reschedule" | "cancel" | "clinical" | "start_attendance";
+}> => {
   switch (status) {
     case "scheduled":
       return [
+        { label: "Iniciar atendimento", kind: "start_attendance" },
         { label: "Confirmar", status: "confirmed" },
-        { label: "Marcar chegada", status: "arrived" },
         { label: "Reagendar", kind: "reschedule" },
         { label: "Cancelar", kind: "cancel" },
         { label: "Marcar falta", status: "no_show" },
       ];
     case "confirmed":
       return [
+        { label: "Iniciar atendimento", kind: "start_attendance" },
         { label: "Marcar chegada", status: "arrived" },
         { label: "Reagendar", kind: "reschedule" },
         { label: "Cancelar", kind: "cancel" },
@@ -42,14 +47,17 @@ const actionsFor = (
       ];
     case "arrived":
       return [
-        { label: "Iniciar atendimento", status: "in_progress" },
+        { label: "Iniciar atendimento", kind: "start_attendance" },
         { label: "Cancelar", kind: "cancel" },
       ];
     case "in_progress":
       return [
-        { label: "Concluir", status: "completed" },
+        { label: "Continuar atendimento", kind: "start_attendance" },
+        { label: "Concluir consulta", status: "completed" },
         { label: "Cancelar", kind: "cancel" },
       ];
+    case "completed":
+      return [];
     default:
       return [];
   }
@@ -79,6 +87,68 @@ export function AppointmentDetail({
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [startLocal, setStartLocal] = useState("");
 
+  async function goToAttendance(ensureInProgress: boolean) {
+    setLoading(true);
+    setError(null);
+    try {
+      if (ensureInProgress && appointment.status !== "in_progress") {
+        // Avança status necessário sem forçar ladder longo
+        if (appointment.status === "scheduled") {
+          await fetch("/api/demo/appointments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "status",
+              id: appointment.id,
+              status: "confirmed",
+            }),
+          });
+        }
+        if (
+          appointment.status === "scheduled" ||
+          appointment.status === "confirmed"
+        ) {
+          await fetch("/api/demo/appointments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "status",
+              id: appointment.id,
+              status: "arrived",
+            }),
+          });
+        }
+        const startRes = await fetch("/api/demo/appointments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "status",
+            id: appointment.id,
+            status: "in_progress",
+          }),
+        });
+        if (!startRes.ok) {
+          const data = (await startRes.json()) as { error?: string };
+          setError(data.error ?? "Não foi possível iniciar o atendimento.");
+          setLoading(false);
+          return;
+        }
+      }
+      // Converte previstos → realizados de forma idempotente (sem pedir recadastro)
+      await fetch("/api/demo/planned-procedures", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "convert",
+          data: { appointment_id: appointment.id },
+        }),
+      });
+    } catch {
+      // segue mesmo se conversão falhar
+    }
+    window.location.href = `/app/agenda/atendimento/${appointment.id}`;
+  }
+
   async function runStatus(status: AppointmentStatus) {
     if (status === "no_show") {
       const ok = window.confirm("Marcar paciente como faltou?");
@@ -92,10 +162,10 @@ export function AppointmentDetail({
         const data = (await drafts.json()) as { items?: unknown[] };
         if ((data.items?.length ?? 0) > 0) {
           const proceed = window.confirm(
-            "Existe uma evolução clínica em rascunho para este atendimento.\n\nOK = Concluir consulta mesmo assim\nCancelar = Voltar ao prontuário",
+            "Existe uma evolução clínica em rascunho para este atendimento.\n\nOK = Concluir consulta mesmo assim\nCancelar = Voltar ao atendimento",
           );
           if (!proceed) {
-            window.location.href = `/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`;
+            window.location.href = `/app/agenda/atendimento/${appointment.id}`;
             return;
           }
         }
@@ -112,38 +182,6 @@ export function AppointmentDetail({
     setLoading(false);
     if (!response.ok) {
       setError(data.error ?? "Não foi possível concluir esta ação. Tente novamente.");
-      return;
-    }
-    if (status === "in_progress") {
-      // Oferece converter procedimentos previstos → realizados (idempotente)
-      try {
-        const plannedRes = await fetch(
-          `/api/demo/planned-procedures?appointmentId=${appointment.id}`,
-        );
-        if (plannedRes.ok) {
-          const plannedData = (await plannedRes.json()) as {
-            items?: unknown[];
-          };
-          if ((plannedData.items?.length ?? 0) > 0) {
-            const usePlanned = window.confirm(
-              "Usar procedimentos previstos para iniciar o atendimento?",
-            );
-            if (usePlanned) {
-              await fetch("/api/demo/planned-procedures", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  action: "convert",
-                  data: { appointment_id: appointment.id },
-                }),
-              });
-            }
-          }
-        }
-      } catch {
-        // segue para a tela de atendimento mesmo se a conversão falhar
-      }
-      window.location.href = `/app/agenda/atendimento/${appointment.id}`;
       return;
     }
     onChanged();
@@ -298,25 +336,12 @@ export function AppointmentDetail({
           </form>
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
-            {appointment.status === "in_progress" ||
-            appointment.status === "arrived" ||
-            appointment.status === "confirmed" ? (
+            {appointment.status === "completed" ? (
               <Link
                 href={`/app/agenda/atendimento/${appointment.id}`}
-                className="inline-flex h-9 items-center rounded-xl bg-[var(--brand-primary)] px-3 text-sm font-medium text-white"
+                className="inline-flex min-h-11 items-center rounded-xl bg-[var(--brand-primary)] px-3 text-sm font-medium text-white"
               >
-                Procedimentos / consumo
-              </Link>
-            ) : null}
-            {canOpenClinical &&
-            (appointment.status === "arrived" ||
-              appointment.status === "in_progress" ||
-              appointment.status === "confirmed") ? (
-              <Link
-                href={`/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`}
-                className="inline-flex h-9 items-center rounded-xl border border-[var(--border)] px-3 text-sm font-medium"
-              >
-                Abrir prontuário
+                Ver atendimento
               </Link>
             ) : null}
             {actions.map((action) => (
@@ -324,11 +349,19 @@ export function AppointmentDetail({
                 key={action.label}
                 type="button"
                 size="sm"
-                variant={action.kind === "cancel" ? "danger" : "secondary"}
+                variant={
+                  action.kind === "cancel"
+                    ? "danger"
+                    : action.kind === "start_attendance"
+                      ? "primary"
+                      : "secondary"
+                }
                 loading={loading}
                 onClick={() => {
                   if (action.kind === "cancel") void cancel();
-                  else if (action.kind === "reschedule") {
+                  else if (action.kind === "start_attendance") {
+                    void goToAttendance(appointment.status !== "in_progress");
+                  } else if (action.kind === "reschedule") {
                     const d = new Date(appointment.start_at);
                     const pad = (n: number) => String(n).padStart(2, "0");
                     setStartLocal(
@@ -341,9 +374,17 @@ export function AppointmentDetail({
                 {action.label}
               </Button>
             ))}
+            {canOpenClinical ? (
+              <Link
+                href={`/app/pacientes/${appointment.patient_id}/prontuario?appointmentId=${appointment.id}`}
+                className="inline-flex min-h-11 items-center rounded-xl border border-[var(--border)] px-3 text-sm font-medium"
+              >
+                Evolução / prontuário
+              </Link>
+            ) : null}
             <Link
               href={`/app/pacientes/${appointment.patient_id}`}
-              className="inline-flex h-9 items-center rounded-xl border border-[var(--border)] px-3 text-sm font-medium"
+              className="inline-flex min-h-11 items-center rounded-xl border border-[var(--border)] px-3 text-sm font-medium"
             >
               Ver paciente
             </Link>

@@ -419,21 +419,67 @@ export function OnboardingClient() {
       {step === "next" ? (
         <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-5">
           <p className="text-sm text-[var(--text-muted)]">
-            Use os fluxos reais do Sorria para os próximos passos:
+            O diferencial do Sorria começa aqui: cadastre um procedimento
+            frequente, os materiais usados e o estoque atual. Depois leve o
+            primeiro paciente até a Agenda.
           </p>
-          <Link
-            href="/app/pacientes/novo?from=onboarding"
-            className="block rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-medium hover:bg-[var(--surface-muted)]/60"
+          <ol className="space-y-2 text-sm">
+            <li>
+              <Link
+                href="/app/procedimentos/novo?from=onboarding"
+                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
+              >
+                2. Cadastrar procedimento frequente
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/app/procedimentos?from=onboarding"
+                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
+              >
+                3. Adicionar materiais da ficha técnica
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/app/estoque?from=onboarding"
+                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
+              >
+                4. Cadastrar estoque atual
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/app/pacientes/novo?from=onboarding"
+                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
+              >
+                5. Cadastrar primeiro paciente
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/app/agenda?from=onboarding"
+                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
+              >
+                6. Agendar primeira consulta
+              </Link>
+            </li>
+          </ol>
+          <p className="text-xs text-[var(--text-subtle)]">
+            Nenhuma etapa é obrigatória — você pode pular e voltar depois.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => router.push("/app/agenda")}
           >
-            Cadastrar primeiro paciente
-          </Link>
-          <Link
-            href="/app/agenda?from=onboarding"
-            className="block rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-medium hover:bg-[var(--surface-muted)]/60"
+            Ir para a Agenda
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.push("/app/home")}
           >
-            Agendar primeira consulta
-          </Link>
-          <Button type="button" variant="secondary" onClick={() => router.push("/app/home")}>
             Ir para o Início
           </Button>
         </section>

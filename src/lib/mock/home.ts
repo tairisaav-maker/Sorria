@@ -37,7 +37,10 @@ export type HomeAppointment = {
   time: string;
   patientName: string;
   procedure: string;
-  status: "confirmed" | "waiting" | "in_progress";
+  status: "confirmed" | "waiting" | "in_progress" | "completed";
+  /** Status real da agenda para CTAs (Iniciar / Continuar / Ver). */
+  rawStatus?: string;
+  missingProcedures?: boolean;
 };
 
 export type HomeRequest = {

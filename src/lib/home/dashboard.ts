@@ -28,12 +28,15 @@ import { countPendingFollowUps } from "@/services/clinical";
 import { listPatients } from "@/services/patients";
 import { getHomeFinanceKpis } from "@/services/finance";
 import { getPortalStore } from "@/lib/demo/portal-store";
+import { getPlannedProceduresStore } from "@/lib/demo/planned-procedures-store";
+import { getPerformedStore } from "@/lib/demo/performed-procedures-store";
 import { countPlansByStatus } from "@/services/treatments";
 import { formatBRL } from "@/lib/money";
 
 function mapHomeStatus(
   status: string,
 ): HomeAppointment["status"] {
+  if (status === "completed") return "completed";
   if (status === "in_progress") return "in_progress";
   if (status === "confirmed" || status === "arrived") return "confirmed";
   return "waiting";
@@ -173,14 +176,30 @@ export function buildHomeDashboard(ctx: AuthzContext) {
         from: startOfDay(today),
         to: endOfDay(today),
       })
-        .filter((a) => a.status !== "cancelled")
-        .map((a) => ({
-          id: a.id,
-          time: format(new Date(a.start_at), "HH:mm"),
-          patientName: a.patient_name,
-          procedure: a.reason || "Consulta",
-          status: mapHomeStatus(a.status),
-        }))
+        .filter((a) => a.status !== "cancelled" && a.status !== "no_show")
+        .map((a) => {
+          const hasPlanned = getPlannedProceduresStore().planned.some(
+            (p) =>
+              p.clinic_id === ctx.clinicId &&
+              p.appointment_id === a.id &&
+              !p.cancelled_at,
+          );
+          const hasPerformed = getPerformedStore().performedProcedures.some(
+            (p) =>
+              p.clinic_id === ctx.clinicId &&
+              p.appointment_id === a.id &&
+              p.status !== "cancelled",
+          );
+          return {
+            id: a.id,
+            time: format(new Date(a.start_at), "HH:mm"),
+            patientName: a.patient_name,
+            procedure: a.reason || "Consulta",
+            status: mapHomeStatus(a.status),
+            rawStatus: a.status,
+            missingProcedures: !hasPlanned && !hasPerformed,
+          };
+        })
     : [];
 
   const requestItems: HomeRequest[] = canRequests

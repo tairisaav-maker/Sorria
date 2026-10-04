@@ -186,9 +186,60 @@ export function AttendanceClient({
   }
 
   useEffect(() => {
-    void loadList();
+    void (async () => {
+      await loadList();
+      // Auto-converte previstos se ainda não houver realizados (idempotente)
+      try {
+        const plannedRes = await fetch(
+          `/api/demo/planned-procedures?appointmentId=${appointmentId}`,
+        ).then((r) => r.json());
+        const count = (plannedRes.items ?? []).length;
+        setPlannedCount(count);
+        const listRes = await fetch(
+          `/api/demo/performed-procedures?view=appointment&appointmentId=${appointmentId}`,
+        ).then((r) => r.json());
+        if (count > 0 && (listRes.items ?? []).length === 0) {
+          await fetch("/api/demo/planned-procedures", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "convert",
+              data: { appointment_id: appointmentId },
+            }),
+          });
+          await loadList();
+        }
+      } catch {
+        // silencioso
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentId]);
+
+  const [message, setMessage] = useState<string | null>(null);
+  const [completingAppt, setCompletingAppt] = useState(false);
+
+  async function completeAppointment() {
+    setCompletingAppt(true);
+    setError(null);
+    const res = await fetch("/api/demo/appointments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "status",
+        id: appointmentId,
+        status: "completed",
+      }),
+    });
+    setCompletingAppt(false);
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? "Não foi possível concluir o atendimento.");
+      return;
+    }
+    setMessage("Atendimento concluído.");
+    await loadList();
+  }
 
   async function addProcedure(e: React.FormEvent) {
     e.preventDefault();
@@ -379,28 +430,36 @@ export function AttendanceClient({
             {patientName}
           </Link>
         </p>
-        <h1 className="mt-1 font-[family-name:var(--font-display)] text-3xl tracking-tight text-[var(--brand-ink)]">
-          Atendimento
-        </h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Procedimentos do paciente · consumo previsto × real · custo individual
-        </p>
+        <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-[var(--brand-ink)]">
+              Atendimento
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              {patientName} · procedimentos · materiais · evolução · financeiro
+            </p>
+          </div>
+          <Link
+            href={`/app/pacientes/${patientId}`}
+            className="text-sm text-[var(--brand-primary)] hover:underline"
+          >
+            Ver paciente
+          </Link>
+        </div>
       </section>
 
-      {error ? (
-        <p className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
-          {error}
-        </p>
-      ) : null}
+      <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-subtle)]">
+        1. Procedimentos
+      </p>
 
-      {canCreate && plannedCount > 0 ? (
+      {canCreate && plannedCount > 0 && list.length === 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4">
           <h2 className="font-medium text-[var(--brand-ink)]">
-            Procedimentos previstos na Agenda
+            Procedimentos previstos
           </h2>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
-            {plannedCount} procedimento(s) previsto(s). Use-os para criar os
-            procedimentos realizados sem duplicar.
+            {plannedCount} previsto(s). Conversão automática ao abrir; use o
+            botão se precisar repetir.
           </p>
           <Button
             type="button"
@@ -537,10 +596,15 @@ export function AttendanceClient({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium">Revisar materiais utilizados</h3>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-subtle)]">
+              2. Materiais
+            </p>
+            <h3 className="mt-1 text-sm font-medium">
+              Revisar materiais utilizados
+            </h3>
             <p className="text-xs text-[var(--text-muted)]">
-              Pré-preenchido com previsto — altere só o diferente. Baixa só após
-              confirmar.
+              Utilizado = previsto por padrão. Altere só o que mudou. Baixa só
+              após confirmar.
             </p>
             <div className="mt-2 overflow-x-auto">
               <table className="w-full text-left text-sm">
@@ -676,6 +740,33 @@ export function AttendanceClient({
             </form>
           ) : null}
 
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-subtle)]">
+              3. Evolução
+            </p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              Contexto pré-preenchido com paciente, procedimento e dente —
+              sem redigitar.
+            </p>
+            {selected.procedure.status === "completed" ? (
+              <Button
+                size="sm"
+                className="mt-2"
+                variant="secondary"
+                onClick={registerEvolution}
+              >
+                Registrar evolução
+              </Button>
+            ) : (
+              <p className="mt-2 text-xs text-[var(--text-subtle)]">
+                Disponível após concluir o procedimento.
+              </p>
+            )}
+          </div>
+
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-subtle)]">
+            4. Custos e financeiro
+          </p>
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
             {financeBreakdown?.standard_price_cents != null ? (
               <div>
@@ -815,11 +906,17 @@ export function AttendanceClient({
 
           <div className="flex flex-wrap gap-2">
             {!selected.procedure.consumption_confirmed && canConfirm ? (
-              <>
-                <Button size="sm" variant="secondary" onClick={saveConsumption}>
-                  Usar quantidades previstas
-                </Button>
-                <Button size="sm" onClick={confirm}>
+              <div className="space-y-2">
+                <p className="text-xs text-[var(--text-muted)]">
+                  Por padrão, utilizado = previsto. Altere só o que mudou.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    await confirm();
+                    setMessage("Consumo confirmado.");
+                  }}
+                >
                   Confirmar consumo
                 </Button>
                 {confirmNeg ? (
@@ -829,10 +926,11 @@ export function AttendanceClient({
                       checked={confirmNeg}
                       onChange={(e) => setConfirmNeg(e.target.checked)}
                     />
-                    Continuar com estoque insuficiente
+                    O estoque registrado deste material é inferior à quantidade
+                    utilizada — continuar mesmo assim
                   </label>
                 ) : null}
-              </>
+              </div>
             ) : null}
             {selected.procedure.consumption_confirmed &&
             selected.procedure.status !== "completed" ? (
@@ -840,17 +938,18 @@ export function AttendanceClient({
                 Concluir procedimento
               </Button>
             ) : null}
-            {selected.procedure.status === "completed" ? (
-              <>
-                <Button size="sm" variant="secondary" onClick={registerEvolution}>
-                  Registrar evolução
-                </Button>
-                {selected.financeOffer?.offer ? (
-                  <Button size="sm" variant="secondary" onClick={addFinance}>
-                    Adicionar ao financeiro
-                  </Button>
-                ) : null}
-              </>
+            {selected.procedure.status === "completed" &&
+            selected.financeOffer?.offer ? (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={async () => {
+                  await addFinance();
+                  setMessage("Cobrança adicionada ao financeiro.");
+                }}
+              >
+                Adicionar ao financeiro
+              </Button>
             ) : null}
           </div>
         </section>
@@ -861,6 +960,9 @@ export function AttendanceClient({
           <h2 className="font-medium text-[var(--brand-ink)]">
             Resumo do atendimento
           </h2>
+          <p className="mt-1 text-sm">
+            {completion.procedures.length} procedimento(s) realizado(s)
+          </p>
           <ul className="mt-2 space-y-1 text-sm">
             {completion.procedures.map((p) => (
               <li key={p.name + String(p.tooth_number)}>
@@ -869,25 +971,52 @@ export function AttendanceClient({
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-[var(--text-muted)]">
-            Materiais:{" "}
-            {completion.materials_confirmed
-              ? "Consumo confirmado"
-              : "Consumo pendente"}
-            {" · "}
-            Evolução: {completion.evolutions_finalized} registrada(s)
-          </p>
-          {completion.charged_cents != null ? (
-            <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Financeiro: {formatBRL(completion.charged_cents)} cobrados
-              {completion.received_cents != null
-                ? ` · ${formatBRL(completion.received_cents)} recebidos`
-                : ""}
-              {completion.outstanding_cents != null
-                ? ` · ${formatBRL(completion.outstanding_cents)} pendentes`
-                : ""}
-            </p>
-          ) : null}
+          <dl className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-[var(--text-muted)]">Consumo</dt>
+              <dd>
+                {completion.materials_confirmed
+                  ? "✓ Confirmado"
+                  : "Consumo pendente"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[var(--text-muted)]">Evolução</dt>
+              <dd>
+                {completion.evolutions_finalized > 0
+                  ? `✓ ${completion.evolutions_finalized} finalizada(s)`
+                  : "Evolução em rascunho / pendente"}
+              </dd>
+            </div>
+            {completion.charged_cents != null ? (
+              <>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Valor cobrado</dt>
+                  <dd>{formatBRL(completion.charged_cents)}</dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Recebido</dt>
+                  <dd>
+                    {completion.received_cents != null
+                      ? formatBRL(completion.received_cents)
+                      : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Saldo</dt>
+                  <dd>
+                    {completion.outstanding_cents != null
+                      ? formatBRL(completion.outstanding_cents)
+                      : "—"}
+                  </dd>
+                </div>
+              </>
+            ) : (
+              <div className="sm:col-span-2 text-[var(--text-muted)]">
+                Financeiro não definido
+              </div>
+            )}
+          </dl>
           {completion.warnings.length > 0 ? (
             <ul className="mt-3 space-y-1 text-xs text-[var(--warning)]">
               {completion.warnings.map((w) => (
@@ -895,7 +1024,39 @@ export function AttendanceClient({
               ))}
             </ul>
           ) : null}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              loading={completingAppt}
+              onClick={() => void completeAppointment()}
+            >
+              Concluir atendimento
+            </Button>
+            <Link href={`/app/pacientes/${patientId}`}>
+              <Button size="sm" variant="secondary">
+                Ver paciente
+              </Button>
+            </Link>
+          </div>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">
+            Financeiro não definido ou evolução em rascunho são avisos — não
+            bloqueiam a conclusão.
+          </p>
         </section>
+      ) : null}
+
+      {message ? (
+        <p
+          role="status"
+          className="rounded-xl bg-[var(--success-soft)] px-3 py-2 text-sm text-[var(--success)]"
+        >
+          {message}
+        </p>
+      ) : null}
+      {error ? (
+        <p className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+          {error}
+        </p>
       ) : null}
     </div>
   );

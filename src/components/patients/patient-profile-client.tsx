@@ -23,9 +23,8 @@ import { cn } from "@/lib/utils";
 
 const tabs = [
   "Resumo",
-  "Prontuário",
+  "Evolução",
   "Procedimentos",
-  "Tratamento",
   "Financeiro",
   "Documentos",
 ] as const;
@@ -423,21 +422,30 @@ export function PatientProfileClient({
         </div>
       ) : null}
 
-      {tab === "Prontuário" ? (
+      {tab === "Evolução" ? (
         canViewClinical ? (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-5 py-8 text-center">
+          <div className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-5 py-6">
             <p className="text-sm text-[var(--text-muted)]">
-              Abrir o prontuário clínico completo deste paciente.
+              Evoluções clínicas e prontuário deste paciente.
             </p>
             <Link
               href={`/app/pacientes/${patient.id}/prontuario`}
-              className="mt-4 inline-flex h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
+              className="inline-flex min-h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
             >
-              Abrir prontuário
+              Abrir evolução / prontuário
             </Link>
+            {canViewTreatments ? (
+              <div className="border-t border-[var(--border)] pt-4">
+                <p className="mb-2 text-sm font-medium">Planos de tratamento</p>
+                <PatientTreatmentTab
+                  patientId={patient.id}
+                  canCreate={canCreateTreatment}
+                />
+              </div>
+            ) : null}
           </div>
         ) : (
-          <Placeholder text="Você não tem permissão para acessar o prontuário deste paciente." />
+          <Placeholder text="Você não tem permissão para acessar a evolução deste paciente." />
         )
       ) : null}
       {tab === "Procedimentos" ? (
@@ -448,29 +456,18 @@ export function PatientProfileClient({
             canViewFinance={canViewFinance}
           />
         ) : (
-          <Placeholder text="Você não tem permissão para ver procedimentos realizados." />
-        )
-      ) : null}
-      {tab === "Tratamento" ? (
-        canViewTreatments ? (
-          <PatientTreatmentTab
-            patientId={patient.id}
-            canCreate={canCreateTreatment}
-          />
-        ) : (
-          <Placeholder text="Você não tem permissão para visualizar planos de tratamento." />
+          <Placeholder text="Este paciente ainda não possui procedimentos realizados — ou você não tem permissão." />
         )
       ) : null}
       {tab === "Financeiro" ? (
         canViewFinance ? (
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 px-5 py-8 text-center">
             <p className="text-sm text-[var(--text-muted)]">
-              Resumo, parcelas e pagamentos deste paciente — separado do
-              prontuário e das despesas gerais da clínica.
+              Cobrado, recebido, a receber e vencido deste paciente.
             </p>
             <Link
               href={`/app/pacientes/${patient.id}/financeiro`}
-              className="mt-4 inline-flex h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
+              className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[var(--brand-primary)] px-4 text-sm font-medium text-white"
             >
               Abrir financeiro do paciente
             </Link>

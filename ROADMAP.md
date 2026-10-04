@@ -2,7 +2,7 @@
 
 ## Concluído
 
-- FASE 0–10 e Reestruturação Subfases 1–7
+- FASE 0–10 e Reestruturação Subfases 1–10 (V1 fechado em fluxo integrado)
 
 ## Reestruturação (ordem)
 
@@ -13,7 +13,13 @@
 5. ✅ Subfase 5 — Evolução + cobrado + financeiro do procedimento  
 6. ✅ Subfase 6 — Relatórios operacionais  
 7. ✅ Subfase 7 — Reposição inteligente + lista de compras  
-8. Subfase 8 (proposta) — Despesas gerais + custo fixo mensal + custo por hora clínica
+8. ✅ Subfase 8 — Despesas gerais + custo/hora + custo operacional  
+9. ✅ Subfase 9 — Preço, margem e simulação  
+10. ✅ Subfase 10 — Fluxo integrado UX + fechamento V1 ([V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md))
+
+## Próximo passo
+
+Piloto controlado com dentista em atendimentos reais (não mais módulos).
 
 ## Despriorizado no V1 comercial
 

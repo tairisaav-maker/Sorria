@@ -4,6 +4,7 @@ import { HomeGreeting } from "@/components/home/home-greeting";
 import { InventoryHomeCard } from "@/components/home/inventory-home-card";
 import { MarginsHomeCard } from "@/components/home/margins-home-card";
 import { OperationalKpisCard } from "@/components/home/operational-kpis-card";
+import { QuickActions } from "@/components/home/quick-actions";
 import { SetupChecklist } from "@/components/home/setup-checklist";
 import { KpiRow } from "@/components/home/kpi-row";
 import { RequestsList } from "@/components/home/requests-list";
@@ -100,12 +101,24 @@ export default async function HomePage() {
         userName={profile?.full_name ?? "Profissional"}
         clinicName={clinic?.name ?? "Clínica"}
       />
+      <p className="text-sm text-[var(--text-muted)]">
+        O que precisa da sua atenção hoje?
+      </p>
+      <QuickActions
+        canCreateAppointment={can(actor.ctx, "appointments.create").allowed}
+        canCreatePatient={
+          can(actor.ctx, "patients.demographics.create").allowed
+        }
+        canPurchase={can(actor.ctx, "inventory.purchase_create").allowed}
+        canPayment={can(actor.ctx, "finance.payment_create").allowed}
+      />
       {!onboarding.complete ? (
         <SetupChecklist
           items={[...onboarding.checklist]}
-          dismissHref="/app/onboarding?step=welcome"
+          dismissHref="/app/onboarding"
         />
       ) : null}
+      <TodayList items={dashboard.todayItems} />
       <KpiRow items={dashboard.kpis} />
       {monthOps ? (
         <OperationalKpisCard
@@ -139,7 +152,6 @@ export default async function HomePage() {
           <RequestsList items={dashboard.requestItems} />
         </div>
       </div>
-      <TodayList items={dashboard.todayItems} />
     </div>
   );
 }

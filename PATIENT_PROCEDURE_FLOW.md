@@ -1,5 +1,8 @@
 # Fluxo do procedimento do paciente — Sorria
 
+> Experiência de produto (Subfase 10): ver [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md).  
+> Centro operacional: `/app/agenda/atendimento/[appointmentId]`.
+
 ## Cadeia completa
 
 ```text

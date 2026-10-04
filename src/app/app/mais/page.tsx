@@ -8,7 +8,6 @@ import {
   Shield,
   Sparkles,
   Users,
-  Wallet,
 } from "lucide-react";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
@@ -25,7 +24,6 @@ export default async function MaisPage() {
   const canTeam = can(actor.ctx, "team.view").allowed;
   const canPermissions = can(actor.ctx, "permissions.manage").allowed;
   const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
-  const canFinance = can(actor.ctx, "finance.view_administrative").allowed;
   const canReports = can(actor.ctx, "reports.view").allowed;
   const canProcedures = can(actor.ctx, "procedures.view").allowed;
   const canAssistant =
@@ -52,14 +50,6 @@ export default async function MaisPage() {
           title: "Relatórios",
           description: "Indicadores essenciais de operação",
           icon: FileBarChart2,
-        }
-      : null,
-    canFinance
-      ? {
-          href: "/app/financeiro",
-          title: "Financeiro",
-          description: "Recebido, a receber, vencidos e despesas",
-          icon: Wallet,
         }
       : null,
     canRequests

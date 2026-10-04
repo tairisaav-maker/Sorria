@@ -20,6 +20,7 @@ import {
   type WeekdayKey,
 } from "@/types/clinic-settings";
 import { getAgendaStore } from "@/lib/demo/agenda-store";
+import { getInventoryStore } from "@/lib/demo/inventory-store";
 import { listPatients } from "@/services/patients/queries";
 
 const clinicUpdateSchema = z.object({
@@ -270,34 +271,57 @@ function maybeCompleteOnboarding(clinic: DemoClinic) {
 
 function buildChecklist(ctx: AuthzContext, clinic: DemoClinic) {
   const o = clinic.onboarding;
+  const inv = getInventoryStore();
+  const proceduresDone = inv.procedures.some(
+    (p) => p.clinic_id === ctx.clinicId && p.active,
+  );
+  const materialsDone = inv.procedureMaterials.some((m) => {
+    const proc = inv.procedures.find(
+      (p) => p.id === m.procedure_id && p.clinic_id === ctx.clinicId,
+    );
+    return Boolean(proc);
+  });
+  const stockDone = inv.inventoryItems.some(
+    (i) =>
+      i.clinic_id === ctx.clinicId &&
+      i.active &&
+      !i.archived_at &&
+      i.current_quantity > 0,
+  );
   return [
     {
       key: "clinic",
-      label: "Clínica configurada",
+      label: "1. Clínica",
       done: o.clinic_done,
       href: "/app/onboarding?step=clinic",
     },
     {
-      key: "profile",
-      label: "Perfil profissional",
-      done: o.profile_done,
-      href: "/app/onboarding?step=profile",
+      key: "procedures",
+      label: "2. Procedimentos",
+      done: proceduresDone,
+      href: "/app/procedimentos/novo?from=onboarding",
     },
     {
-      key: "hours",
-      label: "Definir horários",
-      done: o.hours_done,
-      href: "/app/onboarding?step=hours",
+      key: "materials",
+      label: "3. Materiais",
+      done: materialsDone,
+      href: "/app/procedimentos?from=onboarding",
+    },
+    {
+      key: "stock",
+      label: "4. Estoque inicial",
+      done: stockDone,
+      href: "/app/estoque?from=onboarding",
     },
     {
       key: "patient",
-      label: "Cadastrar paciente",
+      label: "5. Primeiro paciente",
       done: o.first_patient_done,
       href: "/app/pacientes/novo?from=onboarding",
     },
     {
       key: "appointment",
-      label: "Agendar primeira consulta",
+      label: "6. Primeira consulta",
       done: o.first_appointment_done,
       href: "/app/agenda?from=onboarding",
     },

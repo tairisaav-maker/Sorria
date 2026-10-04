@@ -51,6 +51,7 @@ Acesso financeiro é independente do clínico.
 | Reposição inteligente / lista de compras (Subfase 7) | ✅ |
 | Custeio operacional / custo/hora (Subfase 8) | ✅ |
 | Preço, margem e simulação (Subfase 9) | ✅ |
+| Fluxo integrado UX / fechamento V1 (Subfase 10) | ✅ |
 
 ## Novo núcleo operacional
 
@@ -62,6 +63,8 @@ Agenda → Atendimento → Procedimento → Materiais previstos
   → Despesas gerais → Horas produtivas → Custo/hora → Custo operacional do procedimento
   → Preço padrão × cobrado × custo → Margem / simulação (sem recomendar preço)
 ```
+
+Experiência unificada: [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) · tela central `/app/agenda/atendimento/[id]`.
 
 Navegação principal: Início · Agenda · Pacientes · Estoque · Financeiro · Mais  
 Secundário: Procedimentos · Relatórios · Configurações  
