@@ -16,10 +16,11 @@
 8. ✅ Subfase 8 — Despesas gerais + custo/hora + custo operacional  
 9. ✅ Subfase 9 — Preço, margem e simulação  
 10. ✅ Subfase 10 — Fluxo integrado UX + fechamento V1 ([V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md))
+11. ✅ Subfase 11 — SaaS (signup, planos, assinaturas) — [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md)
 
 ## Próximo passo
 
-Piloto controlado com dentista em atendimentos reais (não mais módulos).
+Executar piloto real (PILOT_REPORT) → definir preços → provider de billing → primeiros clientes.
 
 ## Despriorizado no V1 comercial
 

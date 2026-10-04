@@ -18,6 +18,10 @@
 14. `20251017000000_reestruturacao_performed_procedures.sql`
 15. `20251018000000_reestruturacao_appointment_planned_procedures.sql`
 16. `20251019000000_reestruturacao_patient_procedure_finance.sql`
+17. `20251020000000_reestruturacao_replenishment.sql`
+18. `20251021000000_reestruturacao_operational_costing.sql`
+19. `20251022000000_reestruturacao_pricing_margin.sql`
+20. `20251023000000_subfase11_saas_billing.sql` — planos, entitlements, assinaturas, billing_events, convites
 
 ## Reestruturação Subfase 5 — Procedimento ↔ evolução ↔ financeiro
 

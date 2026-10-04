@@ -2,8 +2,10 @@
 
 ## Contexto
 
-Preparação do **piloto controlado** do V1 (versão **0.9.0-pilot**).  
+Preparação do **piloto controlado** do V1.  
 Objetivo: uso real por uma dentista para medir simplicidade e confiabilidade de consumo, estoque, custo e financeiro — **sem novos módulos**.
+
+> **Status em Subfase 11:** o piloto foi *preparado* (instrumentação, checklist, runbook), mas **não há evidência de execução real** (fluxos/bugs/métricas abaixo ainda vazios). Isso é um **bloqueio para lançamento comercial amplo**; a arquitetura SaaS pode seguir em beta fechado.
 
 ## Período
 
