@@ -50,6 +50,7 @@ export type ClinicalEntry = {
   clinic_id: string;
   patient_id: string;
   appointment_id: string | null;
+  performed_procedure_id: string | null;
   professional_id: string;
   status: ClinicalEntryStatus;
   chief_complaint: string | null;

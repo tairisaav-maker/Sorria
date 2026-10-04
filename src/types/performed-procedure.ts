@@ -1,4 +1,5 @@
 import type { ConsumptionMode, InventoryUnit } from "@/types/inventory";
+import type { PerformedFinancialStatus } from "@/types/patient-procedure-finance";
 
 export const PERFORMED_PROCEDURE_STATUSES = [
   "planned",
@@ -39,6 +40,8 @@ export type PerformedProcedure = {
   /** Valor cobrado neste paciente, centavos */
   charged_amount_cents: number | null;
   charged_zero_reason: string | null;
+  financial_status: PerformedFinancialStatus;
+  charge_note: string | null;
   planned_material_cost_cents: number;
   actual_material_cost_cents: number | null;
   planned_shared_cost_cents: number;

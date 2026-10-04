@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDemoSession } from "@/lib/demo/authz-store";
-import { createIncomeTransaction } from "@/services/finance";
 import {
-  attachFinancialTransaction,
   cancelPerformedProcedure,
   completePerformedProcedure,
   createPerformedProcedure,
@@ -10,7 +8,6 @@ import {
   getPatientDirectCostSummary,
   getPatientProcedureHistory,
   getPerformedProcedure,
-  linkClinicalEntry,
   listAppointmentPerformedProcedures,
   shouldOfferFinanceCharge,
   startPerformedProcedure,
@@ -23,8 +20,12 @@ import {
   getConsumptionDeviations,
   updateActualConsumption,
 } from "@/services/procedure-consumption";
-import { createClinicalEntry } from "@/services/clinical";
-import { centsToReais } from "@/lib/money";
+import {
+  createEvolutionFromPerformedProcedure,
+  createFinancialChargeFromPerformedProcedure,
+  getAppointmentCompletionSummary,
+  getProcedureFinanceBreakdown,
+} from "@/services/patient-procedure-finance";
 
 function ensureDemo() {
   if (process.env.NEXT_PUBLIC_DEMO_MODE !== "true") {
@@ -107,6 +108,7 @@ export async function GET(request: Request) {
         ...detail,
         deviations: getConsumptionDeviations(session, id),
         financeOffer: shouldOfferFinanceCharge(session, id),
+        financeBreakdown: getProcedureFinanceBreakdown(session, id),
       });
     }
     if (view === "patient") {
@@ -121,6 +123,7 @@ export async function GET(request: Request) {
       return NextResponse.json({
         items: listAppointmentPerformedProcedures(session, appointmentId),
         forecast: getAppointmentMaterialForecast(session, appointmentId),
+        completion: getAppointmentCompletionSummary(session, appointmentId),
       });
     }
     return NextResponse.json({ error: "view inválida" }, { status: 400 });
@@ -173,48 +176,42 @@ export async function POST(request: Request) {
           correctProcedureConsumption(session, body.data),
         );
       case "register_evolution": {
-        const detail = getPerformedProcedure(session, body.data.id);
-        const p = detail.procedure;
-        const entry = createClinicalEntry(session, {
-          patient_id: p.patient_id,
-          appointment_id: p.appointment_id,
-          procedure_done: `${p.procedure_name_snapshot}${
-            p.tooth_number ? ` — Dente ${p.tooth_number}` : ""
-          }${p.region ? ` — ${p.region}` : ""}`,
-          related_teeth: p.tooth_number ? [p.tooth_number] : [],
-          guidance: body.data.guidance ?? "",
-          conduct: body.data.conduct ?? "",
-          next_step: body.data.next_step ?? "",
+        const entry = createEvolutionFromPerformedProcedure(
+          session,
+          body.data.id,
+          {
+            guidance: body.data.guidance ?? "",
+            conduct: body.data.conduct ?? "",
+            next_step: body.data.next_step ?? "",
+          },
+        );
+        return NextResponse.json({
+          entry,
+          item: getPerformedProcedure(session, body.data.id),
         });
-        linkClinicalEntry(session, p.id, entry.id);
-        return NextResponse.json({ entry, item: getPerformedProcedure(session, p.id) });
       }
       case "add_to_finance": {
         const offer = shouldOfferFinanceCharge(session, body.data.id);
         if (!offer.offer) {
           return NextResponse.json(
-            { error: "Não é possível gerar cobrança automática.", reason: offer.reason },
+            {
+              error:
+                offer.reason === "plan_already_billed"
+                  ? "Incluído no plano de tratamento"
+                  : "Não é possível gerar cobrança automática.",
+              reason: offer.reason,
+            },
             { status: 400 },
           );
         }
-        const detail = getPerformedProcedure(session, body.data.id);
-        const p = detail.procedure;
-        const tx = createIncomeTransaction(session, {
-          type: "income",
-          description: `${p.procedure_name_snapshot}${
-            p.tooth_number ? ` — Dente ${p.tooth_number}` : ""
-          }`,
-          patient_id: p.patient_id,
-          appointment_id: p.appointment_id,
-          gross_amount_reais: centsToReais(p.charged_amount_cents ?? 0),
-          discount_amount_reais: 0,
-          due_date: new Date().toISOString().slice(0, 10),
-          installments_count: 1,
+        const result = createFinancialChargeFromPerformedProcedure(session, {
+          performed_procedure_id: body.data.id,
         });
-        attachFinancialTransaction(session, p.id, tx.id);
         return NextResponse.json({
-          transaction: tx,
-          item: getPerformedProcedure(session, p.id),
+          transaction: result.transaction,
+          link: result.link,
+          breakdown: result.breakdown,
+          item: getPerformedProcedure(session, body.data.id),
         });
       }
       default:

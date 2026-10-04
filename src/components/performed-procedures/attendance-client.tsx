@@ -101,6 +101,25 @@ export function AttendanceClient({
   const [confirmNeg, setConfirmNeg] = useState(false);
   const [plannedCount, setPlannedCount] = useState(0);
   const [converting, setConverting] = useState(false);
+  const [completion, setCompletion] = useState<{
+    materials_confirmed: boolean;
+    evolutions_finalized: number;
+    charged_cents: number | null;
+    received_cents: number | null;
+    outstanding_cents: number | null;
+    warnings: string[];
+    procedures: Array<{ name: string; tooth_number: number | null }>;
+  } | null>(null);
+  const [financeBreakdown, setFinanceBreakdown] = useState<{
+    standard_price_cents: number | null;
+    charged_amount_cents: number | null;
+    received_cents: number;
+    outstanding_cents: number;
+    actual_total_cost_cents: number | null;
+    gross_result_charged_cents: number | null;
+    gross_margin_percent: number | null;
+    financial_status: string;
+  } | null>(null);
 
   async function loadList() {
     const [apptRes, procRes, invRes, plannedRes] = await Promise.all([
@@ -115,6 +134,7 @@ export function AttendanceClient({
     ]);
     setList(apptRes.items ?? []);
     setForecast(apptRes.forecast?.materials ?? []);
+    setCompletion(apptRes.completion ?? null);
     setPlannedCount((plannedRes.items ?? []).length);
     const cats = (procRes.items ?? []) as CatalogProc[];
     setCatalog(cats);
@@ -157,6 +177,7 @@ export function AttendanceClient({
       return;
     }
     setSelected(res);
+    setFinanceBreakdown(res.financeBreakdown ?? null);
     setConfirmNeg(false);
   }
 
@@ -651,44 +672,85 @@ export function AttendanceClient({
             </form>
           ) : null}
 
-          {selected.canViewCosts ? (
-            <dl className="grid gap-2 text-sm sm:grid-cols-2">
+          <dl className="grid gap-2 text-sm sm:grid-cols-2">
+            {financeBreakdown?.standard_price_cents != null ? (
               <div>
-                <dt className="text-[var(--text-muted)]">Valor cobrado</dt>
+                <dt className="text-[var(--text-muted)]">Preço padrão</dt>
                 <dd className="font-medium">
-                  {selected.procedure.charged_amount_cents != null
-                    ? formatBRL(selected.procedure.charged_amount_cents)
-                    : "—"}
+                  {formatBRL(financeBreakdown.standard_price_cents)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-[var(--text-muted)]">Custo real</dt>
-                <dd className="font-medium">
-                  {selected.procedure.actual_total_cost_cents != null
-                    ? formatBRL(selected.procedure.actual_total_cost_cents)
-                    : selected.procedure.planned_total_cost_cents != null
-                      ? `previsto ${formatBRL(selected.procedure.planned_total_cost_cents)}`
-                      : "—"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[var(--text-muted)]">Resultado bruto</dt>
-                <dd className="font-medium">
-                  {selected.procedure.gross_result_cents != null
-                    ? formatBRL(selected.procedure.gross_result_cents)
-                    : "—"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[var(--text-muted)]">Margem do procedimento</dt>
-                <dd className="font-medium">
-                  {selected.procedure.gross_margin_percent != null
-                    ? `${selected.procedure.gross_margin_percent}%`
-                    : "—"}
-                </dd>
-              </div>
-            </dl>
-          ) : null}
+            ) : null}
+            <div>
+              <dt className="text-[var(--text-muted)]">Valor cobrado</dt>
+              <dd className="font-medium">
+                {(financeBreakdown?.charged_amount_cents ??
+                  selected.procedure.charged_amount_cents) != null
+                  ? formatBRL(
+                      financeBreakdown?.charged_amount_cents ??
+                        selected.procedure.charged_amount_cents!,
+                    )
+                  : "—"}
+                <span className="ml-1 text-xs text-[var(--text-subtle)]">
+                  (estimado cobrado)
+                </span>
+              </dd>
+            </div>
+            {financeBreakdown &&
+            (financeBreakdown.received_cents > 0 ||
+              financeBreakdown.outstanding_cents > 0) ? (
+              <>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Recebido</dt>
+                  <dd className="font-medium">
+                    {formatBRL(financeBreakdown.received_cents)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Saldo</dt>
+                  <dd className="font-medium">
+                    {formatBRL(financeBreakdown.outstanding_cents)}
+                  </dd>
+                </div>
+              </>
+            ) : null}
+            {selected.canViewCosts ? (
+              <>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Custo real</dt>
+                  <dd className="font-medium">
+                    {financeBreakdown?.actual_total_cost_cents != null
+                      ? formatBRL(financeBreakdown.actual_total_cost_cents)
+                      : selected.procedure.actual_total_cost_cents != null
+                        ? formatBRL(selected.procedure.actual_total_cost_cents)
+                        : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--text-muted)]">
+                    Resultado bruto (sobre cobrado)
+                  </dt>
+                  <dd className="font-medium">
+                    {financeBreakdown?.gross_result_charged_cents != null
+                      ? formatBRL(financeBreakdown.gross_result_charged_cents)
+                      : selected.procedure.gross_result_cents != null
+                        ? formatBRL(selected.procedure.gross_result_cents)
+                        : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--text-muted)]">Margem</dt>
+                  <dd className="font-medium">
+                    {financeBreakdown?.gross_margin_percent != null
+                      ? `${financeBreakdown.gross_margin_percent}%`
+                      : selected.procedure.gross_margin_percent != null
+                        ? `${selected.procedure.gross_margin_percent}%`
+                        : "—"}
+                  </dd>
+                </div>
+              </>
+            ) : null}
+          </dl>
 
           <div className="flex flex-wrap gap-2">
             {!selected.procedure.consumption_confirmed && canConfirm ? (
@@ -730,6 +792,48 @@ export function AttendanceClient({
               </>
             ) : null}
           </div>
+        </section>
+      ) : null}
+
+      {completion && completion.procedures.length > 0 ? (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4">
+          <h2 className="font-medium text-[var(--brand-ink)]">
+            Resumo do atendimento
+          </h2>
+          <ul className="mt-2 space-y-1 text-sm">
+            {completion.procedures.map((p) => (
+              <li key={p.name + String(p.tooth_number)}>
+                {p.name}
+                {p.tooth_number != null ? ` — ${p.tooth_number}` : ""}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm text-[var(--text-muted)]">
+            Materiais:{" "}
+            {completion.materials_confirmed
+              ? "Consumo confirmado"
+              : "Consumo pendente"}
+            {" · "}
+            Evolução: {completion.evolutions_finalized} registrada(s)
+          </p>
+          {completion.charged_cents != null ? (
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              Financeiro: {formatBRL(completion.charged_cents)} cobrados
+              {completion.received_cents != null
+                ? ` · ${formatBRL(completion.received_cents)} recebidos`
+                : ""}
+              {completion.outstanding_cents != null
+                ? ` · ${formatBRL(completion.outstanding_cents)} pendentes`
+                : ""}
+            </p>
+          ) : null}
+          {completion.warnings.length > 0 ? (
+            <ul className="mt-3 space-y-1 text-xs text-[var(--warning)]">
+              {completion.warnings.map((w) => (
+                <li key={w}>{w}</li>
+              ))}
+            </ul>
+          ) : null}
         </section>
       ) : null}
     </div>

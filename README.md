@@ -4,7 +4,7 @@
 
 ## Versão
 
-**1.4.0** — Reestruturação Subfase 4 (Previsão de materiais pela Agenda)
+**1.5.0** — Reestruturação Subfase 5 (Procedimento + evolução + cobrado + financeiro)
 
 > Agenda → Procedimento → Materiais → Estoque → Custo → Evolução → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
@@ -24,7 +24,8 @@ npm run dev
 Núcleo: Agenda · Pacientes · Estoque · Financeiro
 
 - Procedimentos (catálogo): `/app/procedimentos`
-- Atendimento / consumo: `/app/agenda/atendimento/[id]`
+- Atendimento / consumo / financeiro do procedimento: `/app/agenda/atendimento/[id]`
+- Paciente → aba Procedimentos (custo, cobrado, recebido, saldo)
 - Estoque: `/app/estoque` · Previsão · Compras · Movimentações
 - Onboarding: `/app/onboarding`
 - Configurações: `/app/configuracoes`
@@ -52,6 +53,7 @@ npm run build
 - [SECURITY.md](./SECURITY.md)
 - [SECURITY_MATRIX.md](./SECURITY_MATRIX.md)
 - [INVENTORY_AND_COSTS.md](./INVENTORY_AND_COSTS.md)
+- [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
 - [REPORTS.md](./REPORTS.md)
 - [ASSISTANT.md](./ASSISTANT.md)
 - [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md)

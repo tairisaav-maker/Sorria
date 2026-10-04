@@ -17,6 +17,22 @@
 13. `20251016000000_reestruturacao_inventory_purchases.sql`
 14. `20251017000000_reestruturacao_performed_procedures.sql`
 15. `20251018000000_reestruturacao_appointment_planned_procedures.sql`
+16. `20251019000000_reestruturacao_patient_procedure_finance.sql`
+
+## Reestruturação Subfase 5 — Procedimento ↔ evolução ↔ financeiro
+
+### `clinical_entries.performed_procedure_id`
+
+Vínculo opcional evolução → procedimento realizado (mesmo paciente/clínica).
+
+### `performed_procedures.financial_status` / `charge_note`
+
+`pending_charge` | `charged` | `no_charge` | `included_in_plan`
+
+### `performed_procedure_financial_links`
+
+N:N procedimento ↔ `financial_transactions` com `amount_allocated`.  
+Rateio de pagamentos é analítico (proporcional); pagamento continua na parcela.
 
 ## Reestruturação Subfase 4 — Procedimentos previstos / previsão
 

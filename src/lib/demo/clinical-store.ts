@@ -25,7 +25,7 @@ type Store = {
 };
 
 declare global {
-  var __sorriaClinicalStoreV4: Store | undefined;
+  var __sorriaClinicalStoreV5: Store | undefined;
 }
 
 function stamp(hoursAgo = 0) {
@@ -65,6 +65,7 @@ function seed(): Store {
     clinic_id: CLINIC_A_ID,
     patient_id: "p-a-001",
     appointment_id: "appt-a-5",
+    performed_procedure_id: null,
     professional_id: OWNER_A_ID,
     status: "finalized",
     chief_complaint: "Sensibilidade no dente 16",
@@ -88,6 +89,7 @@ function seed(): Store {
     clinic_id: CLINIC_A_ID,
     patient_id: "p-a-004",
     appointment_id: "appt-a-3",
+    performed_procedure_id: null,
     professional_id: OWNER_A_ID,
     status: "draft",
     chief_complaint: "Retorno de avaliação",
@@ -111,6 +113,7 @@ function seed(): Store {
     clinic_id: CLINIC_A_ID,
     patient_id: "p-a-002",
     appointment_id: null,
+    performed_procedure_id: null,
     professional_id: DENTIST_A_ID,
     status: "finalized",
     chief_complaint: "Limpeza e avaliação",
@@ -289,14 +292,14 @@ export function snapshotOf(entry: ClinicalEntry): Record<string, unknown> {
 }
 
 export function getClinicalStore() {
-  if (!globalThis.__sorriaClinicalStoreV4) {
-    globalThis.__sorriaClinicalStoreV4 = seed();
+  if (!globalThis.__sorriaClinicalStoreV5) {
+    globalThis.__sorriaClinicalStoreV5 = seed();
   }
-  return globalThis.__sorriaClinicalStoreV4;
+  return globalThis.__sorriaClinicalStoreV5;
 }
 
 export function resetClinicalStore() {
-  globalThis.__sorriaClinicalStoreV4 = seed();
+  globalThis.__sorriaClinicalStoreV5 = seed();
 }
 
 export function writeClinicalAudit(

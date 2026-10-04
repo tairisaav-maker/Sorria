@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ForecastHomeCard } from "@/components/home/forecast-home-card";
 import { HomeGreeting } from "@/components/home/home-greeting";
 import { InventoryHomeCard } from "@/components/home/inventory-home-card";
+import { OperationalKpisCard } from "@/components/home/operational-kpis-card";
 import { SetupChecklist } from "@/components/home/setup-checklist";
 import { KpiRow } from "@/components/home/kpi-row";
 import { RequestsList } from "@/components/home/requests-list";
@@ -13,6 +14,7 @@ import { getClinic, getProfile } from "@/lib/demo/authz-store";
 import { buildHomeDashboard } from "@/lib/home/dashboard";
 import { getInventoryDashboard } from "@/services/inventory";
 import { forecastMaterialNeeds } from "@/services/inventory/forecast";
+import { getTodayOperationalKpis } from "@/services/patient-summary";
 import { getOnboarding } from "@/services/settings";
 
 export const metadata: Metadata = {
@@ -27,6 +29,10 @@ export default async function HomePage() {
   const onboarding = getOnboarding(actor.ctx);
   const inventory = getInventoryDashboard(actor.ctx);
   const canForecast = can(actor.ctx, "inventory.forecast_view").allowed;
+  const operational =
+    can(actor.ctx, "performed_procedures.view").allowed
+      ? getTodayOperationalKpis(actor.ctx)
+      : null;
   let weekForecast: {
     materials_at_risk: number;
     procedures_planned: number;
@@ -70,6 +76,7 @@ export default async function HomePage() {
         />
       ) : null}
       <KpiRow items={dashboard.kpis} />
+      {operational ? <OperationalKpisCard kpis={operational} /> : null}
       {inventory ? <InventoryHomeCard data={inventory} /> : null}
       {weekForecast && tomorrowForecast ? (
         <ForecastHomeCard week={weekForecast} tomorrow={tomorrowForecast} />

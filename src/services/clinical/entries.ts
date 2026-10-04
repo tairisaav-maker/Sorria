@@ -7,6 +7,7 @@ import {
 } from "@/lib/demo/clinical-store";
 import { getPatientRecord } from "@/lib/demo/patients-store";
 import { getAgendaStore } from "@/lib/demo/agenda-store";
+import { getPerformedStore } from "@/lib/demo/performed-procedures-store";
 import { getProfile } from "@/lib/demo/authz-store";
 import {
   clinicalEntryCorrectionSchema,
@@ -94,12 +95,26 @@ export function createClinicalEntry(
     }
   }
 
+  if (values.performed_procedure_id) {
+    const pp = getPerformedStore().performedProcedures.find(
+      (p) => p.id === values.performed_procedure_id,
+    );
+    if (
+      !pp ||
+      pp.clinic_id !== ctx.clinicId ||
+      pp.patient_id !== values.patient_id
+    ) {
+      throw new Error("PERFORMED_PROCEDURE_NOT_FOUND");
+    }
+  }
+
   const now = new Date().toISOString();
   const entry: ClinicalEntry = {
     id: crypto.randomUUID(),
     clinic_id: ctx.clinicId,
     patient_id: values.patient_id,
     appointment_id: values.appointment_id ?? null,
+    performed_procedure_id: values.performed_procedure_id ?? null,
     professional_id: ctx.userId,
     status: "draft",
     chief_complaint: values.chief_complaint || null,

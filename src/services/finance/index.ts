@@ -6,6 +6,8 @@ import {
   writeFinanceAudit,
 } from "@/lib/demo/finance-store";
 import { getPatientRecord } from "@/lib/demo/patients-store";
+import { getPerformedStore } from "@/lib/demo/performed-procedures-store";
+import { getProcedureFinanceStore } from "@/lib/demo/procedure-finance-store";
 import { getTreatmentsStore } from "@/lib/demo/treatments-store";
 import {
   calculateInstallmentBalance,
@@ -536,6 +538,36 @@ export function cancelFinancialTransaction(
     id,
     { reason },
   );
+  // Soft-cancel alocações de procedimentos (histórico preservado)
+  const stamp = new Date().toISOString();
+  for (const link of getProcedureFinanceStore().links) {
+    if (
+      link.clinic_id === ctx.clinicId &&
+      link.financial_transaction_id === id &&
+      !link.cancelled_at
+    ) {
+      link.cancelled_at = stamp;
+      link.updated_at = stamp;
+      const pp = getPerformedStore().performedProcedures.find(
+        (p) => p.id === link.performed_procedure_id,
+      );
+      if (pp && pp.financial_status === "charged") {
+        const still = getProcedureFinanceStore().links.some(
+          (l) =>
+            l.performed_procedure_id === pp.id &&
+            !l.cancelled_at &&
+            l.financial_transaction_id !== id,
+        );
+        if (!still) {
+          pp.financial_status = "pending_charge";
+          if (pp.financial_transaction_id === id) {
+            pp.financial_transaction_id = null;
+          }
+          pp.updated_at = stamp;
+        }
+      }
+    }
+  }
   return enrichTransaction(tx);
 }
 

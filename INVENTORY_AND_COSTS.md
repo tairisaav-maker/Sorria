@@ -196,6 +196,14 @@ Valor cobrado ≠ pagamento; plano já faturado não gera cobrança duplicada.
 
 Material → Procedimento realizado → Consulta → Paciente → Período
 
+## Valor cobrado + financeiro (Subfase 5)
+
+- `charged_amount` no `performed_procedure` (histórico com `standard_price_snapshot`)
+- Links N:N `performed_procedure_financial_links.amount_allocated`
+- Recebido por procedimento = rateio proporcional dos pagamentos válidos
+- Evolução: `clinical_entries.performed_procedure_id`
+- Ver [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
+
 ## Procedimentos previstos (Subfase 4)
 
 `appointment_planned_procedures` ≠ catálogo (`procedures`) ≠ realizado (`performed_procedures`).

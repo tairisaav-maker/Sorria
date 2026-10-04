@@ -12,6 +12,7 @@ export const anamnesisAnswersSchema = z.record(
 export const clinicalEntryDraftSchema = z.object({
   patient_id: z.string().min(1),
   appointment_id: z.string().nullable().optional(),
+  performed_procedure_id: z.string().nullable().optional(),
   chief_complaint: z.string().trim().max(2000).optional().default(""),
   clinical_exam: z.string().trim().max(4000).optional().default(""),
   procedure_done: z.string().trim().max(4000).optional().default(""),

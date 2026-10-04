@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 — 2026-10-04
+
+### Added
+- **Subfase 5:** vínculo procedimento ↔ evolução ↔ valor cobrado ↔ financeiro (N:N)
+- `performed_procedure_financial_links`, rateio proporcional de pagamentos, `financial_status`
+- Resumo operacional do paciente e KPIs do dia (cobrado ≠ recebido)
+- UI atendimento (resumo), aba Procedimentos enriquecida, Home operacional
+- [PATIENT_PROCEDURE_FLOW.md](./PATIENT_PROCEDURE_FLOW.md)
+
 ## 1.4.0 — 2026-10-04
 
 ### Added

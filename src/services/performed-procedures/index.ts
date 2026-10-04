@@ -10,7 +10,9 @@ import {
 } from "@/lib/demo/performed-procedures-store";
 import { getPlannedProceduresStore } from "@/lib/demo/planned-procedures-store";
 import { getFinanceStore } from "@/lib/demo/finance-store";
+import { getProcedureFinanceStore } from "@/lib/demo/procedure-finance-store";
 import { getTreatmentsStore } from "@/lib/demo/treatments-store";
+import { completeTreatmentItem } from "@/services/treatments";
 import {
   consumptionCostCents,
   plannedQuantityForMode,
@@ -299,6 +301,11 @@ export function createPerformedProcedure(ctx: AuthzContext, input: unknown) {
     standard_price_snapshot_cents: procedure.default_price_cents,
     charged_amount_cents: charged,
     charged_zero_reason: data.charged_zero_reason ?? null,
+    financial_status:
+      charged === 0
+        ? ("no_charge" as const)
+        : ("pending_charge" as const),
+    charge_note: data.charged_zero_reason ?? null,
     planned_material_cost_cents: 0,
     actual_material_cost_cents: null,
     planned_shared_cost_cents: 0,
@@ -381,6 +388,14 @@ export function completePerformedProcedure(ctx: AuthzContext, id: string) {
     target_type: "performed_procedure",
     target_id: id,
   });
+  // Progresso do tratamento (quando permitido) — não conclui o plano sozinho
+  if (row.treatment_item_id && can(ctx, "treatments.progress_update").allowed) {
+    try {
+      completeTreatmentItem(ctx, row.treatment_item_id);
+    } catch {
+      /* transição inválida ou sem permissão efetiva */
+    }
+  }
   return getPerformedProcedure(ctx, id);
 }
 
@@ -628,10 +643,25 @@ export function linkClinicalEntry(
  */
 export function shouldOfferFinanceCharge(ctx: AuthzContext, id: string) {
   const row = findPerformed(ctx, id);
+  if (row.financial_status === "no_charge") {
+    return { offer: false, reason: "no_charge" as const };
+  }
+  if (row.financial_status === "included_in_plan") {
+    return { offer: false, reason: "plan_already_billed" as const };
+  }
   if (row.charged_amount_cents == null || row.charged_amount_cents <= 0) {
     return { offer: false, reason: "no_charge" as const };
   }
   if (row.financial_transaction_id) {
+    return { offer: false, reason: "already_linked" as const };
+  }
+  const hasLink = getProcedureFinanceStore().links.some(
+    (l) =>
+      l.performed_procedure_id === id &&
+      l.clinic_id === ctx.clinicId &&
+      !l.cancelled_at,
+  );
+  if (hasLink) {
     return { offer: false, reason: "already_linked" as const };
   }
   if (row.treatment_item_id) {
@@ -649,6 +679,7 @@ export function shouldOfferFinanceCharge(ctx: AuthzContext, id: string) {
           !t.cancelled_at,
       );
       if (hasTx) {
+        row.financial_status = "included_in_plan";
         return { offer: false, reason: "plan_already_billed" as const };
       }
     }

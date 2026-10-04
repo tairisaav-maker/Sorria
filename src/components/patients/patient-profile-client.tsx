@@ -445,6 +445,7 @@ export function PatientProfileClient({
           <PatientProceduresClient
             patientId={patient.id}
             canViewCosts={Boolean(canViewProcedureCosts)}
+            canViewFinance={canViewFinance}
           />
         ) : (
           <Placeholder text="Você não tem permissão para ver procedimentos realizados." />
