@@ -15,6 +15,13 @@ Documente aqui o plano contratado da equipe antes do go-live.
 
 **Não declare RPO/RTO que a infraestrutura não garante.**
 
+## Antes do piloto
+
+1. Snapshot / PITR do **projeto Supabase do piloto** (nunca o DB de development).  
+2. Export de segurança antes de migrations ou mudanças estruturais.  
+3. Restore testado em cópia — não no banco da dentista.  
+4. Divergências de estoque: corrigir só via **Ajustar estoque** com motivo.
+
 ## Restore
 
 1. Pausar writes na aplicação (maintenance).

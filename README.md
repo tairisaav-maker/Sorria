@@ -4,10 +4,11 @@
 
 ## Versão
 
-**1.10.0** — Reestruturação Subfase 10 (Fluxo integrado V1)
+**0.9.0-pilot** — Piloto controlado (validação real do V1)
 
 > Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
-> Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco
+> Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco  
+> Piloto: [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
 
 ## Como rodar
 
@@ -51,6 +52,7 @@ npm run build
 ## Docs
 
 - [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
+- [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)

@@ -55,8 +55,8 @@ beforeEach(() => {
 });
 
 describe("FASE 10 — versão e flags", () => {
-  it("versão comercial 1.0.0", () => {
-    expect(APP_VERSION).toBe("1.0.0");
+  it("versão do canal piloto 0.9.0-pilot", () => {
+    expect(APP_VERSION).toBe("0.9.0-pilot");
   });
 
   it("feature flags da clínica demo habilitadas", () => {

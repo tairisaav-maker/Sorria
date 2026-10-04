@@ -4,6 +4,7 @@ import {
   CalendarClock,
   ClipboardList,
   FileBarChart2,
+  Flag,
   Settings,
   Shield,
   Sparkles,
@@ -30,6 +31,12 @@ export default async function MaisPage() {
     can(actor.ctx, "assistant.use").allowed && isAssistantEnabled(clinic);
 
   const links = [
+    {
+      href: "/app/piloto",
+      title: "Piloto",
+      description: "Checklist, cobertura do fluxo e feedback",
+      icon: Flag,
+    },
     canProcedures
       ? {
           href: "/app/procedimentos",

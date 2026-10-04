@@ -25,7 +25,14 @@ function sanitizeMeta(meta?: Record<string, unknown>) {
       key.includes("secret") ||
       key.includes("authorization") ||
       key === "cpf" ||
-      key.includes("service_role")
+      key.includes("service_role") ||
+      key.includes("chief_complaint") ||
+      key.includes("clinical_exam") ||
+      key.includes("procedure_done") ||
+      key.includes("conduct") ||
+      key.includes("guidance") ||
+      key.includes("diagnosis") ||
+      key.includes("evolution")
     ) {
       out[k] = "[redacted]";
       continue;

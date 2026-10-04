@@ -54,11 +54,27 @@ export function ProcedureDetailClient({
     margin: number | null;
     message: string | null;
   } | null>(null);
+  const [variance, setVariance] = useState<{
+    performed_count: number;
+    has_review_suggestion: boolean;
+    rows: Array<{
+      item_name: string;
+      unit: string;
+      samples: number;
+      planned_avg: number;
+      actual_avg: number;
+      delta_pct: number | null;
+      suggest_review: boolean;
+    }>;
+  } | null>(null);
 
   async function load() {
-    const [procRes, invRes] = await Promise.all([
+    const [procRes, invRes, varRes] = await Promise.all([
       fetch(`/api/demo/procedures?id=${procedureId}`).then((r) => r.json()),
       fetch("/api/demo/inventory").then((r) => r.json()),
+      fetch(`/api/demo/pilot?view=variance&procedureId=${procedureId}`).then(
+        (r) => r.json(),
+      ),
     ]);
     if (procRes.error) {
       setError(procRes.error);
@@ -68,6 +84,7 @@ export function ProcedureDetailClient({
     setMaterials(procRes.materials ?? []);
     setCost(procRes.cost ?? null);
     setInventory(invRes.items ?? []);
+    if (!varRes.error) setVariance(varRes);
     if (!itemId && invRes.items?.[0]) setItemId(invRes.items[0].id);
     if (canSeeCosts) {
       try {
@@ -289,6 +306,53 @@ export function ProcedureDetailClient({
           </form>
         ) : null}
       </section>
+
+      {variance && variance.performed_count > 0 ? (
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise">
+          <h2 className="text-lg font-medium text-[var(--brand-ink)]">
+            Previsto × utilizado
+          </h2>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
+            Comparação determinística com base em {variance.performed_count}{" "}
+            procedimento(s) confirmados. O Sorria não altera a ficha sozinho.
+          </p>
+          {variance.has_review_suggestion ? (
+            <p className="mt-2 text-sm text-[var(--warning)]">
+              Consumo real costuma diferir da ficha padrão — revise se fizer
+              sentido.
+            </p>
+          ) : null}
+          <ul className="mt-3 space-y-2 text-sm">
+            {variance.rows.map((r) => (
+              <li
+                key={r.item_name + r.unit}
+                className="flex flex-wrap justify-between gap-2 border-t border-[var(--border)] pt-2 first:border-0 first:pt-0"
+              >
+                <span>
+                  {r.item_name}
+                  <span className="text-[var(--text-subtle)]">
+                    {" "}
+                    · {r.samples} amostra(s)
+                  </span>
+                </span>
+                <span>
+                  previsto {r.planned_avg} → real {r.actual_avg} {r.unit}
+                  {r.delta_pct != null ? ` (${r.delta_pct}%)` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {canEditCosts && variance.has_review_suggestion ? (
+            <p className="mt-3 text-sm">
+              <span className="font-medium">Revisar ficha</span>
+              <span className="text-[var(--text-muted)]">
+                {" "}
+                — ajuste as quantidades acima manualmente se quiser.
+              </span>
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       {canSeeCosts && cost ? (
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-4 animate-rise">

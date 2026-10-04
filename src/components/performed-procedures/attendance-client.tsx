@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { formatBRL } from "@/lib/money";
+import { startFlowTimer, trackClientEvent } from "@/lib/pilot/client";
 import {
   PERFORMED_PROCEDURE_STATUS_LABELS,
   type PerformedProcedureStatus,
@@ -183,10 +184,16 @@ export function AttendanceClient({
     setSelected(res);
     setFinanceBreakdown(res.financeBreakdown ?? null);
     setConfirmNeg(false);
+    void trackClientEvent("procedure_consumption.opened", {
+      meta: { performed_procedure_id: id },
+    });
   }
 
   useEffect(() => {
     void (async () => {
+      void trackClientEvent("appointment.opened", {
+        meta: { appointment_id: appointmentId },
+      });
       await loadList();
       // Auto-converte previstos se ainda não houver realizados (idempotente)
       try {
@@ -238,6 +245,9 @@ export function AttendanceClient({
       return;
     }
     setMessage("Atendimento concluído.");
+    void trackClientEvent("appointment.completed", {
+      meta: { appointment_id: appointmentId },
+    });
     await loadList();
   }
 
@@ -913,8 +923,22 @@ export function AttendanceClient({
                 <Button
                   size="sm"
                   onClick={async () => {
+                    const t = startFlowTimer();
                     await confirm();
                     setMessage("Consumo confirmado.");
+                    void trackClientEvent("procedure_consumption.confirmed", {
+                      duration_ms: t.elapsed(),
+                      meta: {
+                        performed_procedure_id: selected.procedure.id,
+                      },
+                    });
+                    if (confirmNeg) {
+                      void trackClientEvent("inventory.insufficient_warning", {
+                        meta: {
+                          performed_procedure_id: selected.procedure.id,
+                        },
+                      });
+                    }
                   }}
                 >
                   Confirmar consumo

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0-pilot — 2026-10-04
+
+### Added
+- **Piloto controlado:** preparação para uso real (sem novos módulos)
+- Versão **Sorria 0.9.0-pilot** (`APP_CHANNEL=pilot`)
+- Env `NEXT_PUBLIC_SORRIA_ENV` / `NEXT_PUBLIC_PILOT_MODE` + avisos em `/api/health`
+- Instrumentação de eventos de produto sem PHI (`/api/demo/pilot`)
+- Feedback rápido in-app (bug / dificuldade / sugestão)
+- Painel `/app/piloto` — checklist de preparação + cobertura do fluxo
+- Previsto × utilizado na ficha do procedimento (sugestão “Revisar ficha”)
+- [PILOT_REPORT.md](./PILOT_REPORT.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md)
+
+### Notes
+- Não é versão comercial final. Próximo passo: uso real → observar → corrigir.
+
 ## 1.10.0 — 2026-10-04
 
 ### Added

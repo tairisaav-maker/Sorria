@@ -419,9 +419,9 @@ export function OnboardingClient() {
       {step === "next" ? (
         <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-5">
           <p className="text-sm text-[var(--text-muted)]">
-            O diferencial do Sorria começa aqui: cadastre um procedimento
-            frequente, os materiais usados e o estoque atual. Depois leve o
-            primeiro paciente até a Agenda.
+            Para o piloto, comece com 5–10 procedimentos frequentes (ex.:
+            Profilaxia, Restauração, Clareamento) e os materiais deles. Não é
+            preciso cadastrar tudo de uma vez.
           </p>
           <ol className="space-y-2 text-sm">
             <li>
@@ -429,7 +429,7 @@ export function OnboardingClient() {
                 href="/app/procedimentos/novo?from=onboarding"
                 className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
               >
-                2. Cadastrar procedimento frequente
+                3. Procedimentos principais
               </Link>
             </li>
             <li>
@@ -437,7 +437,7 @@ export function OnboardingClient() {
                 href="/app/procedimentos?from=onboarding"
                 className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
               >
-                3. Adicionar materiais da ficha técnica
+                4. Materiais / ficha técnica
               </Link>
             </li>
             <li>
@@ -445,7 +445,7 @@ export function OnboardingClient() {
                 href="/app/estoque?from=onboarding"
                 className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
               >
-                4. Cadastrar estoque atual
+                5. Estoque inicial (saldo + custo estimado)
               </Link>
             </li>
             <li>
@@ -453,20 +453,13 @@ export function OnboardingClient() {
                 href="/app/pacientes/novo?from=onboarding"
                 className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
               >
-                5. Cadastrar primeiro paciente
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/app/agenda?from=onboarding"
-                className="block rounded-xl border border-[var(--border)] px-4 py-3 font-medium hover:bg-[var(--surface-muted)]/60"
-              >
-                6. Agendar primeira consulta
+                6. Primeiro paciente
               </Link>
             </li>
           </ol>
           <p className="text-xs text-[var(--text-subtle)]">
-            Nenhuma etapa é obrigatória — você pode pular e voltar depois.
+            Etapas 1–2 (clínica e horários) já foram nesta tela. Nada é
+            obrigatório — uso progressivo.
           </p>
           <Button
             type="button"

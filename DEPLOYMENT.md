@@ -5,10 +5,11 @@
 | Env | Uso |
 | --- | --- |
 | development | Demo mode / stores locais |
-| staging | Migrations + E2E + smoke |
-| production | Clínicas reais — **sem seed demo** |
+| pilot / staging | Clínica piloto — **DEMO_MODE=false**, DB separado |
+| production | Clínicas reais — **sem seed demo** (futuro) |
 
-Cada ambiente: DB, Auth, Storage, secrets e URLs próprios.
+Cada ambiente: DB, Auth, Storage, secrets e URLs próprios.  
+Piloto: ver [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md).
 
 ## Pipeline
 
@@ -46,4 +47,5 @@ Ver `.env.example` — separar `NEXT_PUBLIC_*` de server-only.
 
 ## Versionamento
 
-Produto: **Sorria 1.0.0** (`src/lib/version.ts` / `package.json`).
+Canal piloto: **Sorria 0.9.0-pilot** (`src/lib/version.ts` / `package.json`).  
+Não apresentar como versão comercial final.
