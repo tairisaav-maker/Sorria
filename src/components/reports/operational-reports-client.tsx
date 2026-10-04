@@ -30,8 +30,19 @@ import type {
 } from "@/types/operational-reports";
 import {
   PERIOD_PRESET_LABELS,
+  type MetricValue,
   type ReportPeriodPreset,
 } from "@/types/reports";
+
+function opMetric(
+  key: string,
+  title: string,
+  value: number,
+  format: MetricValue["format"] = "number",
+  tooltip?: string,
+): MetricValue {
+  return { key, title, value, format, tooltip };
+}
 
 type Tab =
   | "overview"
@@ -342,36 +353,66 @@ function OverviewTab({
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <MetricCard
-          title="Procedimentos realizados"
-          value={String(o.procedures_completed)}
-          hint={o.previous_comparison.procedures.label}
+          metric={opMetric(
+            "procedures",
+            "Procedimentos realizados",
+            o.procedures_completed,
+            "number",
+            o.previous_comparison.procedures.label,
+          )}
         />
         {o.materials_cost_cents != null ? (
           <MetricCard
-            title="Custo real de materiais"
-            value={formatBRL(o.materials_cost_cents)}
-            hint="Custos diretos confirmados"
+            metric={opMetric(
+              "materials_cost",
+              "Custo real de materiais",
+              o.materials_cost_cents,
+              "currency_cents",
+              "Custos diretos confirmados",
+            )}
           />
         ) : null}
         {o.charged_cents != null ? (
-          <MetricCard title="Valor cobrado" value={formatBRL(o.charged_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "charged",
+              "Valor cobrado",
+              o.charged_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
         {o.received_cents != null ? (
           <MetricCard
-            title="Valor recebido"
-            value={formatBRL(o.received_cents)}
-            hint="≠ cobrado"
+            metric={opMetric(
+              "received",
+              "Valor recebido",
+              o.received_cents,
+              "currency_cents",
+              "≠ cobrado",
+            )}
           />
         ) : null}
         {o.gross_result_charged_cents != null ? (
           <MetricCard
-            title="Resultado bruto"
-            value={formatBRL(o.gross_result_charged_cents)}
-            hint="Cobrado − custos diretos (não é lucro líquido)"
+            metric={opMetric(
+              "gross",
+              "Resultado bruto",
+              o.gross_result_charged_cents,
+              "currency_cents",
+              "Cobrado − custos diretos (não é lucro líquido)",
+            )}
           />
         ) : null}
         {o.receivable_cents != null ? (
-          <MetricCard title="A receber" value={formatBRL(o.receivable_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "receivable",
+              "A receber",
+              o.receivable_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
       </div>
 
@@ -703,28 +744,64 @@ function FinancialTab({
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {data.charged_cents != null ? (
-          <MetricCard title="Valor cobrado" value={formatBRL(data.charged_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "fin_charged",
+              "Valor cobrado",
+              data.charged_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
         {data.received_cents != null ? (
-          <MetricCard title="Valor recebido" value={formatBRL(data.received_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "fin_received",
+              "Valor recebido",
+              data.received_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
         {data.receivable_cents != null ? (
-          <MetricCard title="A receber" value={formatBRL(data.receivable_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "fin_receivable",
+              "A receber",
+              data.receivable_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
         {data.overdue_cents != null ? (
-          <MetricCard title="Vencido" value={formatBRL(data.overdue_cents)} />
+          <MetricCard
+            metric={opMetric(
+              "fin_overdue",
+              "Vencido",
+              data.overdue_cents,
+              "currency_cents",
+            )}
+          />
         ) : null}
         {canCosts && data.direct_cost_cents != null ? (
           <MetricCard
-            title="Custos diretos"
-            value={formatBRL(data.direct_cost_cents)}
+            metric={opMetric(
+              "fin_cost",
+              "Custos diretos",
+              data.direct_cost_cents,
+              "currency_cents",
+            )}
           />
         ) : null}
         {canCosts && data.gross_result_charged_cents != null ? (
           <MetricCard
-            title="Resultado bruto"
-            value={formatBRL(data.gross_result_charged_cents)}
-            hint="Não é lucro líquido da clínica"
+            metric={opMetric(
+              "fin_gross",
+              "Resultado bruto",
+              data.gross_result_charged_cents,
+              "currency_cents",
+              "Não é lucro líquido da clínica",
+            )}
           />
         ) : null}
       </div>

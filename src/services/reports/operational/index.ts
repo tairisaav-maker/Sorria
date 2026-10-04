@@ -22,8 +22,10 @@ import {
   periodDeltaPercent,
   plannedVsActual,
 } from "@/lib/reports/operational-formulas";
-import { getPatientFinancialSummary } from "@/services/finance";
-import { calculateProcedureReceivedAmount } from "@/services/patient-procedure-finance";
+import {
+  calculateProcedureOutstandingBalance,
+  calculateProcedureReceivedAmount,
+} from "@/services/patient-procedure-finance";
 import type { ReportFilter } from "@/services/reports";
 import { getFinancialMetrics } from "@/services/reports";
 import type {
@@ -644,14 +646,12 @@ export function getPatientOperationalReport(
     let received: number | null = null;
     let outstanding: number | null = null;
     if (showFin) {
-      try {
-        const fin = getPatientFinancialSummary(ctx, patientId);
-        received = fin.received_cents;
-        outstanding = fin.receivable_cents;
-      } catch {
-        received = sumReceived(ctx, list);
-        outstanding = null;
-      }
+      // Recebido/saldo dos procedimentos do período (financeiro real alocado)
+      received = sumReceived(ctx, list);
+      outstanding = list.reduce(
+        (s, p) => s + calculateProcedureOutstandingBalance(ctx, p.id),
+        0,
+      );
     }
     rows.push({
       patient_id: patientId,

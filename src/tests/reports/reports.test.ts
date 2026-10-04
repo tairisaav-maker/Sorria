@@ -230,7 +230,7 @@ describe("Relatórios — financeiro", () => {
 });
 
 describe("Relatórios — permissões e isolamento", () => {
-  it("secretary vê agenda/pacientes e NÃO financeiro de relatório", () => {
+  it("secretary vê agenda/pacientes/financeiro admin e NÃO custos/margem", () => {
     expect(
       can({ userId: SECRETARY_A_ID, clinicId: CLINIC_A_ID }, "reports.view_schedule")
         .allowed,
@@ -238,10 +238,13 @@ describe("Relatórios — permissões e isolamento", () => {
     expect(
       can({ userId: SECRETARY_A_ID, clinicId: CLINIC_A_ID }, "reports.view_financial")
         .allowed,
+    ).toBe(true);
+    expect(
+      can(
+        { userId: SECRETARY_A_ID, clinicId: CLINIC_A_ID },
+        "reports.procedure_costs_view",
+      ).allowed,
     ).toBe(false);
-    expect(() =>
-      getFinancialMetrics(ctx(SECRETARY_A_ID), { preset: "30d" }),
-    ).toThrow();
   });
 
   it("dentist não recebe financeiro de relatório na API de bundle", () => {

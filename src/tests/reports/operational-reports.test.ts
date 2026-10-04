@@ -161,8 +161,14 @@ describe("Subfase 6 — cobertura e dados incompletos", () => {
         procedure_id: "proc-a-prophylaxis",
         charged_amount_reais: 150,
       });
-      completePerformedProcedure(ownerA, created.procedure.id);
-      // sem confirm consumption → custo incompleto
+      // Concluído sem custo completo (sem confirmação de consumo)
+      const row = getPerformedStore().performedProcedures.find(
+        (p) => p.id === created.procedure.id,
+      )!;
+      row.status = "completed";
+      row.completed_at = new Date().toISOString();
+      row.consumption_confirmed = false;
+      row.actual_total_cost_cents = null;
     }
     const cov = getCostCoverageReport(ownerA, { preset: "month" });
     expect(cov.completed).toBe(100);
