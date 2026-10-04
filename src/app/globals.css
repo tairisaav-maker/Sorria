@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+:root {
+  --brand-ink: #0b3d3a;
+  --brand-primary: #0f766e;
+  --brand-primary-hover: #0d6a63;
+  --brand-soft: #d9f3ef;
+  --brand-glow: rgba(45, 212, 191, 0.35);
+
+  --surface: #eef5f4;
+  --surface-muted: #e3eeec;
+  --surface-elevated: #ffffff;
+
+  --text: #14201f;
+  --text-muted: #4f635f;
+  --text-subtle: #7a8f8a;
+
+  --border: #cfe0dc;
+
+  --success: #0f766e;
+  --success-soft: #d9f3ef;
+  --warning: #b45309;
+  --warning-soft: #ffedd5;
+  --info: #0369a1;
+  --info-soft: #e0f2fe;
+  --danger: #b91c1c;
+  --danger-hover: #991b1b;
+  --danger-soft: #fee2e2;
+
+  --background: var(--surface);
+  --foreground: var(--text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--brand-primary) 28%, white);
+  color: var(--brand-ink);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.04);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease both;
+}
+
+.animate-rise {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-atmosphere {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(45, 212, 191, 0.28), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(14, 116, 144, 0.18), transparent 40%),
+    linear-gradient(160deg, #f7fbfa 0%, #e7f3f1 45%, #dceeee 100%);
+}
+
+.login-atmosphere::before,
+.login-atmosphere::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 9999px;
+  filter: blur(8px);
+  animation: drift 14s ease-in-out infinite;
+}
+
+.login-atmosphere::before {
+  width: min(48vw, 28rem);
+  height: min(48vw, 28rem);
+  top: -8%;
+  right: -6%;
+  background: var(--brand-glow);
+}
+
+.login-atmosphere::after {
+  width: min(56vw, 34rem);
+  height: min(56vw, 34rem);
+  bottom: -18%;
+  left: -12%;
+  background: rgba(15, 118, 110, 0.18);
+  animation-delay: -4s;
+}
+
+.app-canvas {
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 32%),
+    linear-gradient(180deg, #f4faf9 0%, var(--surface) 48%, #eaf3f1 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
