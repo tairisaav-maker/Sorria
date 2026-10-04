@@ -2,8 +2,9 @@ import { APP_CHANNEL, APP_VERSION } from "@/lib/version";
 import { isPilotMode, pilotEnvWarnings } from "@/lib/pilot/env";
 
 export function PilotBanner() {
-  if (!isPilotMode() && APP_CHANNEL !== "pilot" && APP_CHANNEL !== "beta")
-    return null;
+  // Em demo mode o DemoBanner já identifica o ambiente — evita banners duplicados.
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return null;
+  if (!isPilotMode() && APP_CHANNEL !== "pilot") return null;
   const warnings = pilotEnvWarnings();
   return (
     <div
