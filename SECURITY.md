@@ -66,3 +66,14 @@ auth.uid() → patient_portal_access(active) → clinic_id + patient_id → reso
 - Attachments: `patient_visible = true` obrigatório; Storage privado + signed URL
 - Perfil: campos de contato; CPF mascarado; `clinic_id`/`patient_id`/`cpf` imutáveis pelo Portal
 - Auditoria: eventos `patient.*` / `portal.*` sem senha/token; paciente não vê audit log
+
+
+## Relatórios (Fase 8)
+
+- Acesso por seção: `reports.view_*` — API não retorna dados de seções negadas
+- Secretária: agenda + pacientes; **sem** `reports.view_financial` (mesmo com financeiro operacional)
+- Dentista: agenda + pacientes + tratamentos; sem financeiro de relatório
+- Owner admin: todas as seções + export
+- Portal paciente: sem acesso a `/app/relatorios`
+- Exportação audita `report.exported` sem armazenar o arquivo
+- Cross-clinic: membership obrigatória

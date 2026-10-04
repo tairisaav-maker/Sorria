@@ -39,7 +39,8 @@ Acesso financeiro é independente do clínico.
 | Planos de tratamento | ✅ |
 | Financeiro V1 | ✅ |
 | Portal do paciente | ✅ |
-| Relatórios completos / IA | ❌ |
+| Relatórios e indicadores | ✅ |
+| Secretária Virtual / IA | ❌ |
 
 ## Financeiro (Fase 6)
 
@@ -138,6 +139,16 @@ src/services/portal/
 
 Somente `patient_visible = true` + signed URL. Bucket permanece privado.
 
+## Relatórios (Fase 8)
+
+Rota: `/app/relatorios` (atalho em **Mais**).
+
+Serviços: `src/services/reports/` — agregação server-side, permissões por seção (`reports.view_*`), drill-downs acionáveis, exportação PDF/XLSX/CSV.
+
+Ocupação da agenda **não** é inventada sem horários de atendimento.
+
+Definições: [REPORTS.md](./REPORTS.md).
+
 ## Fora do escopo atual
 
-Integração bancária/adquirente, boleto, NF, contabilidade, Relatórios Fase 8, Secretária Virtual, IA, WhatsApp, pagamento online no Portal.
+Integração bancária/adquirente, boleto, NF, contabilidade, Secretária Virtual, IA, WhatsApp, pagamento online no Portal, BI externo.

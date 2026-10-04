@@ -10,6 +10,7 @@
 6. `20251009000000_fase5_treatments.sql`
 7. `20251010000000_fase6_financeiro.sql`
 8. `20251011000000_fase7_portal.sql`
+9. `20251012000000_fase8_relatorios.sql`
 
 ## Fase 6 — Financeiro
 
@@ -85,3 +86,17 @@ Notificações internas do Portal (sem push externo).
 ### Helpers RLS
 
 `has_active_portal_access(clinic_id, patient_id)` · `my_portal_patient_ids()`
+
+
+## Fase 8 — Relatórios
+
+Sem novas tabelas de fatos. Permissões:
+
+- `reports.view`
+- `reports.view_schedule`
+- `reports.view_patients`
+- `reports.view_treatments`
+- `reports.view_financial`
+- `reports.export`
+
+Agregações no serviço da aplicação (demo) / SQL futuro; sem materialized views nesta fase.

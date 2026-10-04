@@ -14,6 +14,7 @@ export default async function MaisPage() {
   const canPermissions = can(actor.ctx, "permissions.manage").allowed;
   const canRequests = can(actor.ctx, "appointment_requests.view").allowed;
   const canFinance = can(actor.ctx, "finance.view_administrative").allowed;
+  const canReports = can(actor.ctx, "reports.view").allowed;
 
   const links = [
     canFinance
@@ -24,12 +25,14 @@ export default async function MaisPage() {
           icon: Wallet,
         }
       : null,
-    {
-      href: "/app/relatorios",
-      title: "Relatórios",
-      description: "Em breve — use exportações do Financeiro",
-      icon: FileBarChart2,
-    },
+    canReports
+      ? {
+          href: "/app/relatorios",
+          title: "Relatórios",
+          description: "Indicadores de agenda, pacientes, tratamentos e financeiro",
+          icon: FileBarChart2,
+        }
+      : null,
     canRequests
       ? {
           href: "/app/solicitacoes",

@@ -49,6 +49,11 @@ export const PERMISSIONS = [
   "finance.export",
 
   "reports.view",
+  "reports.view_schedule",
+  "reports.view_patients",
+  "reports.view_treatments",
+  "reports.view_financial",
+  "reports.export",
 
   "team.view",
   "team.invite",
@@ -142,6 +147,10 @@ export const ROLE_PERMISSION_MATRIX: Record<
     ...TREATMENT_CLINICAL_PERMISSIONS,
     "finance.view_authorized",
     "reports.view",
+    "reports.view_schedule",
+    "reports.view_patients",
+    "reports.view_treatments",
+    "reports.export",
   ],
   secretary: [
     "dashboard.view",
@@ -161,6 +170,10 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "finance.payment_create",
     "finance.payment_reverse",
     "finance.export",
+    "reports.view",
+    "reports.view_schedule",
+    "reports.view_patients",
+    "reports.export",
   ],
 };
 

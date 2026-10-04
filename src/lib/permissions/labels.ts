@@ -50,6 +50,17 @@ export const ACCESS_GROUPS: AccessGroup[] = [
     ],
   },
   {
+    title: "Relatórios",
+    items: [
+      { key: "reports.view", label: "Acessar relatórios" },
+      { key: "reports.view_schedule", label: "Indicadores de agenda" },
+      { key: "reports.view_patients", label: "Indicadores de pacientes" },
+      { key: "reports.view_treatments", label: "Indicadores de tratamentos" },
+      { key: "reports.view_financial", label: "Indicadores financeiros" },
+      { key: "reports.export", label: "Exportar relatórios" },
+    ],
+  },
+  {
     title: "Equipe",
     items: [
       { key: "team.view", label: "Ver equipe" },

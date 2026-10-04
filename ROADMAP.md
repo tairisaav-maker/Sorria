@@ -10,24 +10,19 @@
 ### FASE 5 — Planos de tratamento
 ### FASE 6 — Financeiro V1
 ### FASE 7 — Portal do Paciente
+### FASE 8 — Relatórios e Indicadores
 
-- `patient_portal_access` (N:N; multi-clínica; responsável)
-- Layout próprio + bottom nav mobile
-- Solicitar horário (sem grade livre)
-- Confirmar presença / alteração / cancelamento como solicitação
-- Proposta → confirmação com revalidação atômica
-- Tratamento / documentos liberados / financeiro próprio
-- Cópia de prontuário (`record_copy_requests`)
-- RLS + Storage privado + auditoria
+- Visão geral / Agenda / Pacientes / Tratamentos / Financeiro
+- Períodos com timezone da clínica
+- Comparação com período anterior (sem +∞%)
+- Drill-downs acionáveis
+- Exportação PDF / XLSX / CSV
+- Permissões granulares + REPORTS.md
 
 ## Próximo
 
-**FASE 8 — Relatórios e Indicadores**
-
-## Depois
-
-Secretária Virtual
+**FASE 9 — Secretária Virtual**
 
 ## Fora da V1
 
-IA clínica, adquirente/PIX automático, boleto, NF, contabilidade, teleconsulta, WhatsApp
+IA clínica, BI externo, data warehouse, previsão, benchmarking, comissão, DRE contábil, WhatsApp

@@ -4,10 +4,10 @@
 
 ## Fase atual
 
-**FASE 7 — Portal do Paciente**
+**FASE 8 — Relatórios e Indicadores**
 
-> Solicitação ≠ Consulta · Paciente ≠ profissional · E-mail igual ≠ vínculo  
-> Arquivo do paciente ≠ arquivo liberado · Conhecer UUID ≠ autorização
+> Dado → contexto → decisão  
+> Plano aceito ≠ Receita · Resultado do período ≠ lucro líquido · Paciente ativo ≠ atendido
 
 ## Como rodar
 
@@ -21,20 +21,18 @@ npm run dev
 
 `demo@sorria.app` / `sorria-demo` → `/app`
 
-### Login Portal do paciente (demo)
+Relatórios: **Mais → Relatórios** ou `/app/relatorios`
+
+### Login Portal (demo)
 
 `paciente@sorria.app` / `sorria-demo` → `/portal/inicio`
-
-(Mariana Oliveira — Clinic A; também responsável do menor João Pedro.)
-
-Outros: `paciente2@sorria.app`, `revogado@sorria.app` (acesso negado).
 
 ## Scripts
 
 ```bash
 npm run lint
 npm run typecheck
-npm run test
+npm test
 npm run build
 ```
 
@@ -43,4 +41,5 @@ npm run build
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)
+- [REPORTS.md](./REPORTS.md) — definições de métricas
 - [ROADMAP.md](./ROADMAP.md)
