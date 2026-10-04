@@ -3,6 +3,7 @@ import type {
   PermissionKey,
   RoleKey,
 } from "@/lib/permissions/keys";
+import type { Patient as PatientRow, PatientStatus } from "@/types/patient";
 
 export type Clinic = {
   id: string;
@@ -118,9 +119,16 @@ export type Database = {
         Insert: Partial<AuditLog> & Pick<AuditLog, "action">;
         Update: never;
       };
+      patients: {
+        Row: PatientRow;
+        Insert: Partial<PatientRow> &
+          Pick<PatientRow, "clinic_id" | "full_name">;
+        Update: Partial<PatientRow>;
+      };
     };
     Enums: {
       membership_status: MembershipStatus;
+      patient_status: PatientStatus;
     };
   };
 };

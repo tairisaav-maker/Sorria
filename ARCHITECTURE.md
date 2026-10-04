@@ -4,60 +4,54 @@
 
 Sorria é SaaS multi-clínica. A marca é independente; cada clínica é tenant (`clinic_id`).
 
-## Identidade e autorização (Fase 1)
+## Identidade (Fase 1)
 
 ```text
-Auth
-  ↓
-Profile
-  ↓
-Clinic Membership (status)
-  ↓
-Role
-  ↓
-Permissions
-  ↓
-Resource/Tenant Check
-  ↓
-RLS
-  ↓
-Data
+Auth → Profile → Clinic Membership → Role → Permissions
+  → Resource/Tenant Check → RLS → Data
 ```
 
-### Camadas
-
-1. **UI** — `can()` esconde ações
-2. **Server/API** — `requirePermission` / `assertPermission`
-3. **PostgreSQL RLS** — impede cross-clinic e escalonamento
-
-### Domínios de paciente
-
-- **Administrativo:** demographics, contact, administrative
-- **Clínico:** clinical_record, anamnesis, clinical_evolution, odontogram, clinical_files
-
-Acesso a um domínio **não** implica o outro.
-
-## Estrutura relevante
+## Pacientes (Fase 2)
 
 ```text
-src/lib/permissions/   # keys, labels, matriz
-src/lib/authz/         # can, guards, team-service
-src/lib/demo/          # store demo Clinic A/B + papéis
-src/app/app/configuracoes/equipe
-src/app/app/configuracoes/permissoes
-src/app/forbidden
-supabase/migrations/
+PACIENTES → Buscar/Filtrar → Perfil → Resumo administrativo
+                ↓
+         Editar / Arquivar / Ação rápida
 ```
 
-## Perfis
+Cadastro:
 
-| Role | Escopo |
+```text
++ Novo paciente → Dados essenciais → Duplicidade → Salvar → Perfil
+```
+
+### Domínios
+
+| Domínio | Nesta fase |
 | --- | --- |
-| owner | Admin da própria clínica |
-| dentist | Profissional + clínico |
-| secretary | Administrativo (sem clínico) |
-| patient | Reservado (portal futuro) |
+| Administrativo (demographics/contact/administrative) | ✅ |
+| Clínico (prontuário, anamnese, odontograma…) | ❌ só placeholders |
 
-## Fora desta fase
+**Administrative Patient Data ≠ Clinical Record Access**
 
-Agenda funcional, lista de pacientes, prontuário, financeiro, portal, IA.
+### Services
+
+```text
+src/services/patients/
+  queries.ts      # list/search/get + paginação 25
+  mutations.ts    # create/update/archive/reactivate
+  duplicates.ts   # CPF > telefone > e-mail > nome+nascimento
+```
+
+UI não consulta Supabase diretamente.
+
+### Rotas
+
+- `/app/pacientes`
+- `/app/pacientes/novo`
+- `/app/pacientes/[patientId]`
+- `/app/pacientes/[patientId]/editar`
+
+## Fora do escopo atual
+
+Agenda, prontuário, tratamento, financeiro, portal, IA, WhatsApp oficial.

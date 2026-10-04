@@ -1,0 +1,426 @@
+import { appendAudit } from "@/lib/demo/authz-store";
+import { CLINIC_A_ID, CLINIC_B_ID, OWNER_A_ID, OWNER_B_ID } from "@/lib/demo/authz-store";
+import {
+  normalizeCpf,
+  normalizeEmail,
+  normalizePhone,
+} from "@/lib/patients/normalize";
+import type { Patient, PatientStatus } from "@/types/patient";
+
+type Store = {
+  patients: Patient[];
+};
+
+declare global {
+  var __sorriaPatientsStore: Store | undefined;
+}
+
+function stamp(offsetDays = 0) {
+  return new Date(Date.now() - offsetDays * 86400000).toISOString();
+}
+
+function base(
+  partial: Omit<Patient, "created_at" | "updated_at" | "archived_at"> & {
+    created_at?: string;
+    updated_at?: string;
+    archived_at?: string | null;
+  },
+): Patient {
+  const created = partial.created_at ?? stamp(10);
+  return {
+    ...partial,
+    created_at: created,
+    updated_at: partial.updated_at ?? created,
+    archived_at: partial.archived_at ?? null,
+  };
+}
+
+function seed(): Store {
+  const patients: Patient[] = [
+    base({
+      id: "p-a-001",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Mariana Oliveira",
+      preferred_name: "Mari",
+      cpf: "529.982.247-25",
+      cpf_normalized: "52998224725",
+      birth_date: "1992-03-14",
+      phone: "(31) 99999-4821",
+      phone_normalized: "31999994821",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: "mariana.oliveira@email.com",
+      email_normalized: "mariana.oliveira@email.com",
+      postal_code: "30130-000",
+      street: "Rua da Bahia",
+      number: "1200",
+      complement: "Sala 2",
+      neighborhood: "Centro",
+      city: "Belo Horizonte",
+      state: "MG",
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: "Paulo Oliveira",
+      emergency_contact_phone: "(31) 98888-1000",
+      emergency_contact_relationship: "Cônjuge",
+      referral_source: "Instagram",
+      administrative_notes: "Prefere horários pela manhã.",
+      status: "active",
+      created_by: OWNER_A_ID,
+      updated_at: stamp(1),
+    }),
+    base({
+      id: "p-a-002",
+      clinic_id: CLINIC_A_ID,
+      full_name: "João Pedro Santos",
+      preferred_name: null,
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: "2015-08-20",
+      phone: "(31) 98888-2000",
+      phone_normalized: "31988882000",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: null,
+      email_normalized: null,
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      state: null,
+      guardian_name: "Carla Santos",
+      guardian_phone: "(31) 98888-2000",
+      guardian_relationship: "Mãe",
+      emergency_contact_name: "Carla Santos",
+      emergency_contact_phone: "(31) 98888-2000",
+      emergency_contact_relationship: "Mãe",
+      referral_source: "Indicação",
+      administrative_notes: null,
+      status: "active",
+      created_by: OWNER_A_ID,
+    }),
+    base({
+      id: "p-a-003",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Pedro Almeida",
+      preferred_name: "Pedro",
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: null,
+      phone: "(11) 91234-1002",
+      phone_normalized: "11912341002",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: null,
+      email_normalized: null,
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: "São Paulo",
+      state: "SP",
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: "Google",
+      administrative_notes: null,
+      status: "active",
+      created_by: OWNER_A_ID,
+      created_at: stamp(3),
+    }),
+    base({
+      id: "p-a-004",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Marina Costa",
+      preferred_name: null,
+      cpf: "390.533.447-05",
+      cpf_normalized: "39053344705",
+      birth_date: "1988-11-02",
+      phone: "(11) 91234-1001",
+      phone_normalized: "11912341001",
+      secondary_phone: "(11) 3456-7890",
+      secondary_phone_normalized: "1134567890",
+      email: "marina.costa@email.com",
+      email_normalized: "marina.costa@email.com",
+      postal_code: "01310-100",
+      street: "Av. Paulista",
+      number: "1000",
+      complement: null,
+      neighborhood: "Bela Vista",
+      city: "São Paulo",
+      state: "SP",
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: "Roberto Costa",
+      emergency_contact_phone: "(11) 97777-0001",
+      emergency_contact_relationship: "Irmão",
+      referral_source: "Paciente antigo",
+      administrative_notes: null,
+      status: "active",
+      created_by: OWNER_A_ID,
+    }),
+    base({
+      id: "p-a-005",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Mariana Oliveira Silva",
+      preferred_name: null,
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: "1990-01-10",
+      phone: "(31) 97777-1111",
+      phone_normalized: "31977771111",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: "outra.mariana@email.com",
+      email_normalized: "outra.mariana@email.com",
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      state: null,
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: "Outro",
+      administrative_notes: "Nome semelhante à Mariana Oliveira — teste.",
+      status: "active",
+      created_by: OWNER_A_ID,
+    }),
+    base({
+      id: "p-a-006",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Lucas Nogueira",
+      preferred_name: null,
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: "1995-05-05",
+      phone: "(11) 91234-1008",
+      phone_normalized: "11912341008",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: "lucas@email.com",
+      email_normalized: "lucas@email.com",
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      state: null,
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: null,
+      administrative_notes: null,
+      status: "inactive",
+      created_by: OWNER_A_ID,
+    }),
+    base({
+      id: "p-a-007",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Beatriz Lima",
+      preferred_name: "Bia",
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: "1998-07-07",
+      phone: "(11) 91234-1009",
+      phone_normalized: "11912341009",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: null,
+      email_normalized: null,
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      state: null,
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: "Passou em frente",
+      administrative_notes: null,
+      status: "archived",
+      created_by: OWNER_A_ID,
+      archived_at: stamp(20),
+      updated_at: stamp(20),
+    }),
+    base({
+      id: "p-a-008",
+      clinic_id: CLINIC_A_ID,
+      full_name: "Camila Ferreira",
+      preferred_name: null,
+      cpf: null,
+      cpf_normalized: null,
+      birth_date: "1993-02-02",
+      phone: "(11) 91234-1005",
+      phone_normalized: "11912341005",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: "camila@email.com",
+      email_normalized: "camila@email.com",
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      state: null,
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: "Google",
+      administrative_notes: null,
+      status: "active",
+      created_by: OWNER_A_ID,
+    }),
+    // Clinic B — same CPF/phone as Clinic A for cross-tenant tests (must never leak)
+    base({
+      id: "p-b-001",
+      clinic_id: CLINIC_B_ID,
+      full_name: "Mariana Oliveira",
+      preferred_name: null,
+      cpf: "529.982.247-25",
+      cpf_normalized: "52998224725",
+      birth_date: "1992-03-14",
+      phone: "(31) 99999-4821",
+      phone_normalized: "31999994821",
+      secondary_phone: null,
+      secondary_phone_normalized: null,
+      email: "mariana.b@odontovida.app",
+      email_normalized: "mariana.b@odontovida.app",
+      postal_code: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: "Curitiba",
+      state: "PR",
+      guardian_name: null,
+      guardian_phone: null,
+      guardian_relationship: null,
+      emergency_contact_name: null,
+      emergency_contact_phone: null,
+      emergency_contact_relationship: null,
+      referral_source: "Instagram",
+      administrative_notes: "Paciente da Clínica B — isolamento.",
+      status: "active",
+      created_by: OWNER_B_ID,
+    }),
+  ];
+
+  return { patients };
+}
+
+export function getPatientsStore() {
+  if (!globalThis.__sorriaPatientsStore) {
+    globalThis.__sorriaPatientsStore = seed();
+  }
+  return globalThis.__sorriaPatientsStore;
+}
+
+export function resetPatientsStore() {
+  globalThis.__sorriaPatientsStore = seed();
+}
+
+export function listAllPatients() {
+  return [...getPatientsStore().patients];
+}
+
+export function getPatientRecord(id: string) {
+  return getPatientsStore().patients.find((p) => p.id === id) ?? null;
+}
+
+export function upsertPatientRecord(patient: Patient) {
+  const store = getPatientsStore();
+  const index = store.patients.findIndex((p) => p.id === patient.id);
+  if (index >= 0) store.patients[index] = patient;
+  else store.patients.unshift(patient);
+  return patient;
+}
+
+export function buildNormalizedPatient(
+  input: Partial<Patient> &
+    Pick<Patient, "clinic_id" | "full_name" | "status" | "created_by">,
+): Patient {
+  const now = new Date().toISOString();
+  return {
+    id: input.id ?? crypto.randomUUID(),
+    clinic_id: input.clinic_id,
+    full_name: input.full_name.trim(),
+    preferred_name: input.preferred_name?.trim() || null,
+    cpf: input.cpf?.trim() || null,
+    cpf_normalized: normalizeCpf(input.cpf),
+    birth_date: input.birth_date || null,
+    phone: input.phone?.trim() || null,
+    phone_normalized: normalizePhone(input.phone),
+    secondary_phone: input.secondary_phone?.trim() || null,
+    secondary_phone_normalized: normalizePhone(input.secondary_phone),
+    email: input.email?.trim() || null,
+    email_normalized: normalizeEmail(input.email),
+    postal_code: input.postal_code?.trim() || null,
+    street: input.street?.trim() || null,
+    number: input.number?.trim() || null,
+    complement: input.complement?.trim() || null,
+    neighborhood: input.neighborhood?.trim() || null,
+    city: input.city?.trim() || null,
+    state: input.state?.trim().toUpperCase() || null,
+    guardian_name: input.guardian_name?.trim() || null,
+    guardian_phone: input.guardian_phone?.trim() || null,
+    guardian_relationship: input.guardian_relationship?.trim() || null,
+    emergency_contact_name: input.emergency_contact_name?.trim() || null,
+    emergency_contact_phone: input.emergency_contact_phone?.trim() || null,
+    emergency_contact_relationship:
+      input.emergency_contact_relationship?.trim() || null,
+    referral_source: input.referral_source?.trim() || null,
+    administrative_notes: input.administrative_notes?.trim() || null,
+    status: input.status,
+    created_by: input.created_by,
+    created_at: input.created_at ?? now,
+    updated_at: now,
+    archived_at:
+      input.status === "archived" ? (input.archived_at ?? now) : null,
+  };
+}
+
+export function writePatientAudit(
+  clinicId: string,
+  actorUserId: string,
+  action: string,
+  patientId: string,
+  metadata: Record<string, unknown> = {},
+) {
+  appendAudit({
+    clinic_id: clinicId,
+    actor_user_id: actorUserId,
+    action,
+    target_type: "patient",
+    target_id: patientId,
+    metadata,
+  });
+}
+
+export type { PatientStatus };
