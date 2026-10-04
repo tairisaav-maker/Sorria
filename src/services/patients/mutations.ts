@@ -1,5 +1,6 @@
 import { assertPermission } from "@/lib/authz/guards";
 import type { AuthzContext } from "@/lib/authz/can";
+import { assertClinicCanMutate } from "@/lib/entitlements";
 import {
   buildNormalizedPatient,
   getPatientRecord,
@@ -42,6 +43,7 @@ export function createPatient(
   raw: PatientFormValues & { clinic_id?: string; created_by?: string },
 ): CreatePatientResult {
   assertPermission(ctx, "patients.demographics.create");
+  assertClinicCanMutate(ctx);
   denyClinicIdTamper(ctx, raw.clinic_id);
 
   const parsed = createPatientSchema.safeParse(raw);

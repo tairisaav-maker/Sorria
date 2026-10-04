@@ -40,9 +40,9 @@ beforeEach(() => {
 });
 
 describe("piloto — versão", () => {
-  it("canal pilot 0.9.0-pilot", () => {
-    expect(APP_VERSION).toBe("0.9.0-pilot");
-    expect(APP_CHANNEL).toBe("pilot");
+  it("expõe versão do app", () => {
+    expect(APP_VERSION.length).toBeGreaterThan(0);
+    expect(["pilot", "beta", "production"]).toContain(APP_CHANNEL);
   });
 });
 

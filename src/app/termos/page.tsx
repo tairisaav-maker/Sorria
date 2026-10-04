@@ -13,9 +13,11 @@ export default function TermosPage() {
       <h1 className="mt-8 font-[family-name:var(--font-display)] text-3xl text-[var(--brand-ink)]">
         Termos de Uso
       </h1>
+      <p className="mt-4 rounded-xl border border-[var(--warning)]/40 bg-[var(--warning-soft,rgba(180,120,40,0.12))] px-3 py-2 text-sm font-medium text-[var(--brand-ink)]">
+        REVISÃO JURÍDICA NECESSÁRIA — texto não é termo final.
+      </p>
       <p className="mt-4 text-sm text-[var(--text-muted)]">
-        Este é um placeholder. O texto jurídico final deve ser revisado antes da
-        operação comercial do Sorria. Não constitui aconselhamento legal.
+        Placeholder estrutural. Não constitui aconselhamento legal.
       </p>
       <p className="mt-4 text-sm text-[var(--text-muted)]">
         Ao usar o Sorria, a clínica permanece responsável pelos dados de seus

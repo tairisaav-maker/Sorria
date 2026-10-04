@@ -93,28 +93,57 @@ export async function POST(request: Request) {
     return response;
   }
 
-  // Professional demo
-  if (body.email !== demoEmail || body.password !== demoPassword) {
-    return NextResponse.json(
-      { error: "Credenciais demo inválidas." },
-      { status: 401 },
-    );
+  // Professional demo seed
+  if (body.email === demoEmail && body.password === demoPassword) {
+    setDemoSession(OWNER_A_ID, CLINIC_A_ID, { kind: "professional" });
+    const response = NextResponse.json({
+      ok: true,
+      kind: "professional",
+      redirect: "/app/home",
+    });
+    response.cookies.set(DEMO_COOKIE, "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return response;
   }
 
-  setDemoSession(OWNER_A_ID, CLINIC_A_ID, { kind: "professional" });
-  const response = NextResponse.json({
-    ok: true,
-    kind: "professional",
-    redirect: "/app/home",
-  });
-  response.cookies.set(DEMO_COOKIE, "1", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-  return response;
+  // Contas SaaS criadas via /cadastro
+  const { createHash } = await import("crypto");
+  const { getBillingStore } = await import("@/lib/demo/billing-store");
+  const { listMembershipClinics } = await import("@/services/saas");
+  const hash = createHash("sha256")
+    .update(`sorria:${body.password ?? ""}`)
+    .digest("hex");
+  const account = getBillingStore().accounts.find(
+    (a) => a.email === email && a.password_hash === hash,
+  );
+  if (account) {
+    const clinics = listMembershipClinics(account.user_id);
+    const clinicId = clinics[0]?.clinic_id ?? "";
+    setDemoSession(account.user_id, clinicId, { kind: "professional" });
+    const response = NextResponse.json({
+      ok: true,
+      kind: "professional",
+      redirect: clinicId ? "/app/home" : "/cadastro/clinica",
+    });
+    response.cookies.set(DEMO_COOKIE, `pro:${account.user_id}:${clinicId}`, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return response;
+  }
+
+  return NextResponse.json(
+    { error: "Credenciais inválidas." },
+    { status: 401 },
+  );
 }
 
 export async function DELETE() {

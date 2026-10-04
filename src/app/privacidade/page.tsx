@@ -13,11 +13,13 @@ export default function PrivacidadePage() {
       <h1 className="mt-8 font-[family-name:var(--font-display)] text-3xl text-[var(--brand-ink)]">
         Política de Privacidade
       </h1>
+      <p className="mt-4 rounded-xl border border-[var(--warning)]/40 bg-[var(--warning-soft,rgba(180,120,40,0.12))] px-3 py-2 text-sm font-medium text-[var(--brand-ink)]">
+        REVISÃO JURÍDICA NECESSÁRIA — texto não é política final.
+      </p>
       <p className="mt-4 text-sm text-[var(--text-muted)]">
-        Placeholder — conteúdo jurídico a ser revisado antes da comercialização.
-        Controles técnicos (acesso, auditoria, isolamento por clínica) estão
-        documentados em SECURITY.md; isso não equivale a declaração automática
-        de conformidade total com a LGPD.
+        Placeholder estrutural. Controles técnicos (acesso, auditoria, isolamento
+        por clínica) estão em SECURITY.md; isso não declara conformidade LGPD
+        completa.
       </p>
       <Link href="/login" className="mt-8 inline-block text-sm text-[var(--brand-primary)]">
         Voltar

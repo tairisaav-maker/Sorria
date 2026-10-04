@@ -19,6 +19,7 @@ export function isPortalDemoCookie(value: string | undefined | null) {
  * Hidrata sessão demo a partir do cookie (processos / HMR seguros).
  * Cookie formats:
  * - `1` → profissional OWNER_A
+ * - `pro:<userId>:<clinicId>` → profissional SaaS / multi-clínica
  * - `portal:<authUserId>` → Portal (primeiro acesso ativo)
  * - `portal:<authUserId>:<clinicId>:<patientId>` → Portal com sujeito explícito
  */
@@ -27,9 +28,19 @@ export function hydrateDemoSessionFromCookie(
 ) {
   if (!cookieValue) return null;
 
-  if (cookieValue === "1" || cookieValue.startsWith("pro:")) {
+  if (cookieValue === "1") {
     setDemoSession(OWNER_A_ID, CLINIC_A_ID, { kind: "professional" });
     return { kind: "professional" as const };
+  }
+
+  if (cookieValue.startsWith("pro:")) {
+    const parts = cookieValue.slice("pro:".length).split(":");
+    const userId = parts[0];
+    const clinicId = parts[1] ?? "";
+    if (userId) {
+      setDemoSession(userId, clinicId, { kind: "professional" });
+      return { kind: "professional" as const, userId, clinicId };
+    }
   }
 
   if (cookieValue.startsWith("portal:")) {

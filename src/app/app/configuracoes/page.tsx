@@ -3,6 +3,8 @@ import Link from "next/link";
 import {
   Building2,
   CalendarRange,
+  CreditCard,
+  HelpCircle,
   KeyRound,
   Shield,
   UserRound,
@@ -70,6 +72,20 @@ export default async function ConfiguracoesPage() {
           icon: KeyRound,
         }
       : null,
+    canClinic
+      ? {
+          href: "/app/configuracoes/assinatura",
+          title: "Assinatura",
+          description: "Plano, trial, limites e cobrança SaaS",
+          icon: CreditCard,
+        }
+      : null,
+    {
+      href: "/app/ajuda",
+      title: "Ajuda",
+      description: "Primeiros passos e dúvidas do piloto",
+      icon: HelpCircle,
+    },
   ].filter(Boolean) as Array<{
     href: string;
     title: string;

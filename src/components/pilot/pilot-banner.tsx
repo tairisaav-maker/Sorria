@@ -2,7 +2,8 @@ import { APP_CHANNEL, APP_VERSION } from "@/lib/version";
 import { isPilotMode, pilotEnvWarnings } from "@/lib/pilot/env";
 
 export function PilotBanner() {
-  if (!isPilotMode() && APP_CHANNEL !== "pilot") return null;
+  if (!isPilotMode() && APP_CHANNEL !== "pilot" && APP_CHANNEL !== "beta")
+    return null;
   const warnings = pilotEnvWarnings();
   return (
     <div

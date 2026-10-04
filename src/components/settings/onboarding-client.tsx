@@ -419,9 +419,10 @@ export function OnboardingClient() {
       {step === "next" ? (
         <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/90 p-5">
           <p className="text-sm text-[var(--text-muted)]">
-            Para o piloto, comece com 5–10 procedimentos frequentes (ex.:
-            Profilaxia, Restauração, Clareamento) e os materiais deles. Não é
-            preciso cadastrar tudo de uma vez.
+            Comece com 5–10 procedimentos frequentes e os materiais. Ao montar a
+            ficha, o Sorria mostra o{" "}
+            <strong>custo estimado do procedimento</strong> — esse é o primeiro
+            momento de valor. Não é preciso cadastrar tudo de uma vez.
           </p>
           <ol className="space-y-2 text-sm">
             <li>

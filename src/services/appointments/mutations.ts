@@ -1,5 +1,6 @@
 import { assertPermission } from "@/lib/authz/guards";
 import type { AuthzContext } from "@/lib/authz/can";
+import { assertClinicCanMutate } from "@/lib/entitlements";
 import {
   getMembership,
   listClinicMembers,
@@ -83,6 +84,7 @@ export function createAppointment(
   raw: CreateAppointmentValues & { clinic_id?: string },
 ) {
   assertPermission(ctx, "appointments.create");
+  assertClinicCanMutate(ctx);
   if (raw.clinic_id && raw.clinic_id !== ctx.clinicId) {
     throw new Error("AUTHORIZATION_DENIED");
   }

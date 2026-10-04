@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.10.0-beta — 2026-10-04
+
+### Added
+- **Subfase 11:** comercialização SaaS — signup, clínica, planos, entitlements, assinaturas
+- Migration `subscription_plans` / `plan_entitlements` / `clinic_subscriptions` / `billing_events` / `clinic_invitations`
+- `BillingProvider` abstrato + demo provider (webhook idempotente)
+- `hasEntitlement` / `checkPlanLimit` / modo restrito sem apagar dados
+- Landing, `/cadastro`, `/planos`, `/app/configuracoes/assinatura`, `/app/ajuda`, `/internal`
+- Clinic switcher · convites com token hasheado
+- [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md) · [PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)
+
+### Notes
+- Preços Starter/Pro são placeholders — revisão de produto necessária
+- Piloto real ainda não preenchido em PILOT_REPORT → comercialização ampla bloqueada
+
 ## 0.9.0-pilot — 2026-10-04
 
 ### Added

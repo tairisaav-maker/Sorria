@@ -1,5 +1,6 @@
-/** Versão do produto Sorria (semver). Piloto: 0.9.x — não é versão comercial final. */
-export const APP_VERSION = "0.9.0-pilot";
+/** Versão do produto Sorria (semver). SaaS beta: 0.10.x — não é lançamento comercial. */
+export const APP_VERSION = "0.10.0-beta";
 export const APP_NAME = "Sorria";
 export const APP_TAGLINE = "Gestão inteligente para consultórios";
-export const APP_CHANNEL = "pilot" as const;
+export type AppChannel = "pilot" | "beta" | "production";
+export const APP_CHANNEL: AppChannel = "beta";

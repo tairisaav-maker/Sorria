@@ -4,7 +4,7 @@
 
 ## Versão
 
-**0.9.0-pilot** — Piloto controlado (validação real do V1)
+**0.10.0-beta** — SaaS (signup, planos, assinaturas) · validação comercial ainda depende do piloto
 
 > Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
 > Segurança ≠ esconder botão · UUID ≠ autorização · Demo ≠ produção · IA ≠ banco  
@@ -53,6 +53,7 @@ npm run build
 
 - [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
 - [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)
+- [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md) · [PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
 - [DATABASE.md](./DATABASE.md)
 - [SECURITY.md](./SECURITY.md)
