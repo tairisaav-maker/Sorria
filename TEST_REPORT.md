@@ -220,78 +220,93 @@ Abrir `http://localhost:3000/login` → entrar como owner.
 
 ### TESTE 1 — Login
 
-- [ ] Abrir `/login`
-- [ ] Entrar com owner (`DEMO_EMAIL` + `DEMO_PASSWORD`)
-- **Esperado:** Home da Clínica Teste Sorria; banner “Ambiente de demonstração”
+- [ ] **AÇÃO:** Abrir `/login` → entrar com `DEMO_EMAIL` + `DEMO_PASSWORD`  
+  **RESULTADO ESPERADO:** Home da **Clínica Teste Sorria**; banner “Ambiente de demonstração”
 
-### TESTE 2 — Procedimentos e ficha
+### TESTE 2 — Pacientes
 
-- [ ] `/app/procedimentos` → abrir **Restauração média**
-- **Esperado:** materiais da ficha (resina 0,35 g per_unit, EPI per_appointment, etc.)
+- [ ] **AÇÃO:** Abrir `/app/pacientes`  
+  **RESULTADO ESPERADO:** Mariana Oliveira, João Souza, Ana Martins, Carlos Ferreira, Fernanda Lima (fictícios)
 
-### TESTE 3 — Estoque e conversão
+### TESTE 3 — Procedimento + ficha
 
-- [ ] `/app/estoque` → Resina A2 e Luva
-- **Esperado:** Resina ~20 g; Luva 200 un; conversão 1 seringa = 4 g; 1 caixa = 100 un
+- [ ] **AÇÃO:** `/app/procedimentos` → **Restauração média**  
+  **RESULTADO ESPERADO:** Resina 0,35 g `per_unit`; ácido 0,20 ml; adesivo 0,10 ml; anestésico 1; agulha 1; microbrush 2; gaze 4; máscara 1 `per_appointment`; luva 2 `per_appointment`
 
-### TESTE 4 — Agenda Mariana
+### TESTE 4 — Estoque + conversão
 
-- [ ] Agenda → consulta Mariana 09:00 → Iniciar atendimento
-- [ ] Ver restauração dente 16 prevista + materiais
-- [ ] Alterar resina 0,35→0,45 e anestésico 1→2 → Confirmar consumo
-- **Esperado:** estoque resina −0,45 g; anestésico −2; uma única movimentação por item
+- [ ] **AÇÃO:** `/app/estoque` → Resina A2 e Luva  
+  **RESULTADO ESPERADO:** Resina ~20 g (1 seringa = 4 g); Luva 200 un (1 caixa = 100 un)
 
-### TESTE 5 — Duplo clique
+### TESTE 5 — Atendimento Mariana (fluxo principal)
 
-- [ ] Confirmar consumo novamente
-- **Esperado:** sem segunda baixa
+- [ ] **AÇÃO:** Agenda → Mariana 09:00 → Iniciar → ver restauração dente 16 + materiais  
+  **RESULTADO ESPERADO:** previsto resina 0,35 g e anestésico 1
+- [ ] **AÇÃO:** Alterar para resina 0,45 g e anestésico 2 → Confirmar consumo  
+  **RESULTADO ESPERADO:** estoque resina −0,45 g; anestésico −2; 1 movimentação por item
+- [ ] **AÇÃO:** Clicar Confirmar consumo de novo  
+  **RESULTADO ESPERADO:** sem segunda baixa
+- [ ] **AÇÃO:** Evolução fictícia → finalizar → cobrar R$ 350 → pagar R$ 200 → concluir  
+  **RESULTADO ESPERADO:** cobrado 350 / recebido 200 / saldo 150; evolução não sobrescreve em silêncio
+- [ ] **AÇÃO:** Pagar +R$ 150  
+  **RESULTADO ESPERADO:** saldo 0; sem cobrança duplicada
 
-### TESTE 6 — Evolução + financeiro Mariana
+### TESTE 6 — João (per_appointment + per_unit)
 
-- [ ] Registrar evolução fictícia e finalizar
-- [ ] Valor cobrado R$ 350 → adicionar financeiro → pagar R$ 200
-- **Esperado:** cobrado 350 / recebido 200 / saldo 150
-- [ ] Pagar +R$ 150 → saldo 0
-- **Esperado:** sem cobrança duplicada
+- [ ] **AÇÃO:** Atendimento João (dentes 26 e 27) → ver previsão  
+  **RESULTADO ESPERADO:** resina 0,70 g; máscara 1; luva 2 (não −2 máscaras / −4 luvas)
+- [ ] **AÇÃO:** Confirmar consumo  
+  **RESULTADO ESPERADO:** máscara −1; luva −2
 
-### TESTE 7 — João (per_appointment / per_unit)
+### TESTE 7 — Material extra e zero
 
-- [ ] Atendimento João (26 e 27)
-- **Esperado previsão:** resina 0,70 g; máscara 1; luva 2 (não 2 máscaras / 4 luvas)
-- [ ] Confirmar consumo
-- **Esperado:** máscara −1; luva −2
+- [ ] **AÇÃO:** + Adicionar material não previsto → confirmar  
+  **RESULTADO ESPERADO:** baixa + custo + histórico
+- [ ] **AÇÃO:** Item previsto com quantidade real 0 → confirmar  
+  **RESULTADO ESPERADO:** sem baixa desse item
 
-### TESTE 8 — Material extra e zero
+### TESTE 8 — Compra e custo médio
 
-- [ ] Em um atendimento: + material não previsto → baixa e custo entram
-- [ ] Item previsto com actual_quantity = 0 → sem baixa
+- [ ] **AÇÃO:** Compra Resina 2 seringas × 4 g, R$ 180  
+  **RESULTADO ESPERADO:** +8 g; custo/g coerente com a média ponderada
+- [ ] **AÇÃO (opcional):** cenário 10 g @ R$ 20 + 10 g @ R$ 30  
+  **RESULTADO ESPERADO:** 20 g @ R$ 25/g
 
-### TESTE 9 — Compra e custo médio
+### TESTE 9 — Previsão / reposição / lista
 
-- [ ] Compra Resina: 2 seringas, 4 g, R$ 180 total → +8 g; custo/g coerente
-- [ ] (Opcional) validar média ponderada 10@20 + 10@30 → 20@25 em cenário controlado
+- [ ] **AÇÃO:** Comparar estoque baixo vs necessidade da Agenda  
+  **RESULTADO ESPERADO:** “Insuficiente”; `current_quantity` **não** muda só por estar na Agenda
+- [ ] **AÇÃO:** Criar lista de compras  
+  **RESULTADO ESPERADO:** lista ≠ aumento de estoque (só compra confirmada altera)
 
-### TESTE 10 — Previsão / reposição
+### TESTE 10 — Relatórios + custo operacional
 
-- [ ] Reduzir mentalmente estoque resina vs Agenda futura
-- **Esperado:** status Insuficiente sem baixar `current_quantity` só pela Agenda
-- [ ] Criar lista de compras → estoque **não** sobe até compra confirmada
+- [ ] **AÇÃO:** Relatórios após os atendimentos  
+  **RESULTADO ESPERADO:** quantidade, custo médio, cobrado, previsto×utilizado (dados reais, não mock)
+- [ ] **AÇÃO:** `/app/financeiro/custos`  
+  **RESULTADO ESPERADO:** ~R$ 12.000 / 120 h → R$ 100/h; 45 min → R$ 75
 
-### TESTE 11 — Relatórios e custo operacional
+### TESTE 11 — Null × zero e gratuito
 
-- [ ] Relatórios após os atendimentos: procedimentos / materiais / paciente
-- [ ] Custos: despesas ~R$ 12.000 e 120 h → custo/hora R$ 100; 45 min → R$ 75
+- [ ] **AÇÃO:** procedimento sem valor informado (`null`)  
+  **RESULTADO ESPERADO:** “Valor ainda não definido”
+- [ ] **AÇÃO:** `charged_amount = 0`  
+  **RESULTADO ESPERADO:** “Sem cobrança”; custo permanece; sem fatura
 
 ### TESTE 12 — Segurança
 
-- [ ] Login secretária → sem evolução clínica
-- [ ] Login dentista → sem área financeira/admin completa
-- [ ] Login Clinic B → não vê pacientes/estoque da Clinic A
+- [ ] **AÇÃO:** Login secretária  
+  **RESULTADO ESPERADO:** sem evolução clínica
+- [ ] **AÇÃO:** Login dentista  
+  **RESULTADO ESPERADO:** sem financeiro/admin completo
+- [ ] **AÇÃO:** Login Clinic B (`paula@odontovida.app`)  
+  **RESULTADO ESPERADO:** nunca vê dados da Clínica Teste Sorria
 
-### TESTE 13 — Null × zero
+### TESTE 13 — Mobile / tablet / desktop
 
-- [ ] charged_amount vazio = “não definido”
-- [ ] charged_amount 0 = sem cobrança (custo permanece)
+- [ ] **Mobile:** Agenda → Atendimento → Consumo → Evolução → Financeiro usáveis  
+- [ ] **Tablet:** fluxo Mariana completo  
+- [ ] **Desktop:** Estoque, Compras, Relatórios, Configurações
 
 ---
 
