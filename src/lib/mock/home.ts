@@ -1,7 +1,7 @@
 import type { Clinic, Profile } from "@/types";
 
 export const demoClinic: Clinic = {
-  id: "11111111-1111-1111-1111-111111111111",
+  id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "Clínica Demo Sorria",
   slug: "clinica-demo-sorria",
   timezone: "America/Sao_Paulo",
@@ -16,7 +16,7 @@ export const demoClinic: Clinic = {
 };
 
 export const demoProfile: Profile = {
-  id: "22222222-2222-2222-2222-222222222222",
+  id: "a1000000-0000-0000-0000-000000000001",
   full_name: "Dra. Ana Ribeiro",
   email: "demo@sorria.app",
   phone: "(11) 98888-0000",

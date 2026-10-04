@@ -13,6 +13,7 @@ export async function updateSession(request: NextRequest) {
   const isAppRoute = path.startsWith("/app");
   const isLoginRoute = path === "/login";
   const isAuthCallback = path.startsWith("/auth");
+  const isForbiddenRoute = path === "/forbidden";
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -47,7 +48,7 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthenticated = hasSupabaseUser || (isDemoMode && hasDemoSession);
 
-  if (isAppRoute && !isAuthenticated) {
+  if ((isAppRoute || isForbiddenRoute) && !isAuthenticated) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", path);

@@ -2,18 +2,10 @@ import { describe, expect, it } from "vitest";
 import { professionalNav } from "@/lib/navigation";
 
 describe("professionalNav", () => {
-  it("habilita apenas Início na Fase 0", () => {
-    const enabled = professionalNav.filter((item) => item.enabled);
-    expect(enabled).toHaveLength(1);
-    expect(enabled[0]?.href).toBe("/app/home");
-  });
-
-  it("mantém itens futuros presentes porém desabilitados", () => {
-    expect(professionalNav.some((item) => item.href === "/app/agenda")).toBe(
-      true,
-    );
-    expect(
-      professionalNav.find((item) => item.href === "/app/agenda")?.enabled,
-    ).toBe(false);
+  it("habilita Início e Mais na Fase 1", () => {
+    const enabled = professionalNav.filter((item) => item.enabled).map((i) => i.href);
+    expect(enabled).toContain("/app/home");
+    expect(enabled).toContain("/app/mais");
+    expect(enabled).not.toContain("/app/agenda");
   });
 });

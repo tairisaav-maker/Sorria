@@ -1,13 +1,21 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { demoClinic, demoProfile } from "@/lib/mock/home";
+import {
+  getClinic,
+  getDemoSession,
+  getProfile,
+} from "@/lib/demo/authz-store";
 
 export default function ProfessionalAppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userName = demoProfile.full_name ?? "Profissional";
-  const clinicName = demoClinic.name;
+  const session = getDemoSession();
+  const profile = getProfile(session.userId);
+  const clinic = getClinic(session.clinicId);
+
+  const userName = profile?.full_name ?? "Profissional";
+  const clinicName = clinic?.name ?? "Clínica";
 
   return (
     <div className="app-canvas min-h-dvh">

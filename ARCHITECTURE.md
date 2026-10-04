@@ -2,54 +2,62 @@
 
 ## Visão
 
-Sorria é um produto SaaS de gestão odontológica. A marca é independente; cada clínica é um tenant configurável (`clinic_id`).
+Sorria é SaaS multi-clínica. A marca é independente; cada clínica é tenant (`clinic_id`).
 
-## Perfis previstos
-
-1. **Dentista / Proprietária** — acesso completo à clínica
-2. **Secretária humana** — preparado na arquitetura; permissões restritas a dados administrativos
-3. **Paciente** — portal futuro; acesso apenas aos próprios dados
-
-## Princípios técnicos
-
-- Multi-clínica desde o dia 1 (`clinic_id` em entidades da clínica)
-- RLS no PostgreSQL/Supabase como controle primário de acesso
-- Mobile-first com shell profissional (sidebar + bottom navigation)
-- IA futura nunca executa ação crítica sem confirmação
-- Dados clínicos tratados com restrições próprias (fases posteriores)
-
-## Estrutura de pastas (Fase 0)
+## Identidade e autorização (Fase 1)
 
 ```text
-src/
-  app/                 # rotas App Router
-    login/             # autenticação
-    auth/              # callback Supabase + demo session
-    app/               # área autenticada do profissional
-  components/
-    auth/              # formulários de autenticação
-    brand/             # identidade Sorria
-    home/              # widgets da Home (mock)
-    layout/            # shell, sidebar, bottom nav
-    ui/                # design system básico
-  lib/
-    mock/              # dados fictícios temporários
-    supabase/          # clients browser/server/middleware
-    validations/       # schemas Zod
-  types/               # tipos de domínio
-supabase/migrations/   # SQL versionado
+Auth
+  ↓
+Profile
+  ↓
+Clinic Membership (status)
+  ↓
+Role
+  ↓
+Permissions
+  ↓
+Resource/Tenant Check
+  ↓
+RLS
+  ↓
+Data
 ```
 
-## Autenticação
+### Camadas
 
-- Produção: Supabase Auth (e-mail/senha)
-- Desenvolvimento sem projeto: `NEXT_PUBLIC_DEMO_MODE` + cookie `sorria_demo_session`
-- Middleware protege `/app/*` e redireciona `/` → login ou home
+1. **UI** — `can()` esconde ações
+2. **Server/API** — `requirePermission` / `assertPermission`
+3. **PostgreSQL RLS** — impede cross-clinic e escalonamento
 
-## Camadas futuras (não implementadas na Fase 0)
+### Domínios de paciente
 
-- Agenda / solicitações de horário
-- Pacientes e prontuário
-- Financeiro e exportações
-- Secretária Virtual
-- Portal do Paciente
+- **Administrativo:** demographics, contact, administrative
+- **Clínico:** clinical_record, anamnesis, clinical_evolution, odontogram, clinical_files
+
+Acesso a um domínio **não** implica o outro.
+
+## Estrutura relevante
+
+```text
+src/lib/permissions/   # keys, labels, matriz
+src/lib/authz/         # can, guards, team-service
+src/lib/demo/          # store demo Clinic A/B + papéis
+src/app/app/configuracoes/equipe
+src/app/app/configuracoes/permissoes
+src/app/forbidden
+supabase/migrations/
+```
+
+## Perfis
+
+| Role | Escopo |
+| --- | --- |
+| owner | Admin da própria clínica |
+| dentist | Profissional + clínico |
+| secretary | Administrativo (sem clínico) |
+| patient | Reservado (portal futuro) |
+
+## Fora desta fase
+
+Agenda funcional, lista de pacientes, prontuário, financeiro, portal, IA.

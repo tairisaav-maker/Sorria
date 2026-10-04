@@ -4,39 +4,41 @@
 
 ### FASE 0 — Fundação
 
-- Scaffold Next.js + TypeScript + Tailwind
-- Supabase clients + auth callback
-- Schema/RLS: clinics, profiles, clinic_members
-- Login com identidade Sorria
-- Shell (sidebar + bottom nav)
-- Home mockada
+- Next.js + TypeScript + Tailwind
+- Supabase clients + auth
+- Schema inicial clinics/profiles/clinic_members
+- Login + shell + Home mock
 - Docs iniciais
+
+### FASE 1 — Usuários, equipe, papéis, permissões e segurança
+
+- Roles / permissions / role_permissions
+- Membership com status
+- `can()` + guards
+- RLS helpers (`has_permission`, etc.)
+- Audit logs
+- UI Equipe + Permissões
+- Separação administrativo × clínico no modelo
+- Testes de autorização (incl. cross-clinic e secretary sem clínico)
 
 ## Próximo
 
-### FASE 1 — Agenda e solicitações
+### FASE 2 — (aguardando definição)
 
-- CRUD de consultas
-- Status de consulta
-- Solicitações de horário (paciente → proposta → confirmação)
-- Regra: solicitação nunca vira consulta automática
+Provável: agenda e solicitações de horário, ou pacientes administrativos — conforme nova instrução.
 
-## Depois (ordem prevista)
+## Depois
 
-1. Pacientes + cadastro administrativo
-2. Prontuário / anamnese / evoluções
-3. Odontograma
-4. Plano de tratamento
-5. Financeiro + parcelas
-6. Relatórios e exportações
-7. Secretária Virtual (com confirmação humana)
-8. Portal do Paciente
-9. Multi-usuário avançado / permissões finas
+1. Agenda / solicitações
+2. Pacientes (cadastro administrativo)
+3. Prontuário / anamnese / evoluções
+4. Odontograma
+5. Plano de tratamento
+6. Financeiro
+7. Relatórios / exportações
+8. Secretária Virtual
+9. Portal do Paciente
 
-## Fora da V1 (não implementar sem autorização)
+## Fora da V1
 
-- Teleconsulta
-- Integrações de laboratório
-- Marketplace
-- App nativo
-- Diagnóstico/prescrição por IA
+- Teleconsulta, marketplace, app nativo, diagnóstico/prescrição por IA

@@ -1,4 +1,14 @@
-export type { Clinic, ClinicMember, ClinicRole, Database, Profile } from "./database";
+export type {
+  AuditLog,
+  Clinic,
+  ClinicMember,
+  ClinicRole,
+  Database,
+  Permission,
+  Profile,
+  Role,
+  RolePermission,
+} from "./database";
 
 export type NavItem = {
   href: string;
