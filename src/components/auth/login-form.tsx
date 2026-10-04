@@ -139,8 +139,8 @@ export function LoginForm() {
 
       {isDemoMode() ? (
         <p className="text-center text-xs text-[var(--text-subtle)]">
-          Modo demo ativo — use as credenciais pré-preenchidas para explorar a
-          interface.
+          Demo: demo@sorria.app (clínica) ou paciente@sorria.app (Portal) —
+          senha sorria-demo.
         </p>
       ) : null}
     </form>
