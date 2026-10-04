@@ -139,10 +139,25 @@ export function LoginForm() {
       </Button>
 
       {isDemoMode() ? (
-        <p className="text-center text-xs text-[var(--text-subtle)]">
-          Demo: demo@sorria.app (clínica) ou paciente@sorria.app (Portal) —
-          senha sorria-demo.
-        </p>
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            loading={isSubmitting}
+            onClick={() => {
+              setValue("email", "paciente@sorria.app");
+              setValue("password", "sorria-demo");
+              void handleSubmit(onSubmit)();
+            }}
+          >
+            Entrar no Portal (paciente demo)
+          </Button>
+          <p className="text-center text-xs text-[var(--text-subtle)]">
+            Demo: demo@sorria.app (clínica) ou paciente@sorria.app (Portal) —
+            senha sorria-demo.
+          </p>
+        </div>
       ) : null}
     </form>
   );
