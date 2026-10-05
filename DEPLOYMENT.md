@@ -1,15 +1,26 @@
 # DEPLOYMENT.md
 
+Guia passo a passo de publicação: **[PRODUCTION_SETUP.md](./PRODUCTION_SETUP.md)**  
+Domínio: **[DOMAIN_SETUP.md](./DOMAIN_SETUP.md)** · PWA: **[PWA_SETUP.md](./PWA_SETUP.md)**
+
 ## Ambientes
 
 | Env | Uso |
 | --- | --- |
-| development | Demo mode / stores locais |
-| pilot / staging | Clínica piloto — **DEMO_MODE=false**, DB separado |
-| production | Clínicas reais — **sem seed demo** (futuro) |
+| development | Demo mode / stores locais · `NEXT_PUBLIC_APP_URL=http://localhost:3000` |
+| staging | Preview / staging — **DEMO_MODE=false**, DB Supabase separado |
+| production | Clínicas reais — **DEMO_MODE=false**, `https://app.sorria.com.br` |
 
 Cada ambiente: DB, Auth, Storage, secrets e URLs próprios.  
-Piloto: ver [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md).
+Piloto legado: ver [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md).
+
+## Alvo de produção
+
+```text
+https://app.sorria.com.br
+```
+
+Fonte única da URL: `NEXT_PUBLIC_APP_URL` (`src/lib/app-url.ts`).
 
 ## Pipeline
 

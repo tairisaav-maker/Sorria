@@ -10,6 +10,7 @@ import {
   UserRound,
   Users,
 } from "lucide-react";
+import { InstallSorriaCard } from "@/components/pwa/pwa-provider";
 import { can } from "@/lib/authz/can";
 import { requireClinic } from "@/lib/authz/guards";
 import { APP_VERSION } from "@/lib/version";
@@ -121,6 +122,7 @@ export default async function ConfiguracoesPage() {
           </li>
         ))}
       </ul>
+      <InstallSorriaCard />
       <p className="text-xs text-[var(--text-subtle)]">Sorria {APP_VERSION}</p>
     </div>
   );

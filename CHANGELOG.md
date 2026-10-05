@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.14.0-beta — 2026-10-05
+
+### Added
+- **Publicação online** — preparo para Vercel + domínio `app.sorria.com.br`
+- Fonte única de URL: `NEXT_PUBLIC_APP_URL` (`src/lib/app-url.ts`)
+- **PWA instalável**: manifest, ícones 192/512/maskable, apple-touch, service worker
+- Tela offline amigável (`/offline`) — sem cache de dados clínicos
+- Card **Instalar Sorria** em Configurações (Chrome/Edge nativo; iOS com dica Safari)
+- `vercel.json`, headers CSP/HSTS/SW, `global-error`
+- Docs: [PRODUCTION_SETUP.md](./PRODUCTION_SETUP.md) · [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) · [PWA_SETUP.md](./PWA_SETUP.md)
+
+### Security
+- Auth callback com proteção de open redirect
+- Service role continua server-only (nunca `NEXT_PUBLIC_`)
+- SW não cacheia pacientes / financeiro / atendimento / APIs
+
+### Notes
+- Deploy real (GitHub → Vercel → Supabase → DNS) é configuração externa
+- Não é App Store / Google Play nesta etapa
+
 ## 0.13.0-beta — 2026-10-05
 
 ### Added

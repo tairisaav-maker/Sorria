@@ -4,10 +4,10 @@
 
 ## Versão
 
-**0.13.0-beta** — Dashboard premium + simulador rápido de procedimento
+**0.14.0-beta** — Pronto para publicação online + PWA instalável
 
-> Abra, simule Restauração média a R$ 280/300/350 e veja margem na hora.  
-> [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) · [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md)
+> App em `https://app.sorria.com.br` (após configurar GitHub → Vercel → Supabase → DNS).  
+> [PRODUCTION_SETUP.md](./PRODUCTION_SETUP.md) · [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) · [PWA_SETUP.md](./PWA_SETUP.md)
 
 ## Como rodar
 
@@ -56,8 +56,30 @@ npm test
 npm run build
 ```
 
+## Deploy do Sorria
+
+```text
+GitHub → Vercel → Supabase → Domínio (app.sorria.com.br)
+```
+
+Guia completo (passo a passo, inclusive para quem não programa):
+
+1. [PRODUCTION_SETUP.md](./PRODUCTION_SETUP.md) — Supabase produção, env vars, Vercel, checklist
+2. [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) — DNS `sorria.com.br` / `app.sorria.com.br`
+3. [PWA_SETUP.md](./PWA_SETUP.md) — instalar no celular / tablet / PC
+
+Variáveis: veja `.env.example`.  
+`SUPABASE_SERVICE_ROLE_KEY` **nunca** com prefixo `NEXT_PUBLIC_`.
+
+Antes de publicar:
+
+```bash
+npm run typecheck && npm run lint && npm test && npm run build
+```
+
 ## Docs
 
+- [PRODUCTION_SETUP.md](./PRODUCTION_SETUP.md) · [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) · [PWA_SETUP.md](./PWA_SETUP.md)
 - [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) — biblioteca inteligente de procedimentos e materiais
 - [V1_PRODUCT_FLOW.md](./V1_PRODUCT_FLOW.md) — fluxo integrado do V1
 - [PILOT_RUNBOOK.md](./PILOT_RUNBOOK.md) · [PILOT_CHECKLIST.md](./PILOT_CHECKLIST.md) · [PILOT_REPORT.md](./PILOT_REPORT.md)

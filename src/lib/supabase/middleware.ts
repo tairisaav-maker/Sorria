@@ -27,7 +27,16 @@ export async function updateSession(request: NextRequest) {
     path === "/planos" ||
     path === "/privacidade" ||
     path === "/termos" ||
-    path.startsWith("/convite");
+    path.startsWith("/convite") ||
+    path === "/offline" ||
+    path === "/como-funciona" ||
+    path === "/conhecer" ||
+    path.startsWith("/auth/callback");
+  const isPwaAsset =
+    path === "/sw.js" ||
+    path === "/manifest.webmanifest" ||
+    path.startsWith("/icons/");
+  const isHealth = path === "/api/health";
   const isInternalRoute = path.startsWith("/internal");
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -86,8 +95,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Landing pública; autenticados podem ir ao app pelo CTA
-  if (isPublicMarketing) {
+  // Landing pública, PWA assets e health — autenticados podem ir ao app pelo CTA
+  if (isPublicMarketing || isPwaAsset || isHealth) {
     return supabaseResponse;
   }
 

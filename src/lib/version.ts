@@ -1,5 +1,5 @@
-/** Versão do produto Sorria (semver). Dashboard premium + simulador: 0.13.x. */
-export const APP_VERSION = "0.13.0-beta";
+/** Versão do produto Sorria (semver). Publicação online + PWA: 0.14.x. */
+export const APP_VERSION = "0.14.0-beta";
 export const APP_NAME = "Sorria";
 export const APP_TAGLINE = "Gestão inteligente para consultórios";
 export type AppChannel = "pilot" | "beta" | "production";
