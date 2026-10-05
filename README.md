@@ -4,10 +4,9 @@
 
 ## Versão
 
-**0.12.0-beta** — Biblioteca inteligente de procedimentos e materiais
+**0.13.0-beta** — Dashboard premium + simulador rápido de procedimento
 
-> Escolha da biblioteca → revise a ficha → salve na clínica.  
-> Agenda → Atendimento → Procedimento → Consumo → Estoque → Evolução → Custo → Financeiro  
+> Abra, simule Restauração média a R$ 280/300/350 e veja margem na hora.  
 > [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md) · [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md)
 
 ## Como rodar

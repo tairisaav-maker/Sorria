@@ -12,6 +12,10 @@ export default async function ProcedimentosPage() {
   return (
     <ProceduresClient
       canCreate={can(actor.ctx, "procedures.create").allowed}
+      canSimulate={
+        can(actor.ctx, "procedure_pricing.simulate").allowed ||
+        can(actor.ctx, "procedure_pricing.view").allowed
+      }
     />
   );
 }

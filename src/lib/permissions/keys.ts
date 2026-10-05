@@ -104,6 +104,7 @@ export const PERMISSIONS = [
   "cost_reports.view",
 
   "procedure_pricing.view",
+  "procedure_pricing.simulate",
   "procedure_pricing.manage",
   "procedures.update_price",
   "reports.pricing_view",
@@ -230,6 +231,7 @@ export const ROLE_PERMISSION_MATRIX: Record<
     "procedure_operational_costs.view",
     "cost_reports.view",
     "procedure_pricing.view",
+    "procedure_pricing.simulate",
     "reports.pricing_view",
   ],
   secretary: [

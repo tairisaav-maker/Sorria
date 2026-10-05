@@ -15,6 +15,10 @@ import {
   simulatePriceByMargin,
   updateProcedureDefaultPrice,
 } from "@/services/procedure-pricing";
+import {
+  getQuickSimulationContext,
+  listSimulationProcedures,
+} from "@/services/procedure-simulation";
 import { getPricingProcedureDetail, getPricingReport } from "@/services/reports/pricing";
 import type { ReportPeriodPreset } from "@/types/reports";
 
@@ -51,6 +55,19 @@ export async function GET(request: Request) {
     if (resource === "summary") {
       const procedureId = url.searchParams.get("procedureId") ?? "";
       return NextResponse.json(getProcedurePricingSummary(auth, procedureId));
+    }
+    if (resource === "simulate_list") {
+      return NextResponse.json({
+        items: listSimulationProcedures(auth),
+      });
+    }
+    if (resource === "quick_simulate") {
+      return NextResponse.json(
+        getQuickSimulationContext(auth, {
+          procedureId: url.searchParams.get("procedureId"),
+          performedProcedureId: url.searchParams.get("performedId"),
+        }),
+      );
     }
     if (resource === "performed") {
       const id = url.searchParams.get("id") ?? "";

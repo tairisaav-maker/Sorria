@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.13.0-beta — 2026-10-05
+
+### Added
+- **Dashboard premium** — home leve, hierarquia clara, menos cara de ERP
+- KPIs do dia: atendimentos, recebido, a receber, estoque em atenção
+- Agenda de hoje em timeline + painel “Precisa da sua atenção” (só dados reais)
+- Procedimentos em destaque + gráfico único de recebimentos (7 dias)
+- **Simulador rápido de procedimento** (modal/bottom sheet) — preço, custo, resultado e margem em tempo real
+- Descontos rápidos, calcular por margem, ponto de equilíbrio, comparação atual×simulação
+- Permissão `procedure_pricing.simulate`
+- Atalhos: Home, Procedimentos, “Simular outro valor” no atendimento
+- Serviço consolidado `getDashboardSummary()`
+
+### Changed
+- Tokens de marca alinhados ao visual premium (primary `#246B73`, fundo `#F7F9FA`)
+
+### Notes
+- Simular e fechar **não** persiste nada; salvar preço exige confirmação explícita
+
 ## 0.12.0-beta — 2026-10-04
 
 ### Added

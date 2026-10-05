@@ -56,6 +56,7 @@ export const ACCESS_GROUPS: AccessGroup[] = [
       { key: "procedure_operational_costs.view", label: "Ver custo operacional do procedimento" },
       { key: "expense_categories.manage", label: "Gerenciar categorias de despesa" },
       { key: "procedure_pricing.view", label: "Ver preços e margens" },
+      { key: "procedure_pricing.simulate", label: "Simular preço e margem" },
       { key: "procedure_pricing.manage", label: "Gerenciar precificação" },
     ],
   },

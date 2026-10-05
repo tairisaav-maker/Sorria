@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { ProcedureLibraryPicker } from "@/components/procedures/procedure-library-picker";
+import { ProcedureSimulationDialog } from "@/components/procedures/procedure-simulation-dialog";
 import { formatBRL } from "@/lib/money";
 import { startFlowTimer, trackClientEvent } from "@/lib/pilot/client";
 import {
@@ -102,6 +103,8 @@ export function AttendanceClient({
   const [qty, setQty] = useState("1");
   const [charge, setCharge] = useState("");
   const [showLibrary, setShowLibrary] = useState(false);
+  const [simOpen, setSimOpen] = useState(false);
+  const [simPerformedId, setSimPerformedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [extraItem, setExtraItem] = useState("");
   const [extraQty, setExtraQty] = useState("1");
@@ -641,6 +644,20 @@ export function AttendanceClient({
             </Button>
           </div>
 
+          {selected.canViewCosts ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                setSimPerformedId(selected.procedure.id);
+                setSimOpen(true);
+              }}
+            >
+              Simular outro valor
+            </Button>
+          ) : null}
+
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-subtle)]">
               2. Materiais
@@ -1118,6 +1135,15 @@ export function AttendanceClient({
           {error}
         </p>
       ) : null}
+
+      <ProcedureSimulationDialog
+        open={simOpen}
+        onClose={() => {
+          setSimOpen(false);
+          setSimPerformedId(null);
+        }}
+        performedProcedureId={simPerformedId}
+      />
     </div>
   );
 }

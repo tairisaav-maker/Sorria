@@ -19,10 +19,11 @@
 11. ✅ Subfase 11 — SaaS (signup, planos, assinaturas) — [SAAS_OPERATIONS.md](./SAAS_OPERATIONS.md)
 12. ✅ Subfase 12 — Beta comercial (landing, lead, demo, ativação) — [COMMERCIAL_BETA.md](./COMMERCIAL_BETA.md)
 13. ✅ Biblioteca inteligente de procedimentos e materiais — [PROCEDURE_LIBRARY.md](./PROCEDURE_LIBRARY.md)
+14. ✅ Dashboard premium + simulador rápido de procedimento
 
 ## Próximo passo
 
-Validação manual da biblioteca com dentistas → só então retomar decisão comercial (preço / billing / clínicas pagantes).
+Validação manual com dentistas (biblioteca + simulador na Home) → só então retomar decisão comercial.
 
 ## Despriorizado no V1 comercial
 

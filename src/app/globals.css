@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --brand-ink: #0b3d3a;
-  --brand-primary: #0f766e;
-  --brand-primary-hover: #0d6a63;
-  --brand-soft: #d9f3ef;
-  --brand-glow: rgba(45, 212, 191, 0.35);
+  --brand-ink: #172126;
+  --brand-primary: #246B73;
+  --brand-primary-hover: #1d575e;
+  --brand-soft: #DCECEF;
+  --brand-glow: rgba(36, 107, 115, 0.22);
 
-  --surface: #eef5f4;
-  --surface-muted: #e3eeec;
-  --surface-elevated: #ffffff;
+  --surface: #F7F9FA;
+  --surface-muted: #eef3f4;
+  --surface-elevated: #FFFFFF;
 
-  --text: #14201f;
-  --text-muted: #4f635f;
-  --text-subtle: #7a8f8a;
+  --text: #172126;
+  --text-muted: #66757D;
+  --text-subtle: #8a989f;
 
-  --border: #cfe0dc;
+  --border: #d9e3e6;
 
-  --success: #0f766e;
-  --success-soft: #d9f3ef;
+  --success: #246B73;
+  --success-soft: #DCECEF;
   --warning: #b45309;
   --warning-soft: #ffedd5;
   --info: #0369a1;
@@ -26,6 +26,9 @@
   --danger: #b91c1c;
   --danger-hover: #991b1b;
   --danger-soft: #fee2e2;
+
+  --shadow-card: 0 1px 2px rgba(23, 33, 38, 0.04), 0 8px 24px rgba(23, 33, 38, 0.04);
+  --radius-card: 14px;
 
   --background: var(--surface);
   --foreground: var(--text);
