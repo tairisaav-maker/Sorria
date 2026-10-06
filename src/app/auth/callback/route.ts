@@ -19,10 +19,14 @@ export async function GET(request: Request) {
     origin && !origin.includes("0.0.0.0") ? origin : getAppUrl();
 
   if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${base}${next}`);
+    try {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error) {
+        return NextResponse.redirect(`${base}${next}`);
+      }
+    } catch {
+      // Sem Supabase real (ex.: demo/local com placeholders) — volta ao login.
     }
   }
 

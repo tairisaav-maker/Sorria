@@ -39,14 +39,17 @@ export async function updateSession(request: NextRequest) {
   const isHealth = path === "/api/health";
   const isInternalRoute = path.startsWith("/internal");
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
+  const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
+  // Placeholders NÃO disparam rede Supabase — demo/local funciona sem projeto real.
   const supabaseConfigured =
-    Boolean(url && anonKey) && !url?.includes("your-project");
+    Boolean(url && anonKey) &&
+    !url.includes("your-project") &&
+    anonKey !== "your-anon-key";
 
   let hasSupabaseUser = false;
 
-  if (supabaseConfigured && url && anonKey) {
+  if (supabaseConfigured) {
     const supabase = createServerClient<Database>(url, anonKey, {
       cookies: {
         getAll() {

@@ -27,10 +27,22 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator)) return;
+
+    // Em development o SW atrapalha HMR/cache — remove registros antigos
+    // e só registra de novo com ?pwa=1. Produção mantém PWA normal.
     if (process.env.NODE_ENV === "development") {
-      // Em dev, SW atrapalha HMR — registra só se query ?pwa=1
-      if (!window.location.search.includes("pwa=1")) return;
+      const wantPwa = window.location.search.includes("pwa=1");
+      if (!wantPwa) {
+        void navigator.serviceWorker
+          .getRegistrations()
+          .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+          .catch(() => {
+            /* silencioso */
+          });
+        return;
+      }
     }
+
     void navigator.serviceWorker.register("/sw.js").catch(() => {
       /* silencioso */
     });
